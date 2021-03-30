@@ -28,8 +28,8 @@
      */
     $ENABLED_HOSTS = [
         '::1',
-        'localhost',
-        '127.0.0.1',
+        'localhost:1199',
+        '127.0.0.1:1199',
     ];
 
     /**
@@ -61,4 +61,4 @@
 
     // ---------------------- Dont Edit It ----------------------
 
-    require_once @$_REQUEST['reloader_root'] . '/src/HotReloaderSSE.php';
+    require_once @$_REQUEST['reloader_root'] . '/hot-reload/HotReloaderSSE.php';

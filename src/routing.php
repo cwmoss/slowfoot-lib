@@ -29,7 +29,7 @@ if (array_key_exists('HTTP_ACCESS_CONTROL_REQUEST_HEADERS', $_SERVER)) {
 
 // /a/9990
 if ($requestpath == '/phrwatcher.php') {
-    include 'phrwatcher.php';
+    include __DIR__ . '/hot-reload/phrwatcher.php';
     exit;
 }
 

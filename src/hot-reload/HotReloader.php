@@ -35,7 +35,7 @@ class HotReloader {
      * @return void
      */
     public function init() {
-        $this->addJSClient();
+        return $this->addJSClient();
     }
 
     /**
