@@ -36,7 +36,7 @@ function xxquery($ds, $filter) {
     $s_fn = build_order_fun('firstname, familyname desc');
 
     if ($s_fn) {
-        dbg('... query sorting..');
+        // dbg('... query sorting..');
         // usort($rs, build_sorter($skey));
         usort($rs, $s_fn);
     }
@@ -106,7 +106,7 @@ function eval_cond($db, $query) {
     };
 
     return array_filter($db, function ($item) use ($query, $evaluator) {
-        dbg('item-compare...', $item['_id'], $item['title']);
+        // dbg('item-compare...', $item['_id'], $item['title']);
         [$ok, $next] = $evaluator($query, $item);
         return $ok;
     });
@@ -114,7 +114,7 @@ function eval_cond($db, $query) {
 
 function xxeval_cond($db, $query) {
     $evaluator = function ($query, $item, $level = 0) use (&$evaluator) {
-        dbg('level... ', $level);
+        // dbg('level... ', $level);
         foreach ($query as $q) {
             if (!is_assoc($q)) {
                 //print "\n\nhuhu\n\n";
@@ -124,7 +124,7 @@ function xxeval_cond($db, $query) {
                 $ok = evaluate_single($q['l'], $q['r'], $q['o'], $item);
             }
 
-            dbg('eval result', $ok, $q['x']);
+            // dbg('eval result', $ok, $q['x']);
             if (!$ok && $q['x'] == '&&') {
                 return false;
             }
@@ -136,7 +136,7 @@ function xxeval_cond($db, $query) {
     };
 
     return array_filter($db, function ($item) use ($query, $evaluator) {
-        dbg('item-compare...', $item['_id'], $item['title']);
+        // dbg('item-compare...', $item['_id'], $item['title']);
         return $evaluator($query, $item);
     });
 

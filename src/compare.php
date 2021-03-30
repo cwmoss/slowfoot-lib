@@ -40,7 +40,7 @@ title == subtitle
 authors._ref == "a19"
 */
 function cmp_eq($l, $r) {
-    dbg('cmp +++ ', $l, $r);
+    // dbg('cmp +++ ', $l, $r);
 
     if ($l['t'] == 'k' && is_array($l['v'])) {
         return array_search($r['v'][0], $l['v']);
