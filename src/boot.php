@@ -1,9 +1,17 @@
 <?php
-require_once __DIR__ . '/../vendor/autoload.php';
+// require_once __DIR__ . '/../vendor/autoload.php';
+require_once 'vendor/autoload.php';
+
+/*
+TODO: find project root path
+
+$projectRootPath = dirname(\Composer\Factory::getComposerFile());
+"$projectRootPath";
+*/
 
 define('PATH_PREFIX', '');
 if (!defined('SLOWFOOT_BASE')) {
-    define('SLOWFOOT_BASE', __DIR__ . '/../');
+    define('SLOWFOOT_BASE', __DIR__ . '/../../../../');
 }
 $base = SLOWFOOT_BASE;
 $src = $base . '/src';
