@@ -3,7 +3,6 @@
     "version": "1.0",
     "require": {
         "spatie/async": "^1.5",
-        "felippe-regazio/php-hot-reloader": "dev-master",
         "erusev/parsedown": "^1.7",
         "ausi/slug-generator": "^1.1",
         "jbroadway/urlify": "^1.2"
