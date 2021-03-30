@@ -1,5 +1,6 @@
 <?php
 require __DIR__ . '/boot.php';
+$hr = true;
 
 $obj_id = array_search($requestpath, $paths);
 if ($obj_id) {
@@ -31,4 +32,9 @@ header('Cache-Control: post-check=0, pre-check=0', false);
 header('Pragma: no-cache');
 header('Content-Type: text/html');
 
+if ($hr) {
+    $htrldr = new HotReloader\HotReloader('//localhost:1199/phrwatcher.php');
+    $js = $htrldr->init();
+    $content = str_replace('</html>', $js . '</html>', $content);
+}
 print $content;
