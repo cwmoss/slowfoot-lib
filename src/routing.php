@@ -6,7 +6,8 @@
 
 if (PHP_SAPI == 'cli-server') {
     $docroot = $_SERVER['DOCUMENT_ROOT'];
-    $requestpath = dirname($_SERVER['SCRIPT_NAME']);
+    // $requestpath = dirname($_SERVER['SCRIPT_NAME']);
+    $requestpath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 } else {
     $requestpath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     $docroot = SLOWFOOT_BASE . '/src';
