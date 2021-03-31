@@ -2,9 +2,22 @@
 
 // some routing exceptions
 // for development
+//print_r($_SERVER);
 
-$docroot = $_SERVER['DOCUMENT_ROOT'];
-$requestpath = $_SERVER['SCRIPT_NAME'];
+if (PHP_SAPI == 'cli-server') {
+    $docroot = $_SERVER['DOCUMENT_ROOT'];
+    $requestpath = dirname($_SERVER['SCRIPT_NAME']);
+} else {
+    $requestpath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    $docroot = SLOWFOOT_BASE . '/src';
+}
+
+//print "REQ: $requestpath";
+
+if (PATH_PREFIX) {
+    $requestpath = str_replace(PATH_PREFIX, '', $requestpath);
+}
+
 // startseite?
 if ($requestpath == '/') {
     $requestpath = '/index';
@@ -27,8 +40,10 @@ if (array_key_exists('HTTP_ACCESS_CONTROL_REQUEST_HEADERS', $_SERVER)) {
     //   header('Access-Control-Allow-Headers: *');
 }
 
+//print "REQ: ~$requestpath~";
+
 // /a/9990
-if ($requestpath == '/phrwatcher.php') {
+if (strpos($requestpath, '/phrwatcher.php') === 0) {
     include __DIR__ . '/hot-reload/phrwatcher.php';
     exit;
 }

@@ -1,6 +1,8 @@
 <?php
 // require_once __DIR__ . '/../vendor/autoload.php';
-require_once 'vendor/autoload.php';
+if (!class_exists("\Composer\Autoload\ClassLoader")) {
+    require_once 'vendor/autoload.php';
+}
 
 /*
 TODO: find project root path
@@ -8,25 +10,25 @@ TODO: find project root path
 $projectRootPath = dirname(\Composer\Factory::getComposerFile());
 "$projectRootPath";
 */
+if (!defined('PATH_PREFIX')) {
+    define('PATH_PREFIX', '');
+}
 
-define('PATH_PREFIX', '');
 if (!defined('SLOWFOOT_BASE')) {
     define('SLOWFOOT_BASE', __DIR__ . '/../../../../');
 }
 $base = SLOWFOOT_BASE;
 $src = $base . '/src';
 $dist = $base . '/dist/';
-
 require_once 'util.php';
 require_once 'routing.php';
-
 require_once 'slft_fun.php';
 require_once 'template_helper.php';
 
 require_once $src . '/helper.php';
 
 //$dataset = 'wp.json';
-$dataset = 'dataset-mumok.ndjson';
+$dataset = $base . '/dataset-mumok.ndjson';
 
 $config = load_config($src);
 //print_r($config);

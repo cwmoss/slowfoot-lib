@@ -217,6 +217,14 @@ function ref($ds, $oid) {
     return $ds[$oid];
 }
 
+function path_asset($asset, $cachebust = false) {
+    return PATH_PREFIX . $asset . ($cachebust ? '?' . mktime() : '');
+}
+
+function path_page($page) {
+    return PATH_PREFIX . $page;
+}
+
 function process_template($id, $path) {
     global $templates;
     layout('-');

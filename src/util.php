@@ -9,6 +9,7 @@ function send_file($base, $file) {
         $scss = $full . '.scss';
         if (file_exists($scss)) {
             // die(" sassc $scss $full");
+            //print "sassc $scss $full";
             $ok = `sassc $scss $full`;
             //var_dump($ok);
         }
