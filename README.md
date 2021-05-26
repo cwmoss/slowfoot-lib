@@ -6,6 +6,11 @@
 
 content sources have a unique name, a source type and opts
 
+included source loader
+* dataset, json nd, load_dataset()
+* json, load_json()
+* directory, markdown/ frontmatter, load_directory()
+
 ### types
 
 types are content types with template, path pattern or path function
