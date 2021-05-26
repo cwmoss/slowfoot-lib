@@ -5,9 +5,9 @@ use function lolql\parse;
 use function lolql\query as lquery;
 
 function load_config($dir) {
-    include $dir . '/config.php';
+    $conf = include $dir . '/config.php';
     $tpls = [];
-    foreach ($templates as $name => $t) {
+    foreach ($conf['templates'] as $name => $t) {
         if (!is_array($t)) {
             $t = ['path' => $t];
         }
@@ -16,7 +16,9 @@ function load_config($dir) {
         }
         $tpls[$name] = array_merge(['type' => $name, 'template' => $name], $t);
     }
-    return [$sources, $tpls, $hooks];
+    $conf['templates'] = $tpls;
+    $conf['base'] = $dir;
+    return $conf;
 }
 
 function make_path_fn($pattern) {
@@ -64,7 +66,7 @@ function xload_data($sources, $hooks) {
     return $db;
 }
 
-function load_data($sources, $hooks) {
+function load_data($sources, $hooks, $config) {
     $db = [];
     $loaded = $rejected = [];
     foreach ($sources as $name => $opts) {
@@ -78,7 +80,7 @@ function load_data($sources, $hooks) {
         $fun = 'load_' . $opts['type'];
         dbg('loading from source', $fun, $opts);
 
-        foreach ($fun($opts) as $row) {
+        foreach ($fun($opts, $config) as $row) {
             $otype = $row['_type'];
             $row['_src'] = $name;
             if ($hooks['on_load']) {
@@ -97,16 +99,16 @@ function load_data($sources, $hooks) {
     return $db;
 }
 
-function load_dataset($opts) {
-    $file = $opts['file'];
+function load_dataset($opts, $config) {
+    $file = $config['base'] . '/' . $opts['file'];
     foreach (file($file) as $row) {
         yield json_decode($row, true);
     }
     return;
 }
 
-function load_json($opts) {
-    $file = $opts['file'];
+function load_json($opts, $config) {
+    $file = $config['base'] . '/' . $opts['file'];
     $rows = json_decode(file_get_contents($file), true);
     if (is_assoc($rows)) {
         $rows = [$rows];

@@ -4,36 +4,41 @@ if (!class_exists("\Composer\Autoload\ClassLoader")) {
     require_once 'vendor/autoload.php';
 }
 
-/*
-TODO: find project root path
-
-$projectRootPath = dirname(\Composer\Factory::getComposerFile());
-"$projectRootPath";
-
-$projectRootPath = dirname(\Composer\Factory::getComposerFile());
-var_dump($projectRootPath);
-*/
-if (!defined('PATH_PREFIX')) {
-    define('PATH_PREFIX', '');
-}
-
 if (!defined('SLOWFOOT_BASE')) {
 //    define('SLOWFOOT_BASE', __DIR__ . '/../../../../');
 }
+if (!defined('SLOWFOOT_PREVIEW')) {
+    define('SLOWFOOT_PREVIEW', false);
+}
 $base = SLOWFOOT_BASE;
+if (file_exists("$base/.env")) {
+    Dotenv\Dotenv::createImmutable("$base/.env")->load();
+}
+
 $src = $base . '/src';
 $dist = $base . '/dist/';
+
 require_once 'util.php';
-require_once 'routing.php';
 require_once 'slft_fun.php';
-require_once 'template_helper.php';
 
 $config = load_config($base);
+
+if (!defined('PATH_PREFIX')) {
+    define('PATH_PREFIX', $config['path_prefix']);
+}
+
+if (!SLOWFOOT_PREVIEW) {
+    require_once 'routing.php';
+}
+
+require_once 'template_helper.php';
+
 //print_r($config);
-[$sources, $templates, $hooks] = $config;
 
 //var_dump($hooks);
-$ds = load_data($sources, $hooks);
+$ds = load_data($config['sources'], $config['hooks'], $config);
+
+$templates = $config['templates'];
 
 $paths = array_reduce($templates, function ($res, $item) use ($ds) {
     return array_merge($res, array_map(function ($obj) use ($item) {
