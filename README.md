@@ -17,12 +17,12 @@ available hooks
 
 ## pipeline
 
-  include src/helper.php => SLOWFOOT_BASE (project root directory)
-  read config.php => sources, types, hooks
-  | load_sources
-  | load template helper
-  => dataset, paths
-     | build pages from all types with defined templates
-     | build pages from src/pages folder
-       => website
+    include src/helper.php => SLOWFOOT_BASE (project root directory)
+    read config.php => sources, types, hooks
+    | load_sources
+    | load template helper
+    => dataset, paths
+      | build pages from all types with defined templates
+      | build pages from src/pages folder
+      => website
 
