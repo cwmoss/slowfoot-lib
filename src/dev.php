@@ -1,5 +1,8 @@
 <?php
 require __DIR__ . '/boot.php';
+
+dbg('dataset info', $ds['_info']);
+
 $hr = true;
 
 $obj_id = array_search($requestpath, $paths);

@@ -9,13 +9,16 @@ TODO: find project root path
 
 $projectRootPath = dirname(\Composer\Factory::getComposerFile());
 "$projectRootPath";
+
+$projectRootPath = dirname(\Composer\Factory::getComposerFile());
+var_dump($projectRootPath);
 */
 if (!defined('PATH_PREFIX')) {
     define('PATH_PREFIX', '');
 }
 
 if (!defined('SLOWFOOT_BASE')) {
-    define('SLOWFOOT_BASE', __DIR__ . '/../../../../');
+//    define('SLOWFOOT_BASE', __DIR__ . '/../../../../');
 }
 $base = SLOWFOOT_BASE;
 $src = $base . '/src';
@@ -25,17 +28,12 @@ require_once 'routing.php';
 require_once 'slft_fun.php';
 require_once 'template_helper.php';
 
-require_once $src . '/helper.php';
-
-//$dataset = 'wp.json';
-$dataset = $base . '/dataset-mumok.ndjson';
-
-$config = load_config($src);
+$config = load_config($base);
 //print_r($config);
-[$templates, $hooks] = $config;
+[$sources, $templates, $hooks] = $config;
 
 //var_dump($hooks);
-$ds = load_data($dataset, $hooks);
+$ds = load_data($sources, $hooks);
 
 $paths = array_reduce($templates, function ($res, $item) use ($ds) {
     return array_merge($res, array_map(function ($obj) use ($item) {

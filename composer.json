@@ -5,6 +5,7 @@
         "spatie/async": "^1.5",
         "erusev/parsedown": "^1.7",
         "ausi/slug-generator": "^1.1",
-        "jbroadway/urlify": "^1.2"
+        "jbroadway/urlify": "^1.2",
+        "composer/composer": "^2.0"
     }
 }

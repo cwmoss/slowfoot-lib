@@ -16,7 +16,7 @@ function load_config($dir) {
         }
         $tpls[$name] = array_merge(['type' => $name, 'template' => $name], $t);
     }
-    return [$tpls, $hooks];
+    return [$sources, $tpls, $hooks];
 }
 
 function make_path_fn($pattern) {
@@ -44,7 +44,7 @@ function url_safe($path) {
     return $path;
 }
 
-function load_data($dataset, $hooks) {
+function xload_data($sources, $hooks) {
     $db = [];
     $loaded = $rejected = [];
     foreach (file($dataset) as $line) {
@@ -62,6 +62,59 @@ function load_data($dataset, $hooks) {
     }
     $db['_info'] = ['loaded' => $loaded, 'rejected' => $rejected];
     return $db;
+}
+
+function load_data($sources, $hooks) {
+    $db = [];
+    $loaded = $rejected = [];
+    foreach ($sources as $name => $opts) {
+        if (!is_array($opts)) {
+            $opts = ['file' => $opts];
+        }
+        if (!$opts['type']) {
+            $opts['type'] = $name;
+        }
+        $opts['name'] = $name;
+        $fun = 'load_' . $opts['type'];
+        dbg('loading from source', $fun, $opts);
+
+        foreach ($fun($opts) as $row) {
+            $otype = $row['_type'];
+            $row['_src'] = $name;
+            if ($hooks['on_load']) {
+                $row = $hooks['on_load']($row, $db);
+            }
+            if (!$row) {
+                $rejected[$otype]++;
+            } else {
+                $db[$row['_id']] = $row;
+                $loaded[$row['_type']]++;
+            }
+        }
+    }
+
+    $db['_info'] = ['loaded' => $loaded, 'rejected' => $rejected];
+    return $db;
+}
+
+function load_dataset($opts) {
+    $file = $opts['file'];
+    foreach (file($file) as $row) {
+        yield json_decode($row, true);
+    }
+    return;
+}
+
+function load_json($opts) {
+    $file = $opts['file'];
+    $rows = json_decode(file_get_contents($file), true);
+    if (is_assoc($rows)) {
+        $rows = [$rows];
+    }
+    foreach ($rows as $row) {
+        yield $row;
+    }
+    return;
 }
 
 function query($ds, $filter) {
