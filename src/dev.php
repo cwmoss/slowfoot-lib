@@ -5,11 +5,14 @@ dbg('dataset info', $ds['_info']);
 
 $hr = true;
 
-$obj_id = array_search($requestpath, $paths);
+// $obj_id = array_search($requestpath, $paths);
+[$obj_id, $name] = path_rev($paths_rev, $requestpath);
+
 if ($obj_id) {
     $obj = get($ds, $obj_id);
 
-    $template = $templates[$obj['_type']]['template'];
+    // $template = $templates[$obj['_type']][$name]['template'];
+    $template = template_name($obj['type'], $name);
     dbg('template', $template, $obj);
     $content = template($template, ['page' => $obj], $template_helper, $src);
 } else {

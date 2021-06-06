@@ -8,27 +8,42 @@ function load_config($dir) {
     $conf = include $dir . '/config.php';
     $tpls = [];
     foreach ($conf['templates'] as $name => $t) {
-        if (!is_array($t)) {
-            $t = ['path' => $t];
-        }
-        if (is_string($t['path'])) {
-            $t['path'] = make_path_fn($t['path']);
-        }
-        $tpls[$name] = array_merge(['type' => $name, 'template' => $name], $t);
+        $tpls[$name] = normalize_template_config($name, $t);
     }
     $conf['templates'] = $tpls;
     $conf['base'] = $dir;
     return $conf;
 }
 
+function normalize_template_config($name, $config) {
+    if (!is_array($config) || is_assoc($config)) {
+        $config = [$config];
+    }
+    $tpl = [];
+    foreach ($config as $t) {
+        if (!is_array($t)) {
+            $t = ['path' => $t];
+        }
+        if (is_string($t['path'])) {
+            $t['path'] = make_path_fn($t['path']);
+        }
+        $subname = $t['name'] ?: '_';
+        $tpl[$subname] = array_merge(['type' => $name, 'template' => $name, 'name' => $subname], $t);
+    }
+    return $tpl;
+}
 function make_path_fn($pattern) {
     $replacements = [];
     if (preg_match_all('!:([^/:]+)!', $pattern, $mat, PREG_SET_ORDER)) {
         $replacements = $mat;
     }
+    $replacements = array_map(fn ($r) => [$r[0], explode('.', $r[1])], $replacements);
+    print_r($replacements);
+    // exit;
     return function ($item) use ($pattern, $replacements) {
         $path = $pattern;
-        $replacements = array_map(fn ($r) => [$r[0], url_safe($item[$r[1]])], $replacements);
+        // $item[$r[1]]
+        $replacements = array_map(fn ($r) => [$r[0], url_safe(resolve_dot_value($r[1], $item))], $replacements);
         $path = str_replace(
             array_column($replacements, 0),
             array_column($replacements, 1),
@@ -37,7 +52,23 @@ function make_path_fn($pattern) {
         return $path;
     };
 }
+function resolve_dot_value($keys, $data) {
+    if (!$data) {
+        return null;
+    }
+    $current = array_shift($keys);
 
+    // nested?
+    if ($keys) {
+        return resolve_dot_value($keys, $data[$current]);
+    }
+
+    if (!is_assoc($data)) {
+        return array_column($data, $current);
+    } else {
+        return $data[$current];
+    }
+}
 function url_safe($path) {
     // TODO
     // https://gist.github.com/jaywilliams/119517
@@ -68,7 +99,10 @@ function xload_data($sources, $hooks) {
 
 function load_data($sources, $hooks, $config) {
     $db = [];
-    $loaded = $rejected = [];
+    $paths = [];
+    $paths_rev = [];
+
+    $loaded = $rejected = $conflicts = $conflicts_details = [];
     foreach ($sources as $name => $opts) {
         if (!is_array($opts)) {
             $opts = ['file' => $opts];
@@ -89,16 +123,51 @@ function load_data($sources, $hooks, $config) {
             if (!$row) {
                 $rejected[$otype]++;
             } else {
+                list($p, $p_rev) = load_path($row, $config['templates'][$otype]);
+                $paths[$row['_id']] = $p;
+                foreach ($p_rev as $pr) {
+                    if (isset($paths_rev[$pr[0]])) {
+                        $conflicts[$row['_type']]++;
+                        $rev = $paths_rev[$pr[0]];
+                        $conflicts_details[] = [
+                            'path' => $pr[0],
+                            'rev' => $rev,
+                            'first' => [
+                                '_id' => $paths_rev[$pr[0]][0],
+                                '_type' => $db[$rev[0]]['_type'],
+                                'name' => $paths_rev[$pr[0]][1],
+                                'row' => $db[$rev[0]]
+                            ],
+                            'second' => [
+                                '_id' => $row['_id'],
+                                '_type' => $row['_type'],
+                                'name' => $pr[1],
+                                'row' => $row
+                            ]
+                        ];
+                    } else {
+                        $paths_rev[$pr[0]] = [$row['_id'], $pr[1]];
+                    }
+                }
                 $db[$row['_id']] = $row;
                 $loaded[$row['_type']]++;
             }
         }
     }
 
-    $db['_info'] = ['loaded' => $loaded, 'rejected' => $rejected];
-    return $db;
+    $db['_info'] = ['loaded' => $loaded, 'rejected' => $rejected, 'conflicts' => $conflicts, 'conflicts_details' => $conflicts_details];
+    return [$db, $paths, $paths_rev];
 }
-
+function load_path($row, $template) {
+    $p = [];
+    $pr = [];
+    foreach ($template as $name => $conf) {
+        $path = $conf['path']($row);
+        $p[$name] = $path;
+        $pr[] = [$path, $name];
+    }
+    return [$p, $pr];
+}
 function load_dataset($opts, $config) {
     $file = $config['base'] . '/' . $opts['file'];
     foreach (file($file) as $row) {
@@ -243,19 +312,33 @@ function slow_query_cmd($q) {
     return json_decode($res, true);
 }
 
-function path($pdb, $oid) {
+function path($pdb, $oid, $name = null) {
     if (is_array($oid)) {
         $oid = $oid['_id'];
     }
-    return PATH_PREFIX . $pdb[$oid];
+    if (!$name) {
+        $name = '_';
+    }
+    return PATH_PREFIX . $pdb[$oid][$name];
+}
+
+function path_rev($prdb, $path) {
+    return $prdb[$path];
+}
+
+function template_name($tconfig, $type, $name) {
+    return $tconfig[$type][$name]['template'];
 }
 
 // file path = path without prefix
-function fpath($pdb, $oid) {
+function fpath($pdb, $oid, $name = null) {
     if (is_array($oid)) {
         $oid = $oid['_id'];
     }
-    return $pdb[$oid];
+    if (!$name) {
+        $name = '_';
+    }
+    return $pdb[$oid][$name];
 }
 
 function get($ds, $oid) {

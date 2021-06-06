@@ -2,9 +2,9 @@
 
 function load_template_helper($ds, $paths, $src) {
     return [
-        'path' => function ($oid) use ($paths) {
+        'path' => function ($oid, $name = null) use ($paths) {
             //print "-- $oid";
-            return path($paths, $oid);
+            return path($paths, $oid, $name);
         },
         'get' => function ($oid) use ($ds) {
             return get($ds, $oid);

@@ -12,7 +12,8 @@ if (!defined('SLOWFOOT_PREVIEW')) {
 }
 $base = SLOWFOOT_BASE;
 if (file_exists("$base/.env")) {
-    Dotenv\Dotenv::createImmutable("$base/.env")->load();
+    //print "env: $base/.env";
+    Dotenv\Dotenv::createImmutable("$base")->load();
 }
 
 $src = $base . '/src';
@@ -22,7 +23,7 @@ require_once 'util.php';
 require_once 'slft_fun.php';
 
 $config = load_config($base);
-
+//exit;
 if (!defined('PATH_PREFIX')) {
     define('PATH_PREFIX', $config['path_prefix']);
 }
@@ -36,10 +37,10 @@ require_once 'template_helper.php';
 //print_r($config);
 
 //var_dump($hooks);
-$ds = load_data($config['sources'], $config['hooks'], $config);
+list($ds, $paths, $paths_rev) = load_data($config['sources'], $config['hooks'], $config);
 
 $templates = $config['templates'];
-
+/*
 $paths = array_reduce($templates, function ($res, $item) use ($ds) {
     return array_merge($res, array_map(function ($obj) use ($item) {
         //print_r($obj);
@@ -48,7 +49,10 @@ $paths = array_reduce($templates, function ($res, $item) use ($ds) {
 }, []);
 
 $paths = array_combine(array_column($paths, 0), array_column($paths, 1));
+*/
 //print_r($paths);
+//print_r($paths_rev);
+//exit;
 //print $requestpath;
 
 //print_r($ds['_info']);

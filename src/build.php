@@ -15,6 +15,7 @@ if (!$dist) {
 }
 
 print_r($ds['_info']);
+//exit;
 
 print "clean up dist/\n\n";
 `rm -rf $dist`;
@@ -28,10 +29,12 @@ foreach ($templates as $type => $conf) {
     $start = 0;
 
     foreach (query($ds, $type) as $row) {
-        //	process_template_data($row, path($row['_id']));
-        $path = fpath($paths, $row['_id']);
-        $content = template($conf['template'], ['page' => $row], $template_helper, $src);
-        write($content, $path, $dist);
+        foreach ($conf as $templateconf) {
+            //	process_template_data($row, path($row['_id']));
+            $path = fpath($paths, $row['_id'], $templateconf['name']);
+            $content = template($templateconf['template'], ['page' => $row], $template_helper, $src);
+            write($content, $path, $dist);
+        }
     }
 }
 
