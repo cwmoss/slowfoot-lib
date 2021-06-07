@@ -12,9 +12,19 @@ if ($obj_id) {
     $obj = get($ds, $obj_id);
 
     // $template = $templates[$obj['_type']][$name]['template'];
-    $template = template_name($obj['type'], $name);
+    $template = template_name($config['templates'], $obj['_type'], $name);
     dbg('template', $template, $obj);
-    $content = template($template, ['page' => $obj], $template_helper, $src);
+    $content = template(
+        $template,
+        [
+            'page' => $obj,
+            'path' => path($paths, $obj_id, $name),
+            'template_config' => [], //TODO
+            'path_name' => $name
+        ],
+        $template_helper,
+        $src
+    );
 } else {
     list($dummy, $pagename, $pagenr) = explode('/', $requestpath);
     $pagename = '/' . $pagename;

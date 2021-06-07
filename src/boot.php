@@ -23,7 +23,9 @@ require_once 'util.php';
 require_once 'slft_fun.php';
 
 $config = load_config($base);
-//exit;
+//print_r($_ENV);
+//print_r($config); exit;
+
 if (!defined('PATH_PREFIX')) {
     define('PATH_PREFIX', $config['path_prefix']);
 }

@@ -32,7 +32,17 @@ foreach ($templates as $type => $conf) {
         foreach ($conf as $templateconf) {
             //	process_template_data($row, path($row['_id']));
             $path = fpath($paths, $row['_id'], $templateconf['name']);
-            $content = template($templateconf['template'], ['page' => $row], $template_helper, $src);
+            $content = template(
+                $templateconf['template'],
+                [
+                    'page' => $row,
+                    'path' => path($paths, $row['_id'], $templateconf['name']),
+                    'template_config' => $templateconf,
+                    'path_name' => $templateconf['name']
+                ],
+                $template_helper,
+                $src
+            );
             write($content, $path, $dist);
         }
     }

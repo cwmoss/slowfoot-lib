@@ -15,7 +15,7 @@ dbg('preview', $id, $type);
 
 $obj = load_preview_object($id, $type, $config);
 
-$template = $templates[$obj['_type']]['template'];
+$template = $templates[$obj['_type']]['_']['template'];
 dbg('template', $template, $obj);
 $content = template($template, ['page' => $obj], $template_helper, $src);
 

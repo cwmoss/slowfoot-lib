@@ -38,7 +38,7 @@ function make_path_fn($pattern) {
         $replacements = $mat;
     }
     $replacements = array_map(fn ($r) => [$r[0], explode('.', $r[1])], $replacements);
-    print_r($replacements);
+    // print_r($replacements);
     // exit;
     return function ($item) use ($pattern, $replacements) {
         $path = $pattern;
