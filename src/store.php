@@ -52,6 +52,16 @@ class store {
         $this->data[$id] = $row;
     }
 
+    public function add_ref($src_id, $src_prop, $dest) {
+        if (is_array($src_id)) {
+            $src_id = $src_id['_id'];
+        }
+        if (is_array($dest)) {
+            $dest = $dest['_id'];
+        }
+        $this->data[$src_id][$src_prop][] = ['_ref' => $dest];
+    }
+
     public function add_path($row) {
         foreach ($this->config[$row['_type']] as $name => $conf) {
             //print_r($conf);
