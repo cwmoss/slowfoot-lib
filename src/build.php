@@ -3,7 +3,7 @@ require __DIR__ . '/boot.php';
 
 print memory_get_usage() . " paths ok\n";
 
-$template_helper = load_template_helper($ds, $paths, $src);
+//$template_helper = load_template_helper($ds, $src);
 
 print memory_get_usage() . " helper ok \n";
 
@@ -14,7 +14,7 @@ if (!$dist) {
     die('NO DIST-PATH FOUND');
 }
 
-print_r($ds['_info']);
+print_r($ds->info);
 //exit;
 
 print "clean up dist/\n\n";
@@ -31,12 +31,12 @@ foreach ($templates as $type => $conf) {
     foreach (query($ds, $type) as $row) {
         foreach ($conf as $templateconf) {
             //	process_template_data($row, path($row['_id']));
-            $path = fpath($paths, $row['_id'], $templateconf['name']);
+            $path = $ds->get_fpath($row['_id'], $templateconf['name']);
             $content = template(
                 $templateconf['template'],
                 [
                     'page' => $row,
-                    'path' => path($paths, $row['_id'], $templateconf['name']),
+                    'path' => $ds->get_path($row['_id'], $templateconf['name']),
                     'template_config' => $templateconf,
                     'path_name' => $templateconf['name']
                 ],

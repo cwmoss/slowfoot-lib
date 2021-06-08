@@ -1,20 +1,20 @@
 <?php
 
-function load_template_helper($ds, $paths, $src) {
+function load_template_helper($ds, $src) {
     return [
-        'path' => function ($oid, $name = null) use ($paths) {
+        'path' => function ($oid, $name = null) use ($ds) {
             //print "-- $oid";
-            return path($paths, $oid, $name);
+            return $ds->get_path($oid, $name);
         },
         'get' => function ($oid) use ($ds) {
-            return get($ds, $oid);
+            return $ds->get($oid);
         },
         'ref' => function ($oid) use ($ds) {
-            return ref($ds, $oid);
+            return $ds->ref($oid);
         },
         'query' => function ($q) use ($ds) {
             //print "-- $oid";
-            return query($ds, $q);
+            return query($ds->data, $q);
         },
         'partial' => function ($template, $data) use ($src) {
             //dbg('+++ partial src', $src);

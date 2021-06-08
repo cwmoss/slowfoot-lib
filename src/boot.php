@@ -39,7 +39,7 @@ require_once 'template_helper.php';
 //print_r($config);
 
 //var_dump($hooks);
-list($ds, $paths, $paths_rev) = load_data($config['sources'], $config['hooks'], $config);
+$ds = load_data($config['sources'], $config['hooks'], $config);
 
 $templates = $config['templates'];
 /*
@@ -59,7 +59,7 @@ $paths = array_combine(array_column($paths, 0), array_column($paths, 1));
 
 //print_r($ds['_info']);
 
-$template_helper = load_template_helper($ds, $paths, $src);
+$template_helper = load_template_helper($ds, $src);
 
 $pages = glob($src . '/pages/*.php');
 $pages = array_map(function ($p) {

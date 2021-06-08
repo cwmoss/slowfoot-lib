@@ -6,10 +6,10 @@ dbg('dataset info', $ds['_info']);
 $hr = true;
 
 // $obj_id = array_search($requestpath, $paths);
-[$obj_id, $name] = path_rev($paths_rev, $requestpath);
+[$obj_id, $name] = $ds->get_by_path($requestpath);
 
 if ($obj_id) {
-    $obj = get($ds, $obj_id);
+    $obj = $ds->get($obj_id);
 
     // $template = $templates[$obj['_type']][$name]['template'];
     $template = template_name($config['templates'], $obj['_type'], $name);

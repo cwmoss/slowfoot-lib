@@ -1,6 +1,8 @@
 <?php
 require_once 'lolql.php';
+require_once 'store.php';
 
+use slowfoot\store;
 use function lolql\parse;
 use function lolql\query as lquery;
 
@@ -98,11 +100,8 @@ function xload_data($sources, $hooks) {
 }
 
 function load_data($sources, $hooks, $config) {
-    $db = [];
-    $paths = [];
-    $paths_rev = [];
+    $db = new store($config['templates']);
 
-    $loaded = $rejected = $conflicts = $conflicts_details = [];
     foreach ($sources as $name => $opts) {
         if (!is_array($opts)) {
             $opts = ['file' => $opts];
@@ -121,53 +120,15 @@ function load_data($sources, $hooks, $config) {
                 $row = $hooks['on_load']($row, $db);
             }
             if (!$row) {
-                $rejected[$otype]++;
+                $db->rejected($otype);
             } else {
-                list($p, $p_rev) = load_path($row, $config['templates'][$otype]);
-                $paths[$row['_id']] = $p;
-                foreach ($p_rev as $pr) {
-                    if (isset($paths_rev[$pr[0]])) {
-                        $conflicts[$row['_type']]++;
-                        $rev = $paths_rev[$pr[0]];
-                        $conflicts_details[] = [
-                            'path' => $pr[0],
-                            'rev' => $rev,
-                            'first' => [
-                                '_id' => $paths_rev[$pr[0]][0],
-                                '_type' => $db[$rev[0]]['_type'],
-                                'name' => $paths_rev[$pr[0]][1],
-                                'row' => $db[$rev[0]]
-                            ],
-                            'second' => [
-                                '_id' => $row['_id'],
-                                '_type' => $row['_type'],
-                                'name' => $pr[1],
-                                'row' => $row
-                            ]
-                        ];
-                    } else {
-                        $paths_rev[$pr[0]] = [$row['_id'], $pr[1]];
-                    }
-                }
-                $db[$row['_id']] = $row;
-                $loaded[$row['_type']]++;
+                $db->add($row['_id'], $row);
             }
         }
     }
+    return $db;
+}
 
-    $db['_info'] = ['loaded' => $loaded, 'rejected' => $rejected, 'conflicts' => $conflicts, 'conflicts_details' => $conflicts_details];
-    return [$db, $paths, $paths_rev];
-}
-function load_path($row, $template) {
-    $p = [];
-    $pr = [];
-    foreach ($template as $name => $conf) {
-        $path = $conf['path']($row);
-        $p[$name] = $path;
-        $pr[] = [$path, $name];
-    }
-    return [$p, $pr];
-}
 function load_dataset($opts, $config) {
     $file = $config['base'] . '/' . $opts['file'];
     foreach (file($file) as $row) {
@@ -192,7 +153,7 @@ function query($ds, $filter) {
     if (is_string($filter)) {
         $filter = ['_type' => $filter];
     }
-    $rs = array_filter($ds, function ($row) use ($filter) {
+    $rs = array_filter($ds->data, function ($row) use ($filter) {
         return evaluate($filter, $row);
     });
 
@@ -218,7 +179,7 @@ function build_sorter($key) {
 
 function chunked_paginate($ds, $rule) {
     $limit = $rule['limit'] ?? 20;
-    $all = lquery($ds, $rule);
+    $all = lquery($ds->data, $rule);
     $total = count($all);
     $totalpages = ceil($total / $limit);
     foreach (range(1, $totalpages) as $page) {
@@ -237,7 +198,7 @@ function query_page($ds, $rule, $page = 1) {
     $limit = $rule['limit'] ?? 20;
     $page = $page ?? 1;
 
-    $all = lquery($ds, $rule);
+    $all = lquery($ds->data, $rule);
 
     $total = count($all);
     $totalpages = ceil($total / $limit);
@@ -312,47 +273,8 @@ function slow_query_cmd($q) {
     return json_decode($res, true);
 }
 
-function path($pdb, $oid, $name = null) {
-    if (is_array($oid)) {
-        $oid = $oid['_id'];
-    }
-    if (!$name) {
-        $name = '_';
-    }
-    return PATH_PREFIX . $pdb[$oid][$name];
-}
-
-function path_rev($prdb, $path) {
-    return $prdb[$path];
-}
-
 function template_name($tconfig, $type, $name) {
     return $tconfig[$type][$name]['template'];
-}
-
-// file path = path without prefix
-function fpath($pdb, $oid, $name = null) {
-    if (is_array($oid)) {
-        $oid = $oid['_id'];
-    }
-    if (!$name) {
-        $name = '_';
-    }
-    return $pdb[$oid][$name];
-}
-
-function get($ds, $oid) {
-    if (is_array($oid)) {
-        $oid = $oid['_id'];
-    }
-    return $ds[$oid];
-}
-
-function ref($ds, $oid) {
-    if (is_array($oid)) {
-        $oid = $oid['_ref'];
-    }
-    return $ds[$oid];
 }
 
 function path_asset($asset, $cachebust = false) {
