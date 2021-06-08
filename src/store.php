@@ -39,17 +39,27 @@ class store {
         if (isset($this->data[$id])) {
             return false;
         }
+        $row['_id'] = $id;
         $this->data[$id] = $row;
         $this->info['loaded'][$row['_type']]++;
         $this->add_path($row);
         return true;
     }
 
+    public function add_row($row) {
+        return $this->add($row['_id'], $row);
+    }
+
     public function update($id, $row) {
         if (!isset($this->data[$id])) {
             return false;
         }
+        $row['_id'] = $id;
         $this->data[$id] = $row;
+    }
+
+    public function update_row($row) {
+        return $this->update($row['_id'], $row);
     }
 
     public function add_ref($src_id, $src_prop, $dest) {

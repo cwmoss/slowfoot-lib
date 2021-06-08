@@ -19,7 +19,7 @@ if ($obj_id) {
         [
             'page' => $obj,
             'path' => path($paths, $obj_id, $name),
-            'template_config' => [], //TODO
+            'template_config' => $config['templates'][$obj['_type']][$name], //TODO
             'path_name' => $name
         ],
         $template_helper,
