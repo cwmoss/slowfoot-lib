@@ -50,6 +50,14 @@ if (strpos($requestpath, '/phrwatcher.php') === 0) {
 }
 
 if (preg_match("/\./", $requestpath)) {
-    send_file($src, $requestpath);
+    dbg('+++ dev route file', $requestpath);
+    $assetpath = $config['assets']['src'];
+    // TODO: single method with mapped directories
+    if (preg_match("!^/$assetpath!", $requestpath)) {
+        send_asset_file($base, $requestpath, $assetpath, $config['assets']['dest']);
+    } else {
+        send_file($src, $requestpath);
+    }
+
     exit;
 }

@@ -10,6 +10,9 @@ if (!defined('SLOWFOOT_BASE')) {
 if (!defined('SLOWFOOT_PREVIEW')) {
     define('SLOWFOOT_PREVIEW', false);
 }
+if(!defined('SLOWFOOT_WEBDEPLOY')){
+    define('SLOWFOOT_WEBDEPLOY', false);
+}
 $base = SLOWFOOT_BASE;
 if (file_exists("$base/.env")) {
     //print "env: $base/.env";
@@ -20,6 +23,8 @@ $src = $base . '/src';
 $dist = $base . '/dist/';
 
 require_once 'util.php';
+
+require_once 'image.php';
 require_once 'slft_fun.php';
 
 $config = load_config($base);
@@ -30,10 +35,10 @@ if (!defined('PATH_PREFIX')) {
     define('PATH_PREFIX', $config['path_prefix']);
 }
 
-if (!SLOWFOOT_PREVIEW) {
+if (!(SLOWFOOT_PREVIEW || SLOWFOOT_WEBDEPLOY)) {
     require_once 'routing.php';
 }
-
+dbg("start", $config);
 require_once 'template_helper.php';
 
 //print_r($config);
@@ -59,7 +64,7 @@ $paths = array_combine(array_column($paths, 0), array_column($paths, 1));
 
 //print_r($ds['_info']);
 
-$template_helper = load_template_helper($ds, $src);
+$template_helper = load_template_helper($ds, $src, $config);
 
 $pages = glob($src . '/pages/*.php');
 $pages = array_map(function ($p) {

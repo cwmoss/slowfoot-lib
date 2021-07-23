@@ -1,8 +1,10 @@
 <?php
 require_once 'lolql.php';
 require_once 'store.php';
+require_once 'JsConverter.php';
 
 use slowfoot\store;
+use Ovidigital\JsObjectToJson\JsConverter;
 use function lolql\parse;
 use function lolql\query as lquery;
 
@@ -14,6 +16,7 @@ function load_config($dir) {
     }
     $conf['templates'] = $tpls;
     $conf['base'] = $dir;
+    $conf['assets'] = normalize_assets_config($conf);
     return $conf;
 }
 
@@ -34,6 +37,14 @@ function normalize_template_config($name, $config) {
     }
     return $tpl;
 }
+
+function normalize_assets_config($conf) {
+    $assets = $conf['assets'] ?: [];
+    $default = ['base' => $conf['base'], 'src' => 'images', 'dest' => 'cache', 'profiles' => []];
+    $assets = array_merge($default, $assets);
+    return $assets;
+}
+
 function make_path_fn($pattern) {
     $replacements = [];
     if (preg_match_all('!:([^/:]+)!', $pattern, $mat, PREG_SET_ORDER)) {
@@ -106,11 +117,14 @@ function load_data($sources, $hooks, $config) {
         if (!is_array($opts)) {
             $opts = ['file' => $opts];
         }
+        if (!$opts['loader']) {
+            $opts['loader'] = $name;
+        }
         if (!$opts['type']) {
             $opts['type'] = $name;
         }
         $opts['name'] = $name;
-        $fun = 'load_' . $opts['type'];
+        $fun = 'load_' . $opts['loader'];
         dbg('loading from source', $fun, $opts);
 
         foreach ($fun($opts, $config) as $row) {
@@ -122,6 +136,12 @@ function load_data($sources, $hooks, $config) {
             if (!$row) {
                 $db->rejected($otype);
             } else {
+                if (!$row['_type']) {
+                    $row['_type'] = $opts['type'];
+                }
+                if (!$row['_id']) {
+                    $row['_id'] = $row['id'];
+                }
                 $db->add($row['_id'], $row);
             }
         }
@@ -149,6 +169,35 @@ function load_json($opts, $config) {
     return;
 }
 
+function load_csv($opts, $config) {
+    $file = $config['base'] . '/' . $opts['file'];
+    $opts = array_merge(['sep' => ',', 'enc' => '"'], $opts);
+    $header = null;
+    foreach (file($file) as $row) {
+        if (is_null($header)) {
+            $header = str_getcsv($row, $opts['sep'], $opts['enc']);
+            print_r($header);
+            continue;
+        }
+        $data = str_getcsv($row, $opts['sep'], $opts['enc']);
+
+        if ($opts['json']) {
+            $data = array_map(fn ($val) => json_decode($val, true), $data);
+        }
+        if ($opts['jsol']) {
+            $data = array_map(function ($val) {
+                if ($val[0] == '[' || $val[0] == '{') {
+                    return json_decode(JsConverter::convertToJson($val), true);
+                } else {
+                    return $val;
+                }
+            }, $data);
+        }
+        //print_r($data);
+        //return [];
+        yield array_combine($header, $data);
+    }
+}
 function query($ds, $filter) {
     if (is_string($filter)) {
         $filter = ['_type' => $filter];

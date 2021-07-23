@@ -31,6 +31,20 @@ function send_file($base, $file) {
     }
 }
 
+function send_asset_file($base, $file, $orig, $cache) {
+    $full = $base . '/' . $file;
+    $full = str_replace($orig, $cache, $full);
+    dbg('+++ asset route', $full);
+    //print "$full";
+    //exit;
+    header('Content-Type: image/jpg');
+    if (file_exists($full)) {
+        readfile($full);
+    } else {
+        header('HTTP/1.1 404 Not Found');
+    }
+}
+
 function dbg($txt, ...$vars) {
     // im servermodus wird der zeitstempel automatisch gesetzt
     //	$log = [date('Y-m-d H:i:s')];

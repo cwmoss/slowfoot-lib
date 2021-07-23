@@ -6,6 +6,10 @@
         "erusev/parsedown": "^1.7",
         "ausi/slug-generator": "^1.1",
         "jbroadway/urlify": "^1.2",
-        "vlucas/phpdotenv": "^5.3"
+        "vlucas/phpdotenv": "^5.3",
+        "ovidigital/js-object-to-json": "^1.0",
+        "league/glide": "^2.0",
+        "league/flysystem-memory": "^2.0",
+        "sensiolabs/ansi-to-html": "^1.2"
     }
 }

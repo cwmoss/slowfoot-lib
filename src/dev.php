@@ -1,9 +1,9 @@
 <?php
 require __DIR__ . '/boot.php';
 
-dbg('dataset info', $ds['_info']);
+dbg('dataset info', $ds->info);
 
-$hr = true;
+$hr = false;
 
 // $obj_id = array_search($requestpath, $paths);
 [$obj_id, $name] = $ds->get_by_path($requestpath);
@@ -18,7 +18,7 @@ if ($obj_id) {
         $template,
         [
             'page' => $obj,
-            'path' => path($paths, $obj_id, $name),
+            'path' => $ds->get_path($obj_id, $name),
             'template_config' => $config['templates'][$obj['_type']][$name], //TODO
             'path_name' => $name
         ],

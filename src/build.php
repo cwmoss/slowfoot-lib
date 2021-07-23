@@ -1,6 +1,6 @@
 <?php
 require __DIR__ . '/boot.php';
-
+dbg("start");
 print memory_get_usage() . " paths ok\n";
 
 //$template_helper = load_template_helper($ds, $src);
@@ -77,5 +77,9 @@ foreach ($pages as $pagename) {
 print memory_get_usage() . " pages ok\n";
 
 `cp -R $src/css $src/js $dist/`;
+
+print "copy assets\n";
+
+`cp -R $base/cache $dist/images`;
 
 print "finished\n";

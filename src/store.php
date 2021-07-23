@@ -73,6 +73,11 @@ class store {
     }
 
     public function add_path($row) {
+        //print ' type: ' . $row['_type'];
+        // only, if we have a template for the type
+        if (!$this->config[$row['_type']]) {
+            return;
+        }
         foreach ($this->config[$row['_type']] as $name => $conf) {
             //print_r($conf);
             $path = $conf['path']($row);
