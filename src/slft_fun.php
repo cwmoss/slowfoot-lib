@@ -198,6 +198,16 @@ function load_csv($opts, $config) {
         yield array_combine($header, $data);
     }
 }
+
+function load_late_template_helper($helper, $base){
+    return [
+       'partial' => function ($template, $data) use ($helper, $base) {
+            //dbg('+++ partial src', $src);
+            return partial($base, $template, $data, $helper);
+        }
+    ];
+}
+
 function query($ds, $filter) {
     if (is_string($filter)) {
         $filter = ['_type' => $filter];
@@ -359,6 +369,7 @@ function remove_tags($content) {
 function template($_template, $data, $helper, $_base) {
     extract($data);
     extract($helper);
+    extract(load_late_template_helper($helper, $_base));
     ob_start();
     include $_base . '/templates/' . $_template . '.php';
     $content = ob_get_clean();
@@ -374,6 +385,7 @@ function template($_template, $data, $helper, $_base) {
 function page($_template, $data, $helper, $_base) {
     extract($data);
     extract($helper);
+    extract(load_late_template_helper($helper, $_base));
     ob_start();
     include $_base . '/pages/' . $_template . '.php';
 

@@ -32,11 +32,14 @@ foreach ($templates as $type => $conf) {
         foreach ($conf as $templateconf) {
             //	process_template_data($row, path($row['_id']));
             $path = $ds->get_fpath($row['_id'], $templateconf['name']);
+            if ($path == '/index') {
+                $path = '/';
+            }
             $content = template(
                 $templateconf['template'],
                 [
                     'page' => $row,
-                    'path' => $ds->get_path($row['_id'], $templateconf['name']),
+                    'path' => $path,
                     'template_config' => $templateconf,
                     'path_name' => $templateconf['name']
                 ],

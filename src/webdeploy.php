@@ -8,7 +8,7 @@ https://www.py4u.net/discuss/212391
 https://stackoverflow.com/questions/56415703/live-execute-git-command-on-php
 
 */
-require_once __DIR__.'/../vendor/autoload.php';
+#require_once __DIR__.'/../vendor/autoload.php';
 use SensioLabs\AnsiConverter\AnsiToHtmlConverter;
 
 define('SLOWFOOT_WEBDEPLOY', true);

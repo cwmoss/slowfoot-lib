@@ -1,7 +1,12 @@
 <?php
 
 function load_template_helper($ds, $src, $config) {
-    return [
+    if(file_exists($src.'/template_helper.php')){
+        $custom = require_once($src.'/template_helper.php'));
+    }else{
+        $custom = [];
+    }
+    $default = [
         'path' => function ($oid, $name = null) use ($ds) {
             //print "-- $oid";
             return $ds->get_path($oid, $name);
@@ -16,7 +21,7 @@ function load_template_helper($ds, $src, $config) {
             //print "-- $oid";
             return query($ds->data, $q);
         },
-        'partial' => function ($template, $data) use ($src) {
+        'xxpartial' => function ($template, $data) use ($src) {
             //dbg('+++ partial src', $src);
             return partial($src, $template, $data, []);
         },
@@ -28,4 +33,5 @@ function load_template_helper($ds, $src, $config) {
             return \slowfoot\asset_from_file($path, $config['assets']);
         }
     ];
+    return array_merge($default, $custom);
 }
