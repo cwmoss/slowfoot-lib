@@ -2,7 +2,7 @@
 
 function load_template_helper($ds, $src, $config) {
     if(file_exists($src.'/template_helper.php')){
-        $custom = require_once($src.'/template_helper.php'));
+        $custom = require_once($src.'/template_helper.php');
     }else{
         $custom = [];
     }
