@@ -1,4 +1,5 @@
 <?php
+use function lolql\query as lquery;
 
 function load_template_helper($ds, $src, $config) {
     if(file_exists($src.'/template_helper.php')){
@@ -18,8 +19,7 @@ function load_template_helper($ds, $src, $config) {
             return $ds->ref($oid);
         },
         'query' => function ($q) use ($ds) {
-            //print "-- $oid";
-            return query($ds->data, $q);
+            return lquery($ds->data, $q);
         },
         'xxpartial' => function ($template, $data) use ($src) {
             //dbg('+++ partial src', $src);
