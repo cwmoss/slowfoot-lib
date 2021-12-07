@@ -11,6 +11,11 @@
         "league/glide": "^2.0",
         "league/flysystem-memory": "^2.0",
         "sensiolabs/ansi-to-html": "^1.2",
+<<<<<<< HEAD
         "paragonie/easydb": "^2.11"
+=======
+        "paragonie/easydb": "^2.11",
+        "bramus/router": "^1.6"
+>>>>>>> 12c4cf77a7733148a9de1114517ed01efe1eae6e
     }
 }

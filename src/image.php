@@ -4,7 +4,7 @@ namespace slowfoot;
 
 /*
 
-    s (size)
+    size
     500x400
     500x
     x400
@@ -185,19 +185,36 @@ function get_profile($opts = [], $profiles = []) {
     }
     $def = ($profilename && $profiles[$profilename]) ? $profiles[$profilename] : [];
     $profile = array_merge($def, $opts);
-    list($profile['w'], $profile['h']) = explode('x', $profile['s']);
+    list($profile['w'], $profile['h']) = explode('x', $profile['size']);
     return $profile;
 }
 
 function get_name($url, $profile) {
-    $significant = 's mode fp 4c';
+    $significant = 'size mode fp 4c';
     $profile = array_intersect_key($profile, array_flip(explode(' ', $significant)));
     ksort($profile);
     $info = \pathinfo($url);
     $hash = \md5($info['filename'] . '?'. http_build_query($profile));
-    return $info['filename'] . '--' . $hash . '-' . $profile['s'] . '.' . $info['extension'];
+    return $info['filename'] . '--' . $hash . '-' . $profile['size'] . '.' . $info['extension'];
 }
 
+function download_remote_image($url, $file_name){
+    if(file_put_contents($file_name, file_get_contents($url))) {
+        $info = \getimagesize($fname);
+        if(!\in_array($info['mime'], ['image/jpeg', 'image/png'])){
+            unlink($file_name);
+            return [false, "Unsupported file type"];
+        }else{
+            return [true, $info];
+        }
+    }
+    return [false, "Download failed"];
+}
+
+// TODO: make it more bulletproof
+function is_remote($url){
+    return (preg_match("!^https?://!", $url));
+}
 /*
 
 1 Calculate the final image aspect ratio:
