@@ -12,5 +12,11 @@
     "@sveltejs/kit": "next",
     "svelte": "^3.44.0"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "dom-delegate": "^2.2.1",
+    "extend": "^3.0.2",
+    "store": "^2.0.12",
+    "type-of": "^2.0.1"
+  }
 }

@@ -41,6 +41,21 @@ $router->mount('/__api', function () use ($router, $dbf) {
         resp($rows);
     });
 
+    $router->get('/type/([-\w.]+)(/\d+)?', function ($type, $page=1) use ($router, $db) {
+
+        #print "hallo";
+
+        //$rows = $db->run('SELECT * FROM docs LIMIT 20');
+        $rows = $db->q('SELECT _id, body FROM docs WHERE _type = ? LIMIT 20', $type);
+        resp(['rows'=>$rows]);
+    });
+
+    $router->get('/id/([-\w.]+)?', function ($id) use ($router, $db) {
+
+        $row = $db->row('SELECT _id, _type, body FROM docs WHERE _id = ? ', $id);
+        resp($row);
+    });
+
 });
 
 $router->set404(function () {

@@ -2,7 +2,7 @@
     var base_url = "http://localhost:3039/__api"
 
 	export async function load({ page, fetch, session, stuff }) {
-		const url = `${base_url}/index`;
+		const url = `${base_url}/type/${page.params.type}`;
 		const res = await fetch(url);
         
 		if (res.ok) {
@@ -10,7 +10,7 @@
             
 			return {
 				props: {
-					stats: data
+					rows: data.rows
 				}
 			};
 		}
@@ -22,12 +22,12 @@
 	}    
 </script>
 <script>
-export let stats
+export let rows
 </script>
 <h1>slowfoot explorer</h1>
 
-<ul>
-    {#each stats as type}
-    <li><a href="{type._type}">{type._type} ({type.total})</a></li>
+<ol>
+    {#each rows as row}
+    <li><a href="id/{row._id}">{row._id}</a></li>
     {/each}
-</ul>
+</ol>

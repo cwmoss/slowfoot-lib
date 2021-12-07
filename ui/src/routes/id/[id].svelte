@@ -2,7 +2,7 @@
     var base_url = "http://localhost:3039/__api"
 
 	export async function load({ page, fetch, session, stuff }) {
-		const url = `${base_url}/index`;
+		const url = `${base_url}/id/${page.params.id}`;
 		const res = await fetch(url);
         
 		if (res.ok) {
@@ -10,7 +10,8 @@
             
 			return {
 				props: {
-					stats: data
+                    id: data._id,
+					body: data.body
 				}
 			};
 		}
@@ -22,12 +23,12 @@
 	}    
 </script>
 <script>
-export let stats
+// https://github.com/sparkartgroup/Inspector-JSON
+
+export let body
+export let id
+
 </script>
 <h1>slowfoot explorer</h1>
-
-<ul>
-    {#each stats as type}
-    <li><a href="{type._type}">{type._type} ({type.total})</a></li>
-    {/each}
-</ul>
+{id}
+{body}
