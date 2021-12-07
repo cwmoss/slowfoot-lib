@@ -31,3 +31,30 @@ available hooks
       | build pages from src/pages folder
       => website
 
+
+/*
+
+select _id , group_concat(b.key || ': ' ||  b.value, x'0a') as kv from docs, json_tree(body) b where b.atom not null limit 20;
+
+select _id , group_concat(b.key || ': ' ||  b.value, x'0a') as kv from docs, json_tree(body) b where b.atom not null group by _id limit 3;
+
+
+CREATE VIRTUAL TABLE docs_fts USING fts5(
+    btext, 
+    content='docs', 
+    content_rowid='_id' 
+)
+
+CREATE VIRTUAL TABLE docs_fts USING fts5(
+    _id,
+    btext
+)
+
+    INSERT INTO extra_q (id, chinese, pinyin, english, [type], description, tag)
+    SELECT @id, @chinese, @pinyin, @english, @type, @description, @tag
+    WHERE EXISTS (SELECT 1 FROM extra WHERE id = @id)
+
+INSERT INTO docs_fts(_id, btext) 
+SELECT _id, group_concat(b.key || ': ' ||  b.value, x'0a') as btext from docs, json_tree(body) b where b.atom not null group by _id
+
+*/

@@ -1,4 +1,9 @@
 <script context="module">
+/*
+https://svelte.dev/repl/3238e5737f764431a26e243800dccc6d?version=3.16.4
+
+RemoteTable
+*/
     var base_url = "http://localhost:3039/__api"
 
 	export async function load({ page, fetch, session, stuff }) {
