@@ -10,6 +10,7 @@
         "ovidigital/js-object-to-json": "^1.0",
         "league/glide": "^2.0",
         "league/flysystem-memory": "^2.0",
-        "sensiolabs/ansi-to-html": "^1.2"
+        "sensiolabs/ansi-to-html": "^1.2",
+        "paragonie/easydb": "^2.11"
     }
 }

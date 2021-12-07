@@ -110,6 +110,14 @@ function xload_data($sources, $hooks) {
     return $db;
 }
 
+function get_store($config){
+    if($config['store']== 'sqlite'){
+        $db = new store_sqlite($config);
+    }else{
+        $db = new store($config['templates']);
+    }
+    return $db;
+}
 function load_data($sources, $hooks, $config) {
     $db = new store($config['templates']);
 
