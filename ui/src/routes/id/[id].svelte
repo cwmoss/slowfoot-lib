@@ -29,6 +29,6 @@ export let body
 export let id
 
 </script>
-<h1>slowfoot explorer</h1>
-{id}
-{body}
+<h1>{id}</h1>
+
+<div class="code">{body}</div>

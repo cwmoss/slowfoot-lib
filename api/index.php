@@ -6,6 +6,12 @@ php -S localhost:3039 -t ui/ api/index.php
 
 *** php -S 127.0.0.1:3039 -t api/ api/index.php 
 
+https://epilys.github.io/bibliothecula/notekeeping.html
+
+https://24ways.org/2018/fast-autocomplete-search-for-your-website/
+
+https://docs.datasette.io/en/stable/full_text_search.html
+
 */
 
 require_once __DIR__.'/../vendor/autoload.php';
@@ -56,6 +62,11 @@ $router->mount('/__api', function () use ($router, $dbf) {
         resp($row);
     });
 
+    $router->get('/fts', function () use ($router, $db) {
+        $q = $_GET['q'];
+        $rows = $db->q("SELECT _id, snippet(docs_fts,1, '<b>', '</b>', '[...]', 30) body FROM docs_fts WHERE docs_fts = ? ", $q);
+        resp($rows);
+    });
 });
 
 $router->set404(function () {

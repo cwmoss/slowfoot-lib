@@ -1,7 +1,18 @@
+<script>
+
+import Search from "$lib/search.svelte";
+
+
+</script>
+
 <nav>
-	<a href="/">Home</a>
+    <a href="/" class="logo"><strong>slowfoot explorer</strong></a>
+
 	<a href="/about">About</a>
-	<a href="/settings">Settings</a>
+	
+    <Search></Search>
 </nav>
 
+<main>
 <slot></slot>
+</main>

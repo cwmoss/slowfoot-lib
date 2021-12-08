@@ -29,7 +29,7 @@ RemoteTable
 <script>
 export let stats
 </script>
-<h1>slowfoot explorer</h1>
+
 
 <ul>
     {#each stats as type}

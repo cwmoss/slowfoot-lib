@@ -22,10 +22,11 @@
 	}    
 </script>
 <script>
+import {page} from '$app/stores'
 export let rows
 </script>
-<h1>slowfoot explorer</h1>
 
+<h1>_type: {$page.params.type}</h1>
 <ol>
     {#each rows as row}
     <li><a href="id/{row._id}">{row._id}</a></li>
