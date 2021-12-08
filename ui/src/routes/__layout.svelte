@@ -2,6 +2,7 @@
 
 import Search from "$lib/search.svelte";
 
+console.log("layout script")
 
 </script>
 

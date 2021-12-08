@@ -4,7 +4,11 @@ https://svelte.dev/repl/3238e5737f764431a26e243800dccc6d?version=3.16.4
 
 RemoteTable
 */
-    var base_url = "http://localhost:3039/__api"
+	//import { base_url } from '$lib/stores.js';
+	import {base_url} from '$lib/config.js'
+    // var base_url = "http://localhost:3039/__api"
+	
+	console.log("index page module", base_url)
 
 	export async function load({ page, fetch, session, stuff }) {
 		const url = `${base_url}/index`;
@@ -15,7 +19,7 @@ RemoteTable
             
 			return {
 				props: {
-					stats: data
+					stats: data['res']
 				}
 			};
 		}

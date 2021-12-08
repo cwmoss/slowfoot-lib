@@ -247,6 +247,18 @@ function shell_command($cmd, $parms, $opts=[])
 */
 function resp($data)
 {
+    $elapsed = microtime(true) - START_TIME;
+    if(!isset($data['res'])){
+        $data = ['res'=>$data];
+    }
+    if(isset($data['__meta'])){
+        $data['__meta']['time'] = $elapsed;
+    }else{
+        $data['__meta']=['time'=>$elapsed];
+    }
+    $data['_meta']['time_ms'] = (int)($elapsed * 1000);
+    $data['_meta']['time_microsec'] = (int)($elapsed * 1000 * 1000);
+    $data['_meta']['time_print'] = $data['_meta']['time_ms']?$data['_meta']['time_ms'].' ms':$data['_meta']['time_microsec'].' μs';
     header('Content-Type: application/json'); //; charset=utf-8
     print json_encode($data);
 

@@ -21,7 +21,8 @@ require_once __DIR__.'/utils_server.php';
 
 $dbf = __DIR__.'/../dataset-mumok.ndjson.db';
 
-
+ini_set("precision", 16);
+define('START_TIME', microtime(true));
 
 error_reporting(E_ALL & ~E_NOTICE);
 

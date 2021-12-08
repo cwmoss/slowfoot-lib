@@ -1,5 +1,5 @@
 <script context="module">
-    var base_url = "http://localhost:3039/__api"
+    import {base_url} from '$lib/config.js'
 
 	export async function load({ page, fetch, session, stuff }) {
 		const url = `${base_url}/type/${page.params.type}`;
@@ -10,7 +10,7 @@
             
 			return {
 				props: {
-					rows: data.rows
+					rows: data.res.rows
 				}
 			};
 		}
