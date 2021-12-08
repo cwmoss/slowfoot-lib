@@ -1,8 +1,9 @@
 <script>
 
 import Search from "$lib/search.svelte";
+import { req_meta } from "$lib/stores.js";
 
-console.log("layout script")
+console.log("layout script", $req_meta)
 
 </script>
 
@@ -12,6 +13,8 @@ console.log("layout script")
 	<a href="/about">About</a>
 	
     <Search></Search>
+    {#if $req_meta}<span>{$req_meta.time_print || ''}</span>{/if}
+
 </nav>
 
 <main>

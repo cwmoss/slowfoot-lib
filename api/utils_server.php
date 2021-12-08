@@ -256,9 +256,10 @@ function resp($data)
     }else{
         $data['__meta']=['time'=>$elapsed];
     }
-    $data['_meta']['time_ms'] = (int)($elapsed * 1000);
-    $data['_meta']['time_microsec'] = (int)($elapsed * 1000 * 1000);
-    $data['_meta']['time_print'] = $data['_meta']['time_ms']?$data['_meta']['time_ms'].' ms':$data['_meta']['time_microsec'].' μs';
+    $data['__meta']['time_ms'] = (int)($elapsed * 1000);
+    $data['__meta']['time_microsec'] = (int)($elapsed * 1000 * 1000);
+    $data['__meta']['time_print'] = $data['__meta']['time_ms']?
+        $data['__meta']['time_ms'].' ms':$data['__meta']['time_microsec'].' μs';
     header('Content-Type: application/json'); //; charset=utf-8
     print json_encode($data);
 

@@ -1,5 +1,5 @@
 <script context="module">
-    import {base_url} from '$lib/config.js'
+    import {base_url, handle_resp} from '$lib/config.js'
 
 	export async function load({ page, fetch, session, stuff }) {
 		const url = `${base_url}/type/${page.params.type}`;
@@ -7,7 +7,7 @@
         
 		if (res.ok) {
             const data =  await res.json()
-            
+            handle_resp(data)
 			return {
 				props: {
 					rows: data.res.rows
