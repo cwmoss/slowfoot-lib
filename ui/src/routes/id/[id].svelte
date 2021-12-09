@@ -1,6 +1,6 @@
 <script context="module">
     import {base_url, handle_resp} from '$lib/config.js'
-    import {InspectorJSON} from '$lib/inspector_json/inspector_json.js'
+    import Jinspector from '$lib/jinspector.svelte'
 
 	export async function load({ page, fetch, session, stuff }) {
 		const url = `${base_url}/id/${page.params.id}`;
@@ -24,6 +24,9 @@
 	}    
 </script>
 <script>
+// import {InspectorJSON} from '$lib/inspector_json/inspector_json.js'
+
+
 // https://github.com/sparkartgroup/Inspector-JSON
 import { onMount } from 'svelte';
 export let body
@@ -31,14 +34,19 @@ export let id
 let inspector_el
 let inspector
 
+// <div id="jsoni" class="code" bind:this={inspector_el}>{body}</div>
+
 onMount(() => {
-		console.log('the component has mounted', inspector_el);
-        inspector = new InspectorJSON({
+		console.log('the ID page component has mounted', inspector_el);
+       /* inspector = new InspectorJSON({
             element: 'jsoni',
             collapsed: false
         });
+		*/
 	});
 </script>
 <h1>{id}</h1>
 
-<div id="jsoni" class="code" bind:this={inspector_el}>{body}</div>
+
+
+<Jinspector json={body}></Jinspector>
