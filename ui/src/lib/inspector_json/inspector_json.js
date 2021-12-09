@@ -1,16 +1,46 @@
-var typeOf = require('type-of');
-var extend = require('extend');
-var Delegate = require('dom-delegate');
-var store = require('store');
+import Delegate from 'ftdomdelegate/main.js';
+
+var toString = Object.prototype.toString;
+
+var typeOf = function(object) {
+  var type = typeof object;
+
+  if (type === 'undefined') {
+    return 'undefined';
+  }
+  
+  if (object) {
+    type = object.constructor.name; 
+  } else if (type === 'object') {
+    type = toString.call(object).slice(8, -1);
+  }
+
+  return type.toLowerCase();
+}
+
+
+// var store = require('store');
 
 // a bad toggleClass method
-var toggleClass = require('./toggle_class.js');
+var toggleClass = function( el, class_string ){
+	var classes = el.className;
+	var classRegEx = new RegExp( '\\b'+ class_string +'\\b', 'ig' );
+	var class_exists = !!classRegEx.exec( classes );
+	el.className = class_exists?
+		classes.replace( classRegEx, '' ):
+		classes +' '+ class_string;
+	return el;
+};
 
 // a possibly good string escaping method
-var HTMLEscape = require('./html_escape.js');
+var HTMLEscape = function( string ){
+	var div = document.createElement('div');
+	div.appendChild( document.createTextNode( string ) );
+	return div.innerHTML;
+};
 
 var InspectorJSON = function( params ){
-
+	console.log("all params", params)
 	params = params || {};
 	var defaults = {
 		element: 'body',
@@ -19,11 +49,14 @@ var InspectorJSON = function( params ){
 		url: location.pathname
 	};
 	
-	params = extend( defaults, params );
+	params = Object.assign( {}, defaults, params );
+	console.log("all params 2", params)
+
 	// if the supplied element isn't an element, try to select it by ID
 	if( typeOf( params.element ) !== 'element' ) params.element = document.getElementById( params.element );
 	
-	var collapse_states = store.get( params.url +':inspectorJSON/collapse_states' ) || {};
+	// var collapse_states = store.get( params.url +':inspectorJSON/collapse_states' ) || {};
+	var collapse_states = {}
 	this.el = params.element;
 	this.el.className += ' inspector-json viewer';
 	
@@ -40,7 +73,7 @@ var InspectorJSON = function( params ){
 		else {
 			delete collapse_states[path];
 		}
-		store.set( params.url +':inspectorJSON/collapse_states', collapse_states );
+		// store.set( params.url +':inspectorJSON/collapse_states', collapse_states );
 	});
 	
 	// Create the JSON Viewer on the specified element
@@ -159,4 +192,4 @@ var InspectorJSON = function( params ){
 	
 };
 
-module.exports = InspectorJSON;
+export {InspectorJSON}
