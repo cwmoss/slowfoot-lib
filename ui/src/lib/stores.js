@@ -3,7 +3,7 @@ import { browser } from "$app/env";
 
 const url = "http://localhost:3039/__api"
 
-const req_meta = writable({})
+const req_meta = writable({loading:false, m: {}})
 
 
 console.log('store env', import.meta, browser)

@@ -9,7 +9,7 @@ RemoteTable
     // var base_url = "http://localhost:3039/__api"
 	
 	console.log("index page module", base_url)
-
+/*
 	export async function load({ page, fetch, session, stuff }) {
 		const url = `${base_url}/index`;
 		const res = await fetch(url);
@@ -28,15 +28,17 @@ RemoteTable
 			status: res.status,
 			error: new Error(`Could not load ${url}`)
 		};
-	}    
+	}
+*/    
 </script>
 <script>
-export let stats
+// export let stats
+let url = "https://www.swapi.tech/api/people/1"
+	
+
+//const [data, loading, error, get] = fetchStore(url)
+
 </script>
 
 
-<ul>
-    {#each stats as type}
-    <li><a href="{type._type}">{type._type} ({type.total})</a></li>
-    {/each}
-</ul>
+

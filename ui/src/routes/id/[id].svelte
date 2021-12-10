@@ -4,6 +4,7 @@
 
 	export async function load({ page, fetch, session, stuff }) {
 		const url = `${base_url}/id/${page.params.id}`;
+		handle_resp(true)
 		const res = await fetch(url);
         
 		if (res.ok) {

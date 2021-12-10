@@ -1,4 +1,4 @@
-<label class="has_icon">Suche
+<label class="has_icon">
     <input type="text" >
     <svg width="16" height="16" fill="currentColor">
         <title>Search</title>

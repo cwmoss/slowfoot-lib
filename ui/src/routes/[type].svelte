@@ -3,6 +3,7 @@
 
 	export async function load({ page, fetch, session, stuff }) {
 		const url = `${base_url}/type/${page.params.type}`;
+		handle_resp(true)
 		const res = await fetch(url);
         
 		if (res.ok) {
@@ -23,8 +24,13 @@
 </script>
 <script>
 import {page} from '$app/stores'
+
+
 export let rows
 </script>
+
+
+
 
 <h1>_type: {$page.params.type}</h1>
 <ol>
