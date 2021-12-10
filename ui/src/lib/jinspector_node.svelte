@@ -17,7 +17,7 @@ function init(data){
     if(parent) parent_type=typeOf(parent)
 }
 
-console.log("++ data ", data, typeOf(data))
+//console.log("++ data ", data, typeOf(data))
 //let toString = Object.prototype.toString;
 
 function HTMLEscape( string ){
@@ -71,5 +71,13 @@ onMount(()=>{
         <li class={type}><strong>{key}</strong><em>{data}</em></li>
     {:else if type=='null'}
         <li class={type}><strong>{key}</strong><i>null</i></li>
-    {:else if type=='string'}<li class={type}><strong>{key}</strong><span>{data}</span></li>{/if}
+    {:else if type=='string'}
+        <li class={type}><strong>{key}</strong>
+        {#if key=='_ref'}
+            <a href="{'/id/'+data}" class="underline">{data}</a>
+        {:else}
+            <span>{data}</span>
+        {/if}
+        </li>
+    {/if}
 {/if}

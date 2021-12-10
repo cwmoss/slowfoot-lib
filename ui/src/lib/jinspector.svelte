@@ -4,6 +4,8 @@ import JinspectorNode from './jinspector_node.svelte';
 
 export let json
 let data
+
+$: data = JSON.parse(json)
 let domnode
 let collapse_states = {}
 
@@ -19,10 +21,10 @@ let defaults = {
 params = Object.assign( {}, defaults, params );
 
 function toggle(e){
-    console.log("+++ toggle", e)
+    //console.log("+++ toggle", e)
 }
 function toggle_array(e){
-    console.log("+++ togglearray", e)
+    // console.log("+++ togglearray", e)
 }
 
 var toString = Object.prototype.toString;
@@ -128,22 +130,21 @@ function do_inspect(){
 }
 
 onMount(()=>{
-    console.log("mounted inspector", json)
-    do_inspect()
-    console.log("mounted inspector2", data)
+    //console.log("mounted inspector", json)
+    // do_inspect()
+    //console.log("mounted inspector2", data)
     //console.log("== env, kalender2 == meta.env, browser, prerendering ", import.meta.env, browser, prerendering)
     //if(!prerendering) img_prefix = ""
 })
 
 </script>
 
-
-
-<div class="inspector-json viewer" bind:this={domnode} on:click="{toggle}">
-    
-</div>
 {#if data}
-<div class="inspector-json viewer code"><ul>{#each Object.entries(data) as [k, value]}<JinspectorNode data={value} parent={data} key={k}></JinspectorNode>{/each}</ul></div>
+<div class="inspector-json viewer code">
+    <ul>{#each Object.entries(data) as [k, value]}
+        <JinspectorNode data={value} parent={data} key={k}></JinspectorNode>{/each}
+    </ul>
+</div>
 {/if}
 <style>
    

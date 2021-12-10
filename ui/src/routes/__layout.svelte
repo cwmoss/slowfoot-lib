@@ -13,10 +13,11 @@ console.log("layout script", $req_meta)
     <a href="/" class="logo"><strong>slowfoot explorer</strong></a>
 
 	<a href="/about">About</a>
-	
-    <Search></Search>
-    {#if $req_meta}<span>{$req_meta.time_print || ''}</span>{/if}
-
+   
+	<div class="nav-right">
+        <Search></Search>
+        <div class="nav-stats">{#if $req_meta}<span>{$req_meta.time_print || ''}</span>{/if}</div>
+    </div>
 </nav>
 
 <main>

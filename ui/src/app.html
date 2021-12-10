@@ -11,6 +11,8 @@
 		Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 	--fmono: "SFMono-Regular", Consolas, Liberation Mono, Menlo, Courier, monospace;
 	--cgelb: rgb(246, 211, 85);
+	--wcontainer: 90rem;
+	--pdcontainer: 6rem;
 }
 body{
 	font-family: var(--fbrot);
@@ -20,12 +22,25 @@ body{
 	background-color: white;
 }
 main, nav{
-	width:800px;
+	padding: 0 var(--pdcontainer);
 	margin: 0 auto;
-	padding: 16px;
+	max-width: var(--wcontainer);
 }
-
-a{
+nav{
+	padding-top: 16px;
+	display: flex;
+	align-items: center;
+}
+.nav-right{
+	margin-left: auto;
+}
+.nav-stats{
+	display: inline-block;
+}
+nav a{
+	margin-right:16px;
+}
+a, .inspector-json li > a.underline, .inspector-json ol > a.underline{
 	color: black;
     text-decoration: underline; 
     text-decoration-color: var(--cgelb);
