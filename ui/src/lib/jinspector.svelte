@@ -142,10 +142,9 @@ onMount(()=>{
 <div class="inspector-json viewer" bind:this={domnode} on:click="{toggle}">
     
 </div>
-<div class="inspector-json viewer code">
-    <JinspectorNode data={data}></JinspectorNode>
-</div>
-
+{#if data}
+<div class="inspector-json viewer code"><ul>{#each Object.entries(data) as [k, value]}<JinspectorNode data={value} parent={data} key={k}></JinspectorNode>{/each}</ul></div>
+{/if}
 <style>
    
 </style>
