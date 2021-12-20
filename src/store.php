@@ -3,44 +3,47 @@
 namespace slowfoot;
 
 class store {
-    public $data = [];
-
+   
     // key: _id, value: [path_name => path]
     public $paths = [];
     // key: path, value: [_id, path_name]
     public $paths_rev = [];
+
     public $info = ['loaded' => [], 'rejected' => [], 'conflicts' => 0];
     public $config = [];
     public $conflicts = [];
 
-    public function __construct($config) {
+    public $db;
+
+    public function __construct($db, $config) {
+        $this->db = $db;
         $this->config = $config;
     }
 
     public function data() {
-        return $this->data;
+        return $this->db->data();
     }
 
     public function get($id) {
         if (is_array($id)) {
             $id = $id['_id'];
         }
-        return $this->data[$id];
+        return $this->db->get('docs', $id);
     }
 
     public function ref($id) {
         if (is_array($id)) {
             $id = $id['_ref'];
         }
-        return $this->data[$id];
+        return $this->db->get('docs', $id);
     }
 
     public function add($id, $row) {
-        if (isset($this->data[$id])) {
+        if($this->db->exists("docs", $id)){
             return false;
         }
         $row['_id'] = $id;
-        $this->data[$id] = $row;
+        $this->db->add("docs", $id, $row);
         $this->info['loaded'][$row['_type']]++;
         $this->add_path($row);
         return true;
@@ -51,11 +54,11 @@ class store {
     }
 
     public function update($id, $row) {
-        if (!isset($this->data[$id])) {
+        if (!$this->db->exists("docs", $id)) {
             return false;
         }
         $row['_id'] = $id;
-        $this->data[$id] = $row;
+        return $this->db->update("docs", $id, $row);
     }
 
     public function update_row($row) {
@@ -69,7 +72,7 @@ class store {
         if (is_array($dest)) {
             $dest = $dest['_id'];
         }
-        $this->data[$src_id][$src_prop][] = ['_ref' => $dest];
+        $this->db->add_ref($src_id, $src_prop, $dest);
     }
 
     public function add_path($row) {
@@ -81,11 +84,11 @@ class store {
         foreach ($this->config[$row['_type']] as $name => $conf) {
             //print_r($conf);
             $path = $conf['path']($row);
+            if($this->db->path_exists($path))
             if (isset($this->paths_rev[$path])) {
                 $this->conflict($path, $name, $row);
             } else {
-                $this->paths[$row['_id']][$name] = $path;
-                $this->paths_rev[$path] = [$row['_id'], $name];
+                $this->db->path_add($path, $row['_id'], $name);
             }
         }
     }
@@ -101,11 +104,11 @@ class store {
         if (!$name) {
             $name = '_';
         }
-        return $this->paths[$id][$name];
+        return $this->db->get_path($id, $name);
     }
 
     public function get_by_path($path) {
-        return $this->paths_rev[$path];
+        return $this->db->path_get_props($path);
     }
 
     public function rejected($type) {

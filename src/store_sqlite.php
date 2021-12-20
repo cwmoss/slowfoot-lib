@@ -9,15 +9,17 @@ class store_sqlite {
     public $paths = [];
     // key: path, value: [_id, path_name]
     public $paths_rev = [];
-    public $info = ['loaded' => [], 'rejected' => [], 'conflicts' => 0];
     public $config = [];
-    public $conflicts = [];
 
     public function __construct($config) {
         $this->config = $config;
-        $db = $config['base'].'/slowfoot.db';
+        $adapter = explode(':', $config['adapter']);
+        $name = $adapter[1]??($adapter['name'])??'slowfoot.db';
+        if($name!='memory' && $name[0]!='/'){
+            $name = $config['base'].'/'.$name;
+        }
         $this->db = \ParagonIE\EasyDB\Factory::fromArray([
-            "sqlite:$db"
+            "sqlite:$name"
         ]);
         $this->create_schema();
     }
@@ -31,139 +33,68 @@ CREATE TABLE IF NOT EXISTS docs (
     );
 CREATE INDEX IF NOT EXISTS docs_id on docs(_id);
 CREATE INDEX IF NOT EXISTS docs_type on docs(_type);
+CREATE TABLE IF NOT EXISTS paths (
+    path TEXT NOT NULL,
+    id TEXT NOT NULL,
+    name TEXT DEFAULT '_' NOT NULL
+    );
         ";
         return $this->db->run($ddl);
     }
 
-    public function data() {
-        return [];
+    function exists($collection, $id){
+        return $this->db->cell('SELECT count(_id) from docs WHERE _id=?', $id)?true:false;
     }
 
-    public function get($id) {
-        if (is_array($id)) {
-            $id = $id['_id'];
-        }
+    public function get($collection, $id) {
         return $this->_select_one($id);
     }
 
-    public function ref($id) {
-        if (is_array($id)) {
-            $id = $id['_ref'];
-        }
-        return $this->_select_one($id);
+    public function add($collection, $id, $row) {
+        $this->db->insert('docs', [
+            'body' => \json_encode($row),
+        ]);
+        return true;
+    }
+
+    public function update($collection, $id, $row) {
+        $this->db->update('docs', [
+            'body' => \json_encode($row),
+        ], [
+            '_id' => $id
+        ]);
+        return true;
+    }
+
+    public function add_ref($src_id, $src_prop, $dest) {
+    //    $this->data[$src_id][$src_prop][] = ['_ref' => $dest];
+    }
+
+    public function path_exists($path){
+        return $this->db->cell('SELECT count(id) from paths WHERE path=?', $path)?true:false;
+    }
+
+    public function path_add($path, $id, $name){
+        $this->db->insert('paths', [
+            'path' => $path,
+            'id' => $id,
+            'name' => $name
+        ]);
+        return true;
+    }
+    public function path_get($id, $name){
+        $p = $this->db->cell('SELECT path from paths WHERE id=? AND name=?', $id, $name);
+        return $p;
+    }
+
+    public function path_get_props($path) {
+        $p = $this->db->cell('SELECT id,name from paths WHERE path=?', $id, $name);
+        return [$p['id'], $p['name']];
     }
 
     function _select_one($id){
         return $this->db->cell('SELECT body from docs WHERE _id=?', $id);
     }
 
-    function _exists($id){
-        return $this->db->cell('SELECT count(_id) from docs WHERE _id=?', $id)?true:false;
-    }
 
-    function _update($id, $row){
-
-    }
-    
-    public function add($id, $row) {
-        if ($this->_exists($id)) {
-            return false;
-        }
-        $row['_id'] = $id;
-        $this->db->insert('docs', [
-            'body' => \json_encode($row),
-        ]);
-        
-        $this->add_path($row);
-        return true;
-    }
-
-    public function add_row($row) {
-        return $this->add($row['_id'], $row);
-    }
-
-    public function update($id, $row) {
-        if (!$this->_exists($id)) {
-            return false;
-        }
-        $row['_id'] = $id;
-        $this->data[$id] = $row;
-    }
-
-    public function update_row($row) {
-        return $this->update($row['_id'], $row);
-    }
-
-    public function add_ref($src_id, $src_prop, $dest) {
-        if (is_array($src_id)) {
-            $src_id = $src_id['_id'];
-        }
-        if (is_array($dest)) {
-            $dest = $dest['_id'];
-        }
-        $this->data[$src_id][$src_prop][] = ['_ref' => $dest];
-    }
-
-    public function add_path($row) {
-        //print ' type: ' . $row['_type'];
-        // only, if we have a template for the type
-        if (!$this->config[$row['_type']]) {
-            return;
-        }
-        foreach ($this->config[$row['_type']] as $name => $conf) {
-            //print_r($conf);
-            $path = $conf['path']($row);
-            if (isset($this->paths_rev[$path])) {
-                $this->conflict($path, $name, $row);
-            } else {
-                $this->paths[$row['_id']][$name] = $path;
-                $this->paths_rev[$path] = [$row['_id'], $name];
-            }
-        }
-    }
-
-    public function get_path($id, $name = null) {
-        return PATH_PREFIX . $this->get_fpath($id, $name);
-    }
-
-    public function get_fpath($id, $name = null) {
-        if (is_array($id)) {
-            $id = $id['_id'];
-        }
-        if (!$name) {
-            $name = '_';
-        }
-        return $this->paths[$id][$name];
-    }
-
-    public function get_by_path($path) {
-        return $this->paths_rev[$path];
-    }
-
-    public function rejected($type) {
-        $this->info['rejected'][$type]++;
-    }
-
-    private function conflict($path, $name, $row) {
-        [$firstid, $firstname] = $this->get_by_path($path);
-        $first = $this->get($firstid);
-
-        $this->conflicts[] = [
-            'path' => $path,
-            'rev' => [$row['_id'], $name],
-            'first' => [
-                '_id' => $firstid,
-                '_type' => $first['_type'],
-                'name' => $firstname,
-                'row' => $first
-            ],
-            'second' => [
-                '_id' => $row['_id'],
-                '_type' => $row['_type'],
-                'name' => $name,
-                'row' => $row
-            ]
-        ];
-        $this->info['conflicts']++;
-    }
 }
