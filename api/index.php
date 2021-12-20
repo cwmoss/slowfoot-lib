@@ -20,6 +20,7 @@ require_once __DIR__.'/utils_server.php';
 #print "hallo";
 
 $dbf = __DIR__.'/../dataset-mumok.ndjson.db';
+$dbf = __DIR__.'/../hkw.db';
 
 ini_set("precision", 16);
 define('START_TIME', microtime(true));

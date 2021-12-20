@@ -1,5 +1,12 @@
 <?php
+/*
 
+CREATE VIRTUAL TABLE docs_fts USING fts5( _id, btext);
+
+INSERT INTO docs_fts(_id, btext)
+    SELECT _id, group_concat(b.key || ': ' ||  b.value, x'0a') as btext from docs, json_tree(body) b where b.atom not null group by _id;
+
+*/
 namespace slowfoot;
 
 class store_sqlite {
