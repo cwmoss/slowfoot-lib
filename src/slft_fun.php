@@ -17,6 +17,7 @@ function load_config($dir) {
     $conf['templates'] = $tpls;
     $conf['base'] = $dir;
     $conf['assets'] = normalize_assets_config($conf);
+    $conf['store'] = normalize_store_config($conf);
     return $conf;
 }
 
@@ -38,6 +39,14 @@ function normalize_template_config($name, $config) {
     return $tpl;
 }
 
+function normalize_store_config($conf){
+    $def = ['adapter'=>'memory'];
+    $store = $conf['store']??null;
+    if(!$store) return $def;
+    if(is_string($store)) $store=['adapter'=>$store];
+    $store['base'] = $conf['base'];
+    return $store;
+}
 function normalize_assets_config($conf) {
     $assets = $conf['assets'] ?: [];
     $default = ['base' => $conf['base'], 'src' => 'images', 'dest' => 'cache', 'profiles' => []];
@@ -112,15 +121,14 @@ function xload_data($sources, $hooks) {
 
 function get_store($config){
     if($config['store']== 'sqlite'){
-        $db = new store_sqlite($config);
+        $db = new store_sqlite($config['store']);
     }else{
-        $db = new store($config['templates']);
+        $db = new store_memory();
     }
-    return $db;
+    return new store($db, $config['templates']);
 }
 function load_data($sources, $hooks, $config) {
-    $db = new store($config['templates']);
-
+    $db = get_store($config);
     foreach ($sources as $name => $opts) {
         if (!is_array($opts)) {
             $opts = ['file' => $opts];
