@@ -1,12 +1,23 @@
 <?php
 require_once 'lolql.php';
 require_once 'store.php';
+require_once 'store_memory.php';
+require_once 'store_sqlite.php';
 require_once 'JsConverter.php';
 
 use slowfoot\store;
+use slowfoot\store_memory;
+use slowfoot\store_sqlite;
 use Ovidigital\JsObjectToJson\JsConverter;
 use function lolql\parse;
 use function lolql\query as lquery;
+
+/*
+
+https://github.com/paquettg/php-html-parser
+https://github.com/Masterminds/html5-php
+
+*/
 
 function load_config($dir) {
     $conf = include $dir . '/config.php';
@@ -120,7 +131,7 @@ function xload_data($sources, $hooks) {
 }
 
 function get_store($config){
-    if($config['store']== 'sqlite'){
+    if($config['store']['adapter']== 'sqlite'){
         $db = new store_sqlite($config['store']);
     }else{
         $db = new store_memory();
@@ -129,6 +140,9 @@ function get_store($config){
 }
 function load_data($sources, $hooks, $config) {
     $db = get_store($config);
+    # TODO fetch or not
+    return $db;
+
     foreach ($sources as $name => $opts) {
         if (!is_array($opts)) {
             $opts = ['file' => $opts];
@@ -224,7 +238,11 @@ function load_late_template_helper($helper, $base){
     ];
 }
 
-function query($ds, $filter) {
+function query_type($ds, $type) {
+    return $ds->query_type($type);
+}
+
+function queryxxx($ds, $filter) {
     if (is_string($filter)) {
         $filter = ['_type' => $filter];
     }
@@ -254,8 +272,10 @@ function build_sorter($key) {
 
 function chunked_paginate($ds, $rule) {
     $limit = $rule['limit'] ?? 20;
-    $all = lquery($ds->data, $rule);
-    $total = count($all);
+    // $all = lquery($ds->data, $rule);
+    list($all, $total) = $ds->query($rule, $limit);
+
+    // $total = count($all);
     $totalpages = ceil($total / $limit);
     foreach (range(1, $totalpages) as $page) {
         $offset = ($page - 1) * $limit;
@@ -414,7 +434,10 @@ function page($_template, $data, $helper, $_base) {
     }
     return $content;
 }
-
+/*
+$x = new SimpleXMLElement('<element lang="sql"></element>');
+iterator_to_array($x->attributes()))
+*/
 function check_pagination($_template, $_base) {
     $content = file_get_contents($_base . '/pages/' . $_template . '.php');
     $prule = preg_match('!<page-query>(.*?)</page-query>!ism', $content, $mat);

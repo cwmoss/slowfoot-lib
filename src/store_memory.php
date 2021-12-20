@@ -2,6 +2,9 @@
 
 namespace slowfoot;
 
+use function lolql\parse;
+use function lolql\query as lquery;
+
 class store_memory {
     public $docs = [];
 
@@ -12,6 +15,19 @@ class store_memory {
     
     public function __construct() {
 
+    }
+
+    public function query($q, $limit){
+        $res = lquery($this->docs, $q);
+        return [$res, count($res)];
+    }
+
+    public function query_type($type){
+        $filter = ['_type' => $type];
+        $rs = array_filter($this->docs, function ($row) use ($filter) {
+            return evaluate($filter, $row);
+        });
+        return $rs;
     }
 
     public function exists($collection, $id) {

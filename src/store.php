@@ -20,6 +20,14 @@ class store {
         $this->config = $config;
     }
 
+    public function query($q, $limit=20){
+        return $this->db->query($q, $limit);
+    }
+
+    public function query_type($type){
+        return $this->db->query_type($type);
+    }
+
     public function data() {
         return $this->db->data();
     }
@@ -84,8 +92,7 @@ class store {
         foreach ($this->config[$row['_type']] as $name => $conf) {
             //print_r($conf);
             $path = $conf['path']($row);
-            if($this->db->path_exists($path))
-            if (isset($this->paths_rev[$path])) {
+            if($this->db->path_exists($path)){
                 $this->conflict($path, $name, $row);
             } else {
                 $this->db->path_add($path, $row['_id'], $name);
@@ -104,7 +111,7 @@ class store {
         if (!$name) {
             $name = '_';
         }
-        return $this->db->get_path($id, $name);
+        return $this->db->path_get($id, $name);
     }
 
     public function get_by_path($path) {

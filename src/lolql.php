@@ -4,6 +4,7 @@
 lolql - lovely query language
 
 make queries easy & keep it simple
+
 */
 
 namespace lolql;

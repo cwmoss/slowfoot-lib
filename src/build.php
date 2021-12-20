@@ -14,8 +14,10 @@ if (!$dist) {
     die('NO DIST-PATH FOUND');
 }
 
+print_r($config);
 print_r($ds->info);
-//exit;
+#print_r($ds->db->paths_rev);
+#exit;
 
 print "clean up dist/\n\n";
 `rm -rf $dist`;
@@ -28,7 +30,7 @@ foreach ($templates as $type => $conf) {
     $bs = 100;
     $start = 0;
 
-    foreach (query($ds, $type) as $row) {
+    foreach (query_type($ds, $type) as $row) {
         foreach ($conf as $templateconf) {
             //	process_template_data($row, path($row['_id']));
             $path = $ds->get_fpath($row['_id'], $templateconf['name']);

@@ -3,7 +3,9 @@
 // some routing exceptions
 // for development
 //print_r($_SERVER);
-
+/*
+https://www.php.net/features.commandline.webserver
+*/
 if (PHP_SAPI == 'cli-server') {
     $docroot = $_SERVER['DOCUMENT_ROOT'];
     // $requestpath = dirname($_SERVER['SCRIPT_NAME']);

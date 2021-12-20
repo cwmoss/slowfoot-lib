@@ -34,9 +34,14 @@ class store_sqlite {
     public function create_schema(){
         $ddl = "
 CREATE TABLE IF NOT EXISTS docs (
-    body TEXT,
-    _id TEXT GENERATED ALWAYS AS (json_extract(body, '\$._id')) VIRTUAL NOT NULL,
-    _type TEXT GENERATED ALWAYS AS (json_extract(body, '\$._type')) VIRTUAL NOT NULL,
+    body JSON,
+    _id TEXT GENERATED ALWAYS AS (json_extract(body, '$._id'))
+        VIRTUAL
+        NOT NULL
+        UNIQUE ON CONFLICT REPLACE,
+    _type TEXT GENERATED ALWAYS AS (json_extract(body, '$._type'))
+        VIRTUAL
+        NOT NULL
     );
 CREATE INDEX IF NOT EXISTS docs_id on docs(_id);
 CREATE INDEX IF NOT EXISTS docs_type on docs(_type);
@@ -45,8 +50,33 @@ CREATE TABLE IF NOT EXISTS paths (
     id TEXT NOT NULL,
     name TEXT DEFAULT '_' NOT NULL
     );
+CREATE INDEX IF NOT EXISTS paths_path on paths(path);
+CREATE INDEX IF NOT EXISTS paths_id on paths(id);
         ";
-        return $this->db->run($ddl);
+        $statements = explode(';', $ddl);
+        #print $ddl;
+        foreach($statements as $ddl_s){
+            if(trim($ddl_s))            $this->db->run($ddl_s);
+        }
+        return ;
+    }
+
+    public function query($q, $limit){
+        return [[], 0];
+        $res = lquery($this->docs, $q);
+        return [$res, count($res)];
+    }
+
+    public function query_type($type){
+        $res = $this->db->run("select body from docs WHERE _type=?", $type);
+        $res = array_map(function($r){return json_decode($r['body'], true);}, $res);
+        #var_dump($res);
+        return $res;
+        $filter = ['_type' => $type];
+        $rs = array_filter($this->docs, function ($row) use ($filter) {
+            return evaluate($filter, $row);
+        });
+        return $rs;
     }
 
     function exists($collection, $id){
@@ -95,12 +125,12 @@ CREATE TABLE IF NOT EXISTS paths (
     }
 
     public function path_get_props($path) {
-        $p = $this->db->cell('SELECT id,name from paths WHERE path=?', $id, $name);
+        $p = $this->db->cell('SELECT id,name from paths WHERE path=?', $path);
         return [$p['id'], $p['name']];
     }
 
     function _select_one($id){
-        return $this->db->cell('SELECT body from docs WHERE _id=?', $id);
+        return json_decode($this->db->cell('SELECT body from docs WHERE _id=?', $id), true);
     }
 
 
