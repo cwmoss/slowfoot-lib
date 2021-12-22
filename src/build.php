@@ -21,7 +21,7 @@ print_r($ds->info);
 
 print "clean up dist/\n\n";
 `rm -rf $dist`;
-
+// array_map( 'unlink', array_filter((array) glob("$dist/*") ) );
 // exit;
 
 foreach ($templates as $type => $conf) {

@@ -17,6 +17,8 @@ use function lolql\query as lquery;
 https://github.com/paquettg/php-html-parser
 https://github.com/Masterminds/html5-php
 
+if (! function_exists(__NAMESPACE__ . '\greetings')) 
+
 */
 
 function load_config($dir) {
