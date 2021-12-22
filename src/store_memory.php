@@ -17,6 +17,14 @@ class store_memory {
 
     }
 
+    public function has_data_on_create(){
+        return false;
+    }
+
+    public function query_sql($q, $params=[]){
+        return [];
+    }
+    
     public function query($q, $limit){
         $res = lquery($this->docs, $q);
         return [$res, count($res)];
