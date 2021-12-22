@@ -20,6 +20,14 @@ class store {
         $this->config = $config;
     }
 
+    public function has_data_on_create(){
+        return $this->db->has_data_on_create();
+    }
+
+    public function query_sql($q, $params){
+        return $this->db->query_sql($q, $params);
+    }
+
     public function query($q, $limit=20){
         return $this->db->query($q, $limit);
     }

@@ -83,3 +83,28 @@ function fetch($url, $data) {
     return $response;
 }
 
+function globstar($pattern, $flags = 0)
+{
+    if (stripos($pattern, '**') === false) {
+        $files = glob($pattern, $flags);
+    } else {
+        $position = stripos($pattern, '**');
+        $rootPattern = substr($pattern, 0, $position - 1);
+        $restPattern = substr($pattern, $position + 2);
+        $patterns = array($rootPattern.$restPattern);
+        $rootPattern .= '/*';
+        while ($dirs = glob($rootPattern, GLOB_ONLYDIR)) {
+            $rootPattern .= '/*';
+            foreach ($dirs as $dir) {
+                $patterns[] = $dir . $restPattern;
+            }
+        }
+        $files = array();
+        foreach ($patterns as $pat) {
+            $files = array_merge($files, globstar($pat, $flags));
+        }
+    }
+    $files = array_unique($files);
+    sort($files);
+    return $files;
+}

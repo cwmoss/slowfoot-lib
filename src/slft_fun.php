@@ -4,6 +4,7 @@ require_once 'store.php';
 require_once 'store_memory.php';
 require_once 'store_sqlite.php';
 require_once 'JsConverter.php';
+require_once 'template.php';
 
 use slowfoot\store;
 use slowfoot\store_memory;
@@ -133,7 +134,7 @@ function xload_data($sources, $hooks) {
 }
 
 function get_store($config){
-    if($config['store']['adapter']== 'sqlite'){
+    if(strpos($config['store']['adapter'], 'sqlite') === 0){
         $db = new store_sqlite($config['store']);
     }else{
         $db = new store_memory();
@@ -143,7 +144,10 @@ function get_store($config){
 function load_data($sources, $hooks, $config) {
     $db = get_store($config);
     # TODO fetch or not
-    return $db;
+    if($db->has_data_on_create()) return $db;
+    $db_store = get_class($db->db);
+    print "~~~~~ FETCHING DATA ~~~~~~\n";
+    print "~~~~~ STORE: {$db_store} ~~~~~~\n";
 
     foreach ($sources as $name => $opts) {
         if (!is_array($opts)) {
@@ -231,14 +235,7 @@ function load_csv($opts, $config) {
     }
 }
 
-function load_late_template_helper($helper, $base){
-    return [
-       'partial' => function ($template, $data) use ($helper, $base) {
-            //dbg('+++ partial src', $src);
-            return partial($base, $template, $data, $helper);
-        }
-    ];
-}
+
 
 function query_type($ds, $type) {
     return $ds->query_type($type);
@@ -290,6 +287,8 @@ function chunked_paginate($ds, $rule) {
         yield ['items' => $res, 'info' => $info];
     }
 }
+
+
 
 function query_page($ds, $rule, $page = 1) {
     $limit = $rule['limit'] ?? 20;
@@ -382,127 +381,7 @@ function path_page($page) {
     return PATH_PREFIX . $page;
 }
 
-function process_template($id, $path) {
-    global $templates;
-    layout('-');
-    $data = query('*[_id=="$id"][0]', ['id' => $id]);
-    process_template_data($data, $path);
-}
 
-function partial($base, $template, $data, $helper) {
-    extract($data);
-    extract($helper);
-    ob_start();
-    include $base . '/partials/' . $template . '.php';
-    $content = ob_get_clean();
-    return $content;
-}
-
-function remove_tags($content) {
-    //dbg('remove...');
-    $content = preg_replace('!<page-query>.*?</page-query>!ism', '', $content);
-    return $content;
-}
-
-function template($_template, $data, $helper, $_base) {
-    extract($data);
-    extract($helper);
-    extract(load_late_template_helper($helper, $_base));
-    ob_start();
-    include $_base . '/templates/' . $_template . '.php';
-    $content = ob_get_clean();
-    $layout = layout();
-    if ($layout) {
-        ob_start();
-        include $_base . '/layouts/' . $layout . '.php';
-        $content = ob_get_clean();
-    }
-    return $content;
-}
-
-function page($_template, $data, $helper, $_base) {
-    extract($data);
-    extract($helper);
-    extract(load_late_template_helper($helper, $_base));
-    ob_start();
-    include $_base . '/pages/' . $_template . '.php';
-
-    $content = ob_get_clean();
-    $layout = layout();
-    if ($layout) {
-        ob_start();
-        include $_base . '/layouts/' . $layout . '.php';
-        $content = ob_get_clean();
-    }
-    return $content;
-}
-/*
-$x = new SimpleXMLElement('<element lang="sql"></element>');
-iterator_to_array($x->attributes()))
-*/
-function check_pagination($_template, $_base) {
-    $content = file_get_contents($_base . '/pages/' . $_template . '.php');
-    $prule = preg_match('!<page-query>(.*?)</page-query>!ism', $content, $mat);
-    if ($prule) {
-        return parse($mat[1]);
-    } else {
-        return false;
-    }
-}
-
-function page_paginated($_template, $data, $_base) {
-    extract($data);
-    ob_start();
-    include $_base . '/pages/' . $_template . '.php';
-    $content = ob_get_clean();
-    $layout = layout();
-    if ($layout) {
-        ob_start();
-        include $_base . '/layouts/' . $layout . '.php';
-        $content = ob_get_clean();
-    }
-    return $content;
-}
-
-function paginate($how = null) {
-    static $rules;
-    if (!is_null($how)) {
-        // reset
-        if ($how == '-') {
-            $rules = null;
-        }
-        $rules = $how;
-    }
-    return $rules;
-}
-
-function process_template_data($data, $path) {
-    global $templates;
-    $file_template = $templates[$data['_type']]['template'];
-    extract($data);
-    ob_start();
-    include $file_template . '.php';
-    $content = ob_get_clean();
-    $layout = layout();
-    if ($layout) {
-        ob_start();
-        include 'templates/__' . $layout . '.php';
-        $content = ob_get_clean();
-    }
-    write($content, $path);
-}
-
-function layout($name = null) {
-    static $layout = null;
-    if (!is_null($name)) {
-        // reset layout name
-        if ($name == '-') {
-            $layout = null;
-        }
-        $layout = $name;
-    }
-    return $layout;
-}
 
 function write($content, $path, $base) {
     $file = $base . '/' . $path . '/index.html';
@@ -525,4 +404,8 @@ function slugify($gen, $text, $remove_stop_words = false) {
 function remove_stop_words($text) {
     $stops = ['a', 'the', 'and', 'ein', 'eine', 'der', 'die', 'das', 'und'];
     return preg_replace('/\b(' . join('|', $stops) . ')\b/', '', $text);
+}
+
+function layout($name = null){
+    return \slowfoot\template\layout($name);
 }

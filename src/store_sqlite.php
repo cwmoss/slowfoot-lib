@@ -17,18 +17,28 @@ class store_sqlite {
     // key: path, value: [_id, path_name]
     public $paths_rev = [];
     public $config = [];
+    public $was_filled = false;
 
     public function __construct($config) {
         $this->config = $config;
         $adapter = explode(':', $config['adapter']);
         $name = $adapter[1]??($adapter['name'])??'slowfoot.db';
-        if($name!='memory' && $name[0]!='/'){
-            $name = $config['base'].'/'.$name;
+        if($name=='memory'){
+            $name = ':memory:';
+        }else{
+            if($name[0]!='/'){
+                $name = $config['base'].'/'.$name;
+            }
+            $this->was_filled = \file_exists($name);
         }
         $this->db = \ParagonIE\EasyDB\Factory::fromArray([
             "sqlite:$name"
         ]);
         $this->create_schema();
+    }
+
+    public function has_data_on_create(){
+        return $this->was_filled;
     }
 
     public function create_schema(){
@@ -59,6 +69,17 @@ CREATE INDEX IF NOT EXISTS paths_id on paths(id);
             if(trim($ddl_s))            $this->db->run($ddl_s);
         }
         return ;
+    }
+
+    public function query_sql($q, $params=[]){
+        $res = $this->db->safeQuery($q, $params);
+        #var_dump($q);
+        #var_dump($res);
+        $res = array_map(function($r){return json_decode($r['body'], true);}, $res);
+        return $res;
+        return [[], 0];
+        $res = lquery($this->docs, $q);
+        return [$res, count($res)];
     }
 
     public function query($q, $limit){

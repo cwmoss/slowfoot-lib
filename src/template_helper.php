@@ -18,12 +18,15 @@ function load_template_helper($ds, $src, $config) {
         'ref' => function ($oid) use ($ds) {
             return $ds->ref($oid);
         },
+        'q' => function ($query_string, $params=[]) use ($ds){
+            return $ds->query_sql($query_string, $params);
+        },
         'query' => function ($q) use ($ds) {
             return lquery($ds->data, $q);
         },
         'xxpartial' => function ($template, $data) use ($src) {
             //dbg('+++ partial src', $src);
-            return partial($src, $template, $data, []);
+            return \slowfoot\template\partial($src, $template, $data, []);
         },
         'image' => function ($asset, $profile) use ($config) {
             return \slowfoot\image($asset, $profile, $config['assets']);

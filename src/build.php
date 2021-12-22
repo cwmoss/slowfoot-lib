@@ -1,5 +1,7 @@
 <?php
 require __DIR__ . '/boot.php';
+use function slowfoot\template\{page, template, remove_tags, check_pagination};
+
 dbg("start");
 print memory_get_usage() . " paths ok\n";
 
@@ -21,8 +23,10 @@ print_r($ds->info);
 
 print "clean up dist/\n\n";
 `rm -rf $dist`;
-// array_map( 'unlink', array_filter((array) glob("$dist/*") ) );
+#array_map('unlink', array_filter((array) globstar("$dist/**/*.*")));
 // exit;
+
+
 
 foreach ($templates as $type => $conf) {
     //$count = query('');
@@ -36,6 +40,10 @@ foreach ($templates as $type => $conf) {
             $path = $ds->get_fpath($row['_id'], $templateconf['name']);
             if ($path == '/index') {
                 $path = '/';
+            }
+            if($path=="/"){
+                var_dump($row);
+                exit;
             }
             $content = template(
                 $templateconf['template'],
@@ -78,8 +86,10 @@ foreach ($pages as $pagename) {
         write($content, $pagepath, $dist);
     }
 }
+#exit;
 
 print memory_get_usage() . " pages ok\n";
+
 
 `cp -R $src/css $src/js $dist/`;
 
