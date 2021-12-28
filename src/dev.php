@@ -1,5 +1,6 @@
 <?php
 require __DIR__ . '/boot.php';
+use function slowfoot\template\{page, template, remove_tags, preprocess};
 
 dbg('dataset info', $ds->info);
 
@@ -30,14 +31,16 @@ if ($obj_id) {
     $pagename = '/' . $pagename;
     dbg('page...', $pagename, $pagenr, $requestpath);
     $obj_id = array_search($pagename, $pages);
-    $pagination_query = check_pagination($pagename, $src);
-    dbg('page query', $pagination_query);
-    if ($pagination_query) {
+    #$pagination_query = check_pagination($pagename, $src);
+    $pp = preprocess($pagename, $src);
+    dbg('page query', $pp);
+    if ($page_query = ($pp['page-query']??null)) {
         //var_dump($paginate);
-        $coll = query_page($ds, $pagination_query, $pagenr);
+        $qres = $ds->query($page_query['__content']);  // query_page($ds, $pagination_query, $pagenr);
+        #var_dump($qres);
         //print_r($coll);
-        $content = page($pagename, ['collection' => $coll], $template_helper, $src);
-        $content = remove_tags($content);
+        $content = page($pagename, ['page' => $qres], $template_helper, $src);
+        $content = remove_tags($content, ['page-query']);
     } else {
         $content = page($requestpath, [], $template_helper, $src);
     }

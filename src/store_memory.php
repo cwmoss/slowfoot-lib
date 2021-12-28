@@ -27,6 +27,7 @@ class store_memory {
     
     public function query($q, $limit){
         $res = lquery($this->docs, $q);
+        return $res;
         return [$res, count($res)];
     }
 

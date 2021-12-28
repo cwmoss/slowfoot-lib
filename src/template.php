@@ -19,11 +19,7 @@ function partial($base, $template, $data, $helper) {
     return $content;
 }
 
-function remove_tags($content) {
-    //dbg('remove...');
-    $content = preg_replace('!<page-query>.*?</page-query>!ism', '', $content);
-    return $content;
-}
+
 
 function template($_template, $data, $helper, $_base) {
     extract($data);
@@ -82,6 +78,36 @@ function check_pagination($_template, $_base) {
     } else {
         return false;
     }
+}
+function preprocess($_template, $_base) {
+    $content = file_get_contents($_base . '/pages/' . $_template . '.php');
+    return parse_tags($content, ['page-query']);
+}
+
+function parse_tags($content, $tags){
+    $res = [];
+    foreach($tags as $tag){
+        #print "hhh $tag\n$content";
+        $x = preg_match("!<$tag([^>]*?)>(.*?)</$tag>!ism", $content, $mat);
+        if($x){
+            $xml = new \SimpleXMLElement($mat[0]);
+            $res[$tag] = array_map(function($attr){
+                return (string) $attr;
+            }, \iterator_to_array($xml->attributes()));
+            $res[$tag]['__content'] = trim($mat[2]);
+            $res[$tag]['__tag'] = $tag;
+        }
+    }
+    return $res;
+}
+
+function remove_tags($content, $tags) {
+    //dbg('remove...');
+    foreach($tags as $tag){
+        $content = preg_replace("!<$tag([^>]*?)>(.*?)</$tag>!ism", '', $content);
+    }
+    //$content = preg_replace('!<page-query>.*?</page-query>!ism', '', $content);
+    return $content;
 }
 
 function page_paginated($_template, $data, $_base) {

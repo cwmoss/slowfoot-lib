@@ -1,12 +1,22 @@
 <?php
 // require_once __DIR__ . '/../vendor/autoload.php';
-if (!class_exists("\Composer\Autoload\ClassLoader")) {
-    require_once 'vendor/autoload.php';
-}
+#if (!class_exists("\Composer\Autoload\ClassLoader")) {
+    //require_once __DIR__.'/../vendor/autoload.php';
+   require_once __DIR__.'/../vendor/autoload.php';
+#}
 
 if (!defined('SLOWFOOT_BASE')) {
-//    define('SLOWFOOT_BASE', __DIR__ . '/../../../../');
+    // via php cli webserver
+#    print_r($_SERVER);
+    
+    define('SLOWFOOT_BASE', $_SERVER['DOCUMENT_ROOT'] . '/../');
+    
+}else{
+
 }
+
+require_once SLOWFOOT_BASE.'/vendor/autoload.php';
+
 if (!defined('SLOWFOOT_PREVIEW')) {
     define('SLOWFOOT_PREVIEW', false);
 }

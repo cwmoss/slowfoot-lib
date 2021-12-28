@@ -82,7 +82,16 @@ CREATE INDEX IF NOT EXISTS paths_id on paths(id);
         return [$res, count($res)];
     }
 
-    public function query($q, $limit){
+    public function query($q, $limit=20){
+        $query = \lolql\parse($q);
+        $fn = \lolql\eval_cond_as_sql_function($query['q']);
+        $name = 'lolql_'.bin2hex(\random_bytes(8));
+        #$name = 'lolq';
+        $pdo = $this->db->getPdo();
+        $pdo->sqliteCreateFunction($name, $fn, 1);
+        $res = $this->db->run('SELECT body from docs WHERE '.$name.'(body)');
+        $res = array_map(function($r){return json_decode($r['body'], true);}, $res);
+        return $res;
         return [[], 0];
         $res = lquery($this->docs, $q);
         return [$res, count($res)];
@@ -146,7 +155,7 @@ CREATE INDEX IF NOT EXISTS paths_id on paths(id);
     }
 
     public function path_get_props($path) {
-        $p = $this->db->cell('SELECT id,name from paths WHERE path=?', $path);
+        $p = $this->db->row('SELECT id,name from paths WHERE path=?', $path);
         return [$p['id'], $p['name']];
     }
 

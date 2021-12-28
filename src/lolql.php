@@ -62,6 +62,28 @@ function parse($string) {
 }
 
 function eval_cond($db, $query) {
+    $evaluator = get_evaluator($query);
+
+    return array_filter($db, function ($item) use ($query, $evaluator) {
+        // dbg('item-compare...', $item['_id'], $item['title']);
+        [$ok, $next] = $evaluator($query, $item);
+        return $ok;
+    });
+}
+
+function eval_cond_as_sql_function($query){
+    $evaluator = get_evaluator($query);
+    return function($json_col)use($query, $evaluator){
+        $item = json_decode($json_col, true);
+        #print_r($item);
+        #return true;
+        [$ok, $dummy] = $evaluator($query, $item);
+        return $ok;
+    };
+}
+
+function get_evaluator($query){
+    #print_r($query);
     $evaluator = function ($query, $item, $level = 0) use (&$evaluator) {
         // dbg('level... ', $level);
         foreach ($query as $q) {
@@ -84,12 +106,7 @@ function eval_cond($db, $query) {
         }
         return [$ok, null];
     };
-
-    return array_filter($db, function ($item) use ($query, $evaluator) {
-        // dbg('item-compare...', $item['_id'], $item['title']);
-        [$ok, $next] = $evaluator($query, $item);
-        return $ok;
-    });
+    return $evaluator;
 }
 
 function evaluate($cond, $data) {
