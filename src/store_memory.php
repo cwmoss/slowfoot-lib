@@ -76,4 +76,7 @@ class store_memory {
         return $this->paths_rev[$path];
     }
 
+    function info(){
+        return [];
+    }
 }

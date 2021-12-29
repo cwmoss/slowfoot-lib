@@ -48,7 +48,7 @@ if (!defined('PATH_PREFIX')) {
 if (!(SLOWFOOT_PREVIEW || SLOWFOOT_WEBDEPLOY)) {
     require_once 'routing.php';
 }
-dbg("start", $config);
+
 require_once 'template_helper.php';
 
 //print_r($config);
@@ -80,3 +80,5 @@ $pages = glob($src . '/pages/*.php');
 $pages = array_map(function ($p) {
     return '/' . basename($p, '.php');
 }, $pages);
+
+dbg('dataset info', $ds->info);

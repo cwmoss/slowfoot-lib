@@ -12,6 +12,9 @@
         "league/flysystem-memory": "^2.0",
         "sensiolabs/ansi-to-html": "^1.2",
         "paragonie/easydb": "^2.11",
-        "bramus/router": "^1.6"
+        "bramus/router": "^1.6",
+        "php-parallel-lint/php-console-color": "^1.0",
+        "docopt/docopt": "^1.0",
+        "phplucidframe/console-table": "^1.2"
     }
 }

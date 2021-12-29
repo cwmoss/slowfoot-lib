@@ -166,5 +166,10 @@ CREATE INDEX IF NOT EXISTS paths_id on paths(id);
         return json_decode($this->db->cell('SELECT body from docs WHERE _id=?', $id), true);
     }
 
+    function info(){
+        $types = $this->db->run('SELECT _type, count(*) AS total FROM docs GROUP BY _type');
+        $routes = $this->db->run("SELECT '__paths' as _type, count(*) AS total FROM paths");
+        return array_merge($types, $routes);
+    }
 
 }

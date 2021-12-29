@@ -130,6 +130,10 @@ class store {
         $this->info['rejected'][$type]++;
     }
 
+    public function info(){
+        return $this->db->info();
+    }
+    
     private function conflict($path, $name, $row) {
         [$firstid, $firstname] = $this->get_by_path($path);
         $first = $this->get($firstid);

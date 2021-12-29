@@ -143,11 +143,15 @@ function get_store($config){
 }
 function load_data($sources, $hooks, $config) {
     $db = get_store($config);
-    # TODO fetch or not
-    if($db->has_data_on_create()) return $db;
     $db_store = get_class($db->db);
-    print "~~~~~ FETCHING DATA ~~~~~~\n";
-    print "~~~~~ STORE: {$db_store} ~~~~~~\n";
+    
+    # TODO fetch or not
+    if($db->has_data_on_create()){
+        shell_info("store {$db_store} using old data", true);
+        return $db;
+    }
+    
+    shell_info("fetching data {$db_store}", true);
 
     foreach ($sources as $name => $opts) {
         if (!is_array($opts)) {
@@ -161,8 +165,9 @@ function load_data($sources, $hooks, $config) {
         }
         $opts['name'] = $name;
         $fun = 'load_' . $opts['loader'];
-        dbg('loading from source', $fun, $opts);
-
+        
+        shell_info("fetching $name");
+    
         foreach ($fun($opts, $config) as $row) {
             $otype = $row['_type'];
             $row['_src'] = $name;
@@ -181,6 +186,7 @@ function load_data($sources, $hooks, $config) {
                 $db->add($row['_id'], $row);
             }
         }
+        shell_info();
     }
     return $db;
 }

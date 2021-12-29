@@ -1,4 +1,5 @@
 <?php
+require_once(__DIR__."/console.php");
 
 function send_file($base, $file) {
     $name = basename($file);
@@ -107,4 +108,43 @@ function globstar($pattern, $flags = 0)
     $files = array_unique($files);
     sort($files);
     return $files;
+}
+
+function shell_info($start=null, $single=false){
+    static $stime;
+    static $console;
+
+    if(!$console){
+       $console = console();
+    }
+
+    if($start){
+        if(!$single){
+            $stime = microtime(true);
+            print $console('bold', $start);
+            print ' ... ';
+        }else{
+            print $console('green', $start);
+            print PHP_EOL;
+        }
+        
+    }else{
+        $elapsed = microtime(true) - $stime;
+        $stime = null;
+        print $console('reverse', nice_elapsed_time($elapsed)['print']);
+        print PHP_EOL; 
+    }
+}
+
+function nice_elapsed_time($elapsed){
+    $nice = [
+        'time' => $elapsed,
+        's' => (int) $elapsed,
+        'ms' => (int)($elapsed * 1000),
+        'micro' => (int)($elapsed * 1000 * 1000),
+    ];
+    $nice['print'] = $nice['s']?
+        $nice['s']. ' s'
+        : ($nice['ms']?$nice['ms'].' ms':$nice['micro'].' μs');
+    return $nice;
 }

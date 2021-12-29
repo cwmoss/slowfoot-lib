@@ -1,28 +1,65 @@
 <?php
-$cmd = $argv[1];
 $slft_lib_base = __DIR__;
 
-if ($cmd == 'dev') {
+$doc = <<<DOC
+slowfoot.
+
+Usage:
+  slowfoot dev [-S <server:port>] [-f | --fetch <content source>]
+  slowfoot build
+  slowfoot (-h | --help)
+  slowfoot --version
+
+Options:
+  -f                        fetch all contents
+  --fetch <content source>  fetch contents from <content source>
+  -h --help                 Show this screen.
+  --version                 Show version.
+  -S --server <server:port> Set server and port [default: localhost:1199]
+
+DOC;
+
+#require('vendor/autoload.php');
+$parsed = Docopt::handle($doc, array('version'=>'slowfoot 0.1'));
+#var_dump($parsed);
+$args = $parsed->args;
+
+// https://www.kammerl.de/ascii/AsciiSignature.php rounded
+
+$logo = '
+       _                ___                 
+      | |              / __)            _   
+   ___| | ___  _ _ _ _| |__ ___   ___ _| |_ 
+  /___) |/ _ \| | | (_   __) _ \ / _ (_   _)
+ |___ | | |_| | | | | | | | |_| | |_| || |_ 
+ (___/ \_)___/ \___/  |_|  \___/ \___/  \__)
+                                            
+ ';
+
+if ($args['dev']) {
+
+    print $logo."\n";
+
+    // evtl. fetching data
+    require __DIR__ . '/boot.php';
+
     // this wont work :)
     // `(sleep 1 ; open http://localhost:1199/ )&`;
     // this works!
     shell_exec('(sleep 1 ; open http://localhost:1199/ ) 2>/dev/null >/dev/null &');
     $command = "php -S localhost:1199 -t src/ {$slft_lib_base}/dev.php";
     print "\n\n";
-    print "     ***********************************\n";
-    print "     *                                 *\n";
-    print "     *          slowfoot               *\n";
-    print "     *                                 *\n";
-    print "     *   starting development server   *\n";
-    print "     *                                 *\n";
-    print "     *   http://localhost:1199         *\n";
-    print "     *                                 *\n";
-    print "     *                                 *\n";
-    print "     *   have fun!                     *\n";
-    print "     *                                 *\n";
-    print "     ***********************************\n\n\n";
+
+    print "starting development server\n\n";
+    print "   🌈 http://localhost:1199\n\n";
+    print "have fun!\n\n";
+
     `$command`;
 }
-if ($cmd == 'build') {
+if ($args['build']) {
+
+    print $logo."\n";
+    
+    require __DIR__ . '/boot.php';
     include 'build.php';
 }

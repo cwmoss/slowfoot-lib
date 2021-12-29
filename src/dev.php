@@ -2,7 +2,6 @@
 require __DIR__ . '/boot.php';
 use function slowfoot\template\{page, template, remove_tags, preprocess};
 
-dbg('dataset info', $ds->info);
 
 $hr = false;
 

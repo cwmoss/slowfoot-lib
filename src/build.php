@@ -1,8 +1,9 @@
 <?php
-require __DIR__ . '/boot.php';
+
 use function slowfoot\template\{page, template, remove_tags, preprocess};
 
-dbg("start");
+$console = console();
+
 print memory_get_usage() . " paths ok\n";
 
 //$template_helper = load_template_helper($ds, $src);
@@ -16,23 +17,31 @@ if (!$dist) {
     die('NO DIST-PATH FOUND');
 }
 
-print_r($config);
-print_r($ds->info);
+# print_r($config);
+# print_r($ds->info);
 #print_r($ds->db->paths_rev);
 #exit;
+print console_table(['_type'=>'type', 'total'=>'total'], $ds->info());
 
-print "clean up dist/\n\n";
+
+
+shell_info("removing old dist/ folder");
 `rm -rf $dist`;
+shell_info();
+
 #array_map('unlink', array_filter((array) globstar("$dist/**/*.*")));
 // exit;
 
 
+shell_info("writing templates", true);
 
 foreach ($templates as $type => $conf) {
     //$count = query('');
     //if($type=='article') continue;
     $bs = 100;
     $start = 0;
+
+    shell_info("  => $type");
 
     foreach (query_type($ds, $type) as $row) {
         foreach ($conf as $templateconf) {
@@ -59,12 +68,15 @@ foreach ($templates as $type => $conf) {
             write($content, $path, $dist);
         }
     }
+    shell_info();
 }
 
-print memory_get_usage() . " templates ok\n";
+#print memory_get_usage() . " templates ok\n";
+
+shell_info("writing pages", true);
 
 foreach ($pages as $pagename) {
-    dbg('page... ', $pagename);
+    shell_info("  => $pagename");
     // $paginate = check_pagination($pagename, $src);
     $pp = preprocess($pagename, $src);
     $page_query = $pp['page-query']??null;
@@ -94,16 +106,19 @@ foreach ($pages as $pagename) {
         $content = page($pagename, [], $template_helper, $src);
         write($content, $pagepath, $dist);
     }
+    shell_info();
 }
 #exit;
 
-print memory_get_usage() . " pages ok\n";
 
+
+#print memory_get_usage() . " pages ok\n";
+
+shell_info("copy assets");
 
 `cp -R $src/css $src/js $dist/`;
-
-print "copy assets\n";
-
 `cp -R $base/cache $dist/images`;
 
-print "finished\n";
+shell_info();
+
+shell_info("⚡️ done", true);
