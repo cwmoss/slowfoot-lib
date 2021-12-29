@@ -135,6 +135,9 @@ CREATE INDEX IF NOT EXISTS paths_id on paths(id);
 
     public function add_ref($src_id, $src_prop, $dest) {
     //    $this->data[$src_id][$src_prop][] = ['_ref' => $dest];
+        $row = $this->get('docs', $src_id);
+        $row[$src_prop][] = ['_ref' => $dest];
+        $this->update('docs', $row['_id'], $row);
     }
 
     public function path_exists($path){
