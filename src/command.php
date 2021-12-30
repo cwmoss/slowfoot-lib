@@ -19,7 +19,8 @@ Options:
 
 DOC;
 
-#require('vendor/autoload.php');
+require_once(__DIR__.'/../vendor/autoload.php');
+
 $parsed = Docopt::handle($doc, array('version'=>'slowfoot 0.1'));
 #var_dump($parsed);
 $args = $parsed->args;
@@ -43,6 +44,8 @@ if ($args['dev']) {
     // evtl. fetching data
     require __DIR__ . '/boot.php';
 
+    print console_table(['_type'=>'type', 'total'=>'total'], $ds->info());
+    
     // this wont work :)
     // `(sleep 1 ; open http://localhost:1199/ )&`;
     // this works!
