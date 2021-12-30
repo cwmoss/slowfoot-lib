@@ -4,6 +4,7 @@ use function slowfoot\template\{page, template, remove_tags, preprocess};
 
 
 $hr = false;
+$debug = true;
 
 // $obj_id = array_search($requestpath, $paths);
 [$obj_id, $name] = $ds->get_by_path($requestpath);
@@ -25,6 +26,8 @@ if ($obj_id) {
         $template_helper,
         $src
     );
+    debug_js("page", $obj);
+
 } else {
     list($dummy, $pagename, $pagenr) = explode('/', $requestpath);
     $pagename = '/' . $pagename;
@@ -40,8 +43,13 @@ if ($obj_id) {
         //print_r($coll);
         $content = page($pagename, ['page' => $qres], $template_helper, $src);
         $content = remove_tags($content, ['page-query']);
+
+        debug_js("page", $qres);
+
     } else {
         $content = page($requestpath, [], $template_helper, $src);
+
+        debug_js("page", []);
     }
 }
 
@@ -55,5 +63,11 @@ if ($hr) {
     $htrldr = new HotReloader\HotReloader('//localhost:1199/phrwatcher.php');
     $js = $htrldr->init();
     $content = str_replace('</html>', $js . '</html>', $content);
+}
+if($debug){
+    $inspector = include_to_buffer(__DIR__.'/assets/debug.php');
+    $inspector_css = '<link rel="stylesheet" href="/inspector-json.css">';
+    $content = str_replace('</head>', $inspector_css.'</head>', $content);
+    $content = str_replace('</body>', $inspector.'</body>', $content);
 }
 print $content;

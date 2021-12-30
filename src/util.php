@@ -148,3 +148,29 @@ function nice_elapsed_time($elapsed){
         : ($nice['ms']?$nice['ms'].' ms':$nice['micro'].' μs');
     return $nice;
 }
+
+// output zur browser console
+function console_log(...$data)
+{
+    //func_get_args()
+    $out = ["<script>", "console.info('%cPHP console', 'font-weight:bold;color:green;');"];
+    foreach ($data as $d) {
+        $out[] = 'console.log('.json_encode($d).');';
+    }
+    $out[] = "</script>";
+    print(join("", $out));
+}
+function debug_js($k=null, $v=null)
+{
+    static $vars=[];
+    if (is_null($k) && is_null($v)) {
+        return json_encode($vars, JSON_PRETTY_PRINT);
+    }
+    $vars[$k] = $v;
+}
+
+function include_to_buffer($incl){
+    ob_start();
+    include $incl;
+    return ob_get_clean();
+}

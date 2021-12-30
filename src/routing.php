@@ -51,6 +51,14 @@ if (strpos($requestpath, '/phrwatcher.php') === 0) {
     exit;
 }
 
+if (strpos($requestpath, '/inspector-json.js') === 0) {
+    send_file(__DIR__ , '/assets/inspector-json.js');
+    exit;
+}
+if (strpos($requestpath, '/inspector-json.css') === 0) {
+    send_file(__DIR__ , '/assets/inspector-json.css');
+    exit;
+}
 if (preg_match("/\./", $requestpath)) {
     dbg('+++ dev route file', $requestpath);
     $assetpath = $config['assets']['src'];
