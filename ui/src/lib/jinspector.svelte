@@ -5,7 +5,9 @@ import JinspectorNode from './jinspector_node.svelte';
 export let json
 let data
 
-$: data = JSON.parse(json)
+//$: data = JSON.parse(json)
+$: data = json
+
 let domnode
 let collapse_states = {}
 

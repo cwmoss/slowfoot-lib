@@ -50,7 +50,7 @@ if ($args['dev']) {
     // `(sleep 1 ; open http://localhost:1199/ )&`;
     // this works!
     shell_exec('(sleep 1 ; open http://localhost:1199/ ) 2>/dev/null >/dev/null &');
-    $command = "php -S localhost:1199 -t src/ {$slft_lib_base}/dev.php";
+    $command = "php -S localhost:1199 -t src/ {$slft_lib_base}/development.php";
     print "\n\n";
 
     print "starting development server\n\n";

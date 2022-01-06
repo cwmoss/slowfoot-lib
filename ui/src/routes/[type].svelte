@@ -1,8 +1,8 @@
 <script context="module">
     import {base_url, handle_resp} from '$lib/config.js'
 
-	export async function load({ page, fetch, session, stuff }) {
-		const url = `${base_url}/type/${page.params.type}`;
+	export async function load({ params, fetch, session, stuff }) {
+		const url = `${base_url}/type/${params.type}`;
 		handle_resp(true)
 		const res = await fetch(url);
         

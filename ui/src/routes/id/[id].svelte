@@ -2,8 +2,8 @@
     import {base_url, handle_resp} from '$lib/config.js'
     import Jinspector from '$lib/jinspector.svelte'
 
-	export async function load({ page, fetch, session, stuff }) {
-		const url = `${base_url}/id/${page.params.id}`;
+	export async function load({ params, fetch, session, stuff }) {
+		const url = `${base_url}/id/${params.id}`;
 		handle_resp(true)
 		const res = await fetch(url);
         
@@ -13,7 +13,7 @@
 			return {
 				props: {
                     id: data.res._id,
-					body: data.res.body
+					body: data.res
 				}
 			};
 		}
@@ -49,5 +49,6 @@ onMount(() => {
 <h1>{id}</h1>
 
 
-
+{#if body}
 <Jinspector json={body}></Jinspector>
+{/if}

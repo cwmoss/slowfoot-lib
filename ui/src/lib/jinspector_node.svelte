@@ -1,5 +1,6 @@
 <script>
 import { onMount } from 'svelte';
+import {path as idpath} from '$lib/config.js'
 
 export let data
 export let parent
@@ -74,7 +75,7 @@ onMount(()=>{
     {:else if type=='string'}
         <li class={type}><strong>{key}</strong>
         {#if key=='_ref'}
-            <a href="{'/id/'+data}" class="underline">{data}</a>
+            <a href="{idpath('id/'+data)}" class="underline">{data}</a>
         {:else}
             <span>{data}</span>
         {/if}

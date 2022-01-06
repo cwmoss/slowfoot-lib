@@ -3,6 +3,7 @@
 import Search from "$lib/search.svelte";
 import { req_meta } from "$lib/stores.js";
 import {stats} from '$lib/fetchstore.js'
+import {path} from '$lib/config.js'
 
 console.log("layout script", $req_meta)
 
@@ -30,7 +31,7 @@ console.log("layout script", $req_meta)
 <nav class="subnav">
     {#if $stats.loaded}
         {#each $stats.types as type}
-        <a href="/{type._type}">{type._type} ({type.total})</a>
+        <a href="{path(type._type)}">{type._type} ({type.total})</a>
         {/each}
         {/if}
     

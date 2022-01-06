@@ -46,7 +46,7 @@ if (!defined('PATH_PREFIX')) {
 }
 
 if (!(SLOWFOOT_PREVIEW || SLOWFOOT_WEBDEPLOY)) {
-    require_once 'routing.php';
+#    require_once 'routing.php';
 }
 
 require_once 'template_helper.php';

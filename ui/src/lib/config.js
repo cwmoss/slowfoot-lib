@@ -1,9 +1,10 @@
 import { browser } from "$app/env";
 import { req_meta } from "$lib/stores.js";
+import { base, assets } from '$app/paths';
 
 console.log('config.js env', import.meta.env, browser)
 
-const base_url = "http://localhost:3039/__api"
+const base_url = "http://localhost:1199/__api"
 
 function handle_resp(data){
     if(data===true){
@@ -24,4 +25,7 @@ function handle_resp(data){
     }
 }
 
-export {base_url, handle_resp}
+function path(p){
+    return base + '/' + p;
+}
+export {base_url, handle_resp, path}

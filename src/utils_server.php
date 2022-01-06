@@ -5,20 +5,6 @@ function println($str)
     return print($str.PHP_EOL);
 }
 
-function dbg($txt, ...$vars)
-{
-    // im servermodus wird der zeitstempel automatisch gesetzt
-    //	$log = [date('Y-m-d H:i:s')];
-    $log = [];
-    if (!is_string($txt)) {
-        array_unshift($vars, $txt);
-    } else {
-        $log[] = $txt;
-    }
-    $log[] = join(' ', array_map('json_encode', $vars));
-    error_log(join(' ', $log));
-}
-
 function get_env()
 {
     return array_merge($_SERVER, getenv());
@@ -170,7 +156,7 @@ function stream_to_file($name)
     ];
 }
 
-function send_file($base, $file)
+function xsend_file($base, $file)
 {
     $file = basename($file);
     if (preg_match('/css$/', $file)) {
@@ -189,7 +175,7 @@ function send_file($base, $file)
     readfile($base . '/ui/' . $file);
 }
 
-function send_asset_file($base, $file, $ext="")
+function xsend_asset_file($base, $file, $ext="")
 {
     $types = [
         'woff' => 'font/woff',
