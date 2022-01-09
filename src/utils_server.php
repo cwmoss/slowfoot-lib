@@ -330,3 +330,10 @@ function send_cors()
     //  header('Access-Control-Allow-Headers: Authorization');
     header('Access-Control-Expose-Headers: Upload-Key, Upload-Checksum, Upload-Length, Upload-Offset, Upload-Metadata, Tus-Version, Tus-Resumable, Tus-Extension, Location');
 }
+
+function send_nocache(){
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Cache-Control: post-check=0, pre-check=0', false);
+    header('Pragma: no-cache');
+    header('Content-Type: text/html');
+}

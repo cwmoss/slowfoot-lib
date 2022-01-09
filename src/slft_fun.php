@@ -380,7 +380,7 @@ function template_name($tconfig, $type, $name) {
 }
 
 function path_asset($asset, $cachebust = false) {
-    return PATH_PREFIX . $asset . ($cachebust ? '?' . mktime() : '');
+    return PATH_PREFIX . $asset . ($cachebust ? '?' . time() : '');
 }
 
 function path_page($page) {
