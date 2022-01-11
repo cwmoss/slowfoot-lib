@@ -57,4 +57,29 @@ CREATE VIRTUAL TABLE docs_fts USING fts5(
 INSERT INTO docs_fts(_id, btext) 
 SELECT _id, group_concat(b.key || ': ' ||  b.value, x'0a') as btext from docs, json_tree(body) b where b.atom not null group by _id
 
+composer // lib development
+
+dev
+COMPOSER=composer-dev.json composer install
+
+OR 
+
+composer install --prefer-source
+
+prod
+{
+    "type": "vcs",
+    "url": "https://github.com/cwmoss/slowfoot-lib"
+}
+
+dev (besser: --prefer-source)
+
+{
+    "type": "path",
+    "url": "../slowfoot-lib",
+    "options": {
+        "symlink": true
+        }
+}
+
 */
