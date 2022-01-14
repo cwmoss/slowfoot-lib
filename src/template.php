@@ -51,7 +51,7 @@ function page($_template, $data, $helper, $_base)
 {
     extract($data);
     extract($helper);
-    extract(load_late_template_helper($helper, $_base));
+    extract(load_late_template_helper($helper, $_base, $data));
     ob_start();
     include $_base . '/pages/' . $_template . '.php';
 

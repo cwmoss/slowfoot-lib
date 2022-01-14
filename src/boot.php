@@ -51,6 +51,11 @@ require_once 'template_helper.php';
 
 //print_r($config);
 
+# TODO: im store inbauen
+if (isset($FETCH) && $FETCH) {
+    $dbfile = SLOWFOOT_BASE.'/slowfoot.db';
+    `rm $dbfile`;
+}
 //var_dump($hooks);
 $ds = load_data($config['sources'], $config['hooks'], $config);
 

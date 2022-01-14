@@ -22,7 +22,7 @@ DOC;
 //require_once(__DIR__.'/../vendor/autoload.php');
 
 $parsed = Docopt::handle($doc, array('version'=>'slowfoot 0.1'));
-#var_dump($parsed);
+var_dump($parsed);
 $args = $parsed->args;
 
 // https://www.kammerl.de/ascii/AsciiSignature.php rounded
@@ -40,6 +40,8 @@ $logo = '
 if ($args['dev']) {
     print $logo."\n";
 
+    $FETCH = $args['-f'];
+    
     // evtl. fetching data
     require __DIR__ . '/boot.php';
 
