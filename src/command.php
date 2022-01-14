@@ -19,7 +19,7 @@ Options:
 
 DOC;
 
-require_once(__DIR__.'/../vendor/autoload.php');
+//require_once(__DIR__.'/../vendor/autoload.php');
 
 $parsed = Docopt::handle($doc, array('version'=>'slowfoot 0.1'));
 #var_dump($parsed);
@@ -38,7 +38,6 @@ $logo = '
  ';
 
 if ($args['dev']) {
-
     print $logo."\n";
 
     // evtl. fetching data
@@ -60,7 +59,6 @@ if ($args['dev']) {
     `$command`;
 }
 if ($args['build']) {
-
     print $logo."\n";
     
     require __DIR__ . '/boot.php';

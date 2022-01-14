@@ -1,7 +1,8 @@
 <?php
 require_once(__DIR__."/console.php");
 
-function send_file($base, $file) {
+function send_file($base, $file)
+{
     $name = basename($file);
     $full = $base . '/' . $file;
 
@@ -32,7 +33,8 @@ function send_file($base, $file) {
     }
 }
 
-function send_asset_file($base, $file, $orig, $cache) {
+function send_asset_file($base, $file, $orig, $cache)
+{
     $full = $base . '/' . $file;
     $full = str_replace($orig, $cache, $full);
     dbg('+++ asset route', $full);
@@ -46,7 +48,8 @@ function send_asset_file($base, $file, $orig, $cache) {
     }
 }
 
-function dbg($txt, ...$vars) {
+function dbg($txt, ...$vars)
+{
     // im servermodus wird der zeitstempel automatisch gesetzt
     //	$log = [date('Y-m-d H:i:s')];
     $log = [];
@@ -59,13 +62,15 @@ function dbg($txt, ...$vars) {
     error_log(join(' ', $log));
 }
 
-function markdown($text) {
+function markdown($text)
+{
     $parser = new Parsedown();
     //$parser->setUrlsLinked(false);
     return $parser->text($text);
 }
 
-function fetch($url, $data) {
+function fetch($url, $data)
+{
     if (is_array($data)) {
         $data = json_encode($data);
     }
@@ -110,33 +115,39 @@ function globstar($pattern, $flags = 0)
     return $files;
 }
 
-function shell_info($start=null, $single=false){
+function shell_info($start=null, $single=false)
+{
     static $stime;
     static $console;
 
-    if(!$console){
-       $console = console();
+    // last resort to non-cli stuff
+    if (PHP_SAPI != 'cli') {
+        return;
     }
 
-    if($start){
-        if(!$single){
+    if (!$console) {
+        $console = console();
+    }
+
+    if ($start) {
+        if (!$single) {
             $stime = microtime(true);
             print $console('bold', $start);
             print ' ... ';
-        }else{
+        } else {
             print $console('green', $start);
             print PHP_EOL;
         }
-        
-    }else{
+    } else {
         $elapsed = microtime(true) - $stime;
         $stime = null;
         print $console('reverse', nice_elapsed_time($elapsed)['print']);
-        print PHP_EOL; 
+        print PHP_EOL;
     }
 }
 
-function nice_elapsed_time($elapsed){
+function nice_elapsed_time($elapsed)
+{
     $nice = [
         'time' => $elapsed,
         's' => (int) $elapsed,
@@ -169,8 +180,23 @@ function debug_js($k=null, $v=null)
     $vars[$k] = $v;
 }
 
-function include_to_buffer($incl){
+function include_to_buffer($incl)
+{
     ob_start();
     include $incl;
     return ob_get_clean();
+}
+
+function dot_get($data, $path, $default=null)
+{
+    $val = $data;
+    $path = explode(".", $path);
+    #print_r($path);
+    foreach ($path as $key) {
+        if (!isset($val[$key])) {
+            return $default;
+        }
+        $val = $val[$key];
+    }
+    return $val;
 }
