@@ -65,9 +65,8 @@ $router->mount('/__api', function () use ($router, $ds) {
 
 $router->mount('/__ui', function () use ($router, $ds) {
     $router->get('/', function () use ($router, $ds) {
-        dbg("+++ index ++++");
         $uibase = __DIR__.'/../ui/build';
-        $uifile = $uibase.'/'.$file;
+        dbg("+++ ui index ++++", $uibase);
         send_file($uibase, 'index.html');
         exit;
     });
