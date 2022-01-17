@@ -2,7 +2,7 @@
 // require_once __DIR__ . '/../vendor/autoload.php';
 #if (!class_exists("\Composer\Autoload\ClassLoader")) {
     //require_once __DIR__.'/../vendor/autoload.php';
-   require_once __DIR__.'/../vendor/autoload.php';
+//   require_once __DIR__.'/../vendor/autoload.php';
 #}
 
 if (!defined('SLOWFOOT_BASE')) {
@@ -10,9 +10,7 @@ if (!defined('SLOWFOOT_BASE')) {
 #    print_r($_SERVER);
     
     define('SLOWFOOT_BASE', $_SERVER['DOCUMENT_ROOT'] . '/../');
-    
-}else{
-
+} else {
 }
 
 require_once SLOWFOOT_BASE.'/vendor/autoload.php';
@@ -20,7 +18,7 @@ require_once SLOWFOOT_BASE.'/vendor/autoload.php';
 if (!defined('SLOWFOOT_PREVIEW')) {
     define('SLOWFOOT_PREVIEW', false);
 }
-if(!defined('SLOWFOOT_WEBDEPLOY')){
+if (!defined('SLOWFOOT_WEBDEPLOY')) {
     define('SLOWFOOT_WEBDEPLOY', false);
 }
 $base = SLOWFOOT_BASE;
@@ -53,6 +51,11 @@ require_once 'template_helper.php';
 
 //print_r($config);
 
+# TODO: im store inbauen
+if (isset($FETCH) && $FETCH) {
+    $dbfile = SLOWFOOT_BASE.'/slowfoot.db';
+    `rm $dbfile`;
+}
 //var_dump($hooks);
 $ds = load_data($config['sources'], $config['hooks'], $config);
 

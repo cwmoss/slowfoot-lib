@@ -11,7 +11,7 @@ const config = {
 		prerender: {
 			enabled: false
 		},
-		ssr: false,
+		// ssr: false,
 		// hydrate the <div id="svelte"> element in src/app.html
 		target: '#svelte',
 		paths: {
