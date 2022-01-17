@@ -82,4 +82,7 @@ dev (besser: --prefer-source)
         }
 }
 
+{"type": "vcs","url": "https://github.com/cwmoss/slowfoot"}
+
+composer create-project -s dev --repository '{"type": "vcs","url": "https://github.com/cwmoss/slowfoot"}' cwmoss/slowfoot slowf
 */
