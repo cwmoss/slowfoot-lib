@@ -200,3 +200,65 @@ function dot_get($data, $path, $default=null)
     }
     return $val;
 }
+
+/*
+    parts:
+    m main
+    i imports
+    c css
+*/
+function assets_from_manifest($manifest_base, $entry, $prefix, $parts='m')
+{
+    $content = file_get_contents($manifest_base . '/manifest.json');
+    $man = json_decode($content, true);
+    
+    $main = '<script type="module" crossorigin src="%s"></script>';
+    $import = '<link rel="modulepreload" href="%s">';
+    $css = '<link rel="stylesheet" href="%s">';
+    $tags = [
+        sprintf($main, man_asset_url($man, $entry, $prefix))
+    ];
+
+    if (strpos($parts, 'i')!==false) {
+        $tags = array_merge($tags, array_map(function ($url) use ($import) {
+            return sprintf($import, $url);
+        }, man_imports_urls($man, $entry, $prefix)));
+    }
+    if (strpos($parts, 'c')!==false) {
+        $tags = array_merge($tags, array_map(function ($url) use ($css) {
+            return sprintf($css, $url);
+        }, man_css_urls($man, $entry, $prefix)));
+    }
+  
+    return join("\n", $tags);
+}
+
+function man_asset_url($manifest, $entry, $prefix="")
+{
+    return isset($manifest[$entry])
+        ? $prefix.'/'.$manifest[$entry]['file']
+        : '';
+}
+
+function man_imports_urls($manifest, $entry, $prefix)
+{
+    $urls = [];
+    if (!empty($manifest[$entry]['imports'])) {
+        foreach ($manifest[$entry]['imports'] as $imports) {
+            $urls[] = $prefix.'/'.$manifest[$imports]['file'];
+        }
+    }
+    return $urls;
+}
+
+function man_css_urls($manifest, $entry, $prefix)
+{
+    $urls = [];
+
+    if (!empty($manifest[$entry]['css'])) {
+        foreach ($manifest[$entry]['css'] as $file) {
+            $urls[] = $prefix.'/'.$file;
+        }
+    }
+    return $urls;
+}
