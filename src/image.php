@@ -34,6 +34,8 @@ function image($img, $opts = [], $gopts = [])
         }
         $img = $gopts['map']($img);
     }
+    
+    dbg("++ img", $img);
 
     if (is_remote($img['url'])) {
         $img['remote_src'] = true;
@@ -51,6 +53,7 @@ function image($img, $opts = [], $gopts = [])
             if (isset($gopts['resize_cdn'])) {
                 $cdn_url = $gopts['resize_cdn']($img, $profile);
                 $img['resize_url'] = $cdn_url;
+                return $img;
             }
         }
     }
