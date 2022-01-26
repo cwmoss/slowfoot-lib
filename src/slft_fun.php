@@ -18,11 +18,12 @@ use function lolql\query as lquery;
 https://github.com/paquettg/php-html-parser
 https://github.com/Masterminds/html5-php
 
-if (! function_exists(__NAMESPACE__ . '\greetings')) 
+if (! function_exists(__NAMESPACE__ . '\greetings'))
 
 */
 
-function load_config($dir) {
+function load_config($dir)
+{
     $conf = include $dir . '/config.php';
     $tpls = [];
     foreach ($conf['templates'] as $name => $t) {
@@ -35,7 +36,8 @@ function load_config($dir) {
     return $conf;
 }
 
-function normalize_template_config($name, $config) {
+function normalize_template_config($name, $config)
+{
     if (!is_array($config) || is_assoc($config)) {
         $config = [$config];
     }
@@ -53,22 +55,29 @@ function normalize_template_config($name, $config) {
     return $tpl;
 }
 
-function normalize_store_config($conf){
+function normalize_store_config($conf)
+{
     $def = ['adapter'=>'memory'];
     $store = $conf['store']??null;
-    if(!$store) return $def;
-    if(is_string($store)) $store=['adapter'=>$store];
+    if (!$store) {
+        return $def;
+    }
+    if (is_string($store)) {
+        $store=['adapter'=>$store];
+    }
     $store['base'] = $conf['base'];
     return $store;
 }
-function normalize_assets_config($conf) {
+function normalize_assets_config($conf)
+{
     $assets = $conf['assets'] ?: [];
     $default = ['base' => $conf['base'], 'src' => 'images', 'dest' => 'cache', 'profiles' => []];
     $assets = array_merge($default, $assets);
     return $assets;
 }
 
-function make_path_fn($pattern) {
+function make_path_fn($pattern)
+{
     $replacements = [];
     if (preg_match_all('!:([^/:]+)!', $pattern, $mat, PREG_SET_ORDER)) {
         $replacements = $mat;
@@ -88,7 +97,8 @@ function make_path_fn($pattern) {
         return $path;
     };
 }
-function resolve_dot_value($keys, $data) {
+function resolve_dot_value($keys, $data)
+{
     if (!$data) {
         return null;
     }
@@ -105,7 +115,8 @@ function resolve_dot_value($keys, $data) {
         return $data[$current];
     }
 }
-function url_safe($path) {
+function url_safe($path)
+{
     // TODO
     // https://gist.github.com/jaywilliams/119517
     $path = str_replace([' '], ['-'], $path);
@@ -113,7 +124,8 @@ function url_safe($path) {
     return $path;
 }
 
-function xload_data($sources, $hooks) {
+function xload_data($sources, $hooks)
+{
     $db = [];
     $loaded = $rejected = [];
     foreach (file($dataset) as $line) {
@@ -133,20 +145,22 @@ function xload_data($sources, $hooks) {
     return $db;
 }
 
-function get_store($config){
-    if(strpos($config['store']['adapter'], 'sqlite') === 0){
+function get_store($config)
+{
+    if (strpos($config['store']['adapter'], 'sqlite') === 0) {
         $db = new store_sqlite($config['store']);
-    }else{
+    } else {
         $db = new store_memory();
     }
     return new store($db, $config['templates']);
 }
-function load_data($sources, $hooks, $config) {
+function load_data($sources, $hooks, $config)
+{
     $db = get_store($config);
     $db_store = get_class($db->db);
     
     # TODO fetch or not
-    if($db->has_data_on_create()){
+    if ($db->has_data_on_create()) {
         shell_info("store {$db_store} using old data", true);
         return $db;
     }
@@ -191,7 +205,8 @@ function load_data($sources, $hooks, $config) {
     return $db;
 }
 
-function load_dataset($opts, $config) {
+function load_dataset($opts, $config)
+{
     $file = $config['base'] . '/' . $opts['file'];
     foreach (file($file) as $row) {
         yield json_decode($row, true);
@@ -199,7 +214,8 @@ function load_dataset($opts, $config) {
     return;
 }
 
-function load_json($opts, $config) {
+function load_json($opts, $config)
+{
     $file = $config['base'] . '/' . $opts['file'];
     $rows = json_decode(file_get_contents($file), true);
     if (is_assoc($rows)) {
@@ -211,7 +227,8 @@ function load_json($opts, $config) {
     return;
 }
 
-function load_csv($opts, $config) {
+function load_csv($opts, $config)
+{
     $file = $config['base'] . '/' . $opts['file'];
     $opts = array_merge(['sep' => ',', 'enc' => '"'], $opts);
     $header = null;
@@ -243,11 +260,13 @@ function load_csv($opts, $config) {
 
 
 
-function query_type($ds, $type) {
+function query_type($ds, $type)
+{
     return $ds->query_type($type);
 }
 
-function queryxxx($ds, $filter) {
+function queryxxx($ds, $filter)
+{
     if (is_string($filter)) {
         $filter = ['_type' => $filter];
     }
@@ -269,13 +288,15 @@ function queryxxx($ds, $filter) {
     return $rs;
 }
 
-function build_sorter($key) {
+function build_sorter($key)
+{
     return function ($a, $b) use ($key) {
         return strnatcasecmp($a[$key], $b[$key]);
     };
 }
 
-function chunked_paginate($ds, $rule) {
+function chunked_paginate($ds, $rule)
+{
     $limit = $rule['limit'] ?? 20;
     // $all = lquery($ds->data, $rule);
     list($all, $total) = $ds->query($rule, $limit);
@@ -296,7 +317,8 @@ function chunked_paginate($ds, $rule) {
 
 
 
-function query_page($ds, $rule, $page = 1) {
+function query_page($ds, $rule, $page = 1)
+{
     $limit = $rule['limit'] ?? 20;
     $page = $page ?? 1;
 
@@ -315,7 +337,8 @@ function query_page($ds, $rule, $page = 1) {
     return ['items' => $res, 'info' => $info];
 }
 
-function evaluate($cond, $data) {
+function evaluate($cond, $data)
+{
     foreach ($cond as $k => $v) {
         $ok = evaluate_single($k, $v, $data);
         if (!$ok) {
@@ -324,7 +347,8 @@ function evaluate($cond, $data) {
     }
     return true;
 }
-function evaluate_single($key, $value, $data) {
+function evaluate_single($key, $value, $data)
+{
     $nested = explode('.', $key);
     $current = array_shift($nested);
 
@@ -343,7 +367,8 @@ function evaluate_single($key, $value, $data) {
     }
 }
 
-function array_find($haystack, $needle, $prop) {
+function array_find($haystack, $needle, $prop)
+{
     foreach ($haystack as $val) {
         if ($val[$prop] == $needle) {
             return true;
@@ -352,14 +377,16 @@ function array_find($haystack, $needle, $prop) {
     return false;
 }
 
-function is_assoc(array $arr) {
+function is_assoc(array $arr)
+{
     if ([] === $arr) {
         return false;
     }
     return array_keys($arr) !== range(0, count($arr) - 1);
 }
 
-function slow_query($q, $vars = []) {
+function slow_query($q, $vars = [])
+{
     $q = str_replace(array_map(function ($k) {
         return '$' . $k;
     }, array_keys($vars)), array_values($vars), $q);
@@ -367,7 +394,8 @@ function slow_query($q, $vars = []) {
     return query_cmd($q);
 }
 
-function slow_query_cmd($q) {
+function slow_query_cmd($q)
+{
     $dataset = 'dataset-mumok.ndjson';
 
     $cmd = sprintf("cat %s | groq -i ndjson -o json '%s'", $dataset, $q);
@@ -375,21 +403,28 @@ function slow_query_cmd($q) {
     return json_decode($res, true);
 }
 
-function template_name($tconfig, $type, $name) {
+function template_name($tconfig, $type, $name)
+{
     return $tconfig[$type][$name]['template'];
 }
 
-function path_asset($asset, $cachebust = false) {
+function path_asset($asset, $cachebust = false)
+{
     return PATH_PREFIX . $asset . ($cachebust ? '?' . time() : '');
 }
 
-function path_page($page) {
+function path_page($page)
+{
     return PATH_PREFIX . $page;
 }
 
+function prefix_endpoint($ep)
+{
+    return PATH_PREFIX .'/__fun'.$ep;
+}
 
-
-function write($content, $path, $base) {
+function write($content, $path, $base)
+{
     $file = $base . '/' . $path . '/index.html';
     $dir = dirname($file);
     if (!is_dir($dir)) {
@@ -398,7 +433,8 @@ function write($content, $path, $base) {
     file_put_contents($file, $content);
 }
 
-function slugify($gen, $text, $remove_stop_words = false) {
+function slugify($gen, $text, $remove_stop_words = false)
+{
     if ($remove_stop_words) {
         $text = remove_stop_words($text);
     }
@@ -407,11 +443,13 @@ function slugify($gen, $text, $remove_stop_words = false) {
     $text = substr($text, 0, 60);
     return $text;
 }
-function remove_stop_words($text) {
+function remove_stop_words($text)
+{
     $stops = ['a', 'the', 'and', 'ein', 'eine', 'der', 'die', 'das', 'und'];
     return preg_replace('/\b(' . join('|', $stops) . ')\b/', '', $text);
 }
 
-function layout($name = null){
+function layout($name = null)
+{
     return \slowfoot\template\layout($name);
 }

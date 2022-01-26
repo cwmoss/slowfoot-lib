@@ -40,7 +40,11 @@ $config = load_config($base);
 //print_r($config); exit;
 
 if (!defined('PATH_PREFIX')) {
-    define('PATH_PREFIX', $config['path_prefix']);
+    if (PHP_SAPI == 'cli-server') {
+        define('PATH_PREFIX', "");
+    } else {
+        define('PATH_PREFIX', $config['path_prefix']);
+    }
 }
 
 if (!(SLOWFOOT_PREVIEW || SLOWFOOT_WEBDEPLOY)) {
