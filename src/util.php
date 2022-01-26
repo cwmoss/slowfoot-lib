@@ -17,6 +17,10 @@ function send_file($base, $file)
         }
     } elseif (preg_match('/js$/', $name)) {
         header('Content-Type: text/javascript');
+    } elseif (preg_match('/jpe?g$/', $name)) {
+        header('Content-Type: image/jpeg');
+    } elseif (preg_match('/png$/', $name)) {
+        header('Content-Type: image/png');
     } elseif (preg_match('/svg$/', $name)) {
         header('Content-Type: image/svg+xml');
     } elseif (preg_match('/html$/', $name)) {

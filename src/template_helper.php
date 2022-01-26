@@ -28,6 +28,12 @@ function load_template_helper($ds, $src, $config)
         'image' => function ($asset, $profile) use ($config) {
             return \slowfoot\image($asset, $profile, $config['assets']);
         },
+        'image_tag' => function ($asset, $profile) use ($config) {
+            return \slowfoot\image_tag($asset, $profile, $config['assets']);
+        },
+        'image_url' => function ($asset, $profile) use ($config) {
+            return \slowfoot\image_url($asset, $profile, $config['assets']);
+        },
         'asset_from_file' => function ($path) use ($config) {
             //var_dump($config);
             return \slowfoot\asset_from_file($path, $config['assets']);

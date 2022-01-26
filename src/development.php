@@ -102,6 +102,15 @@ $router->post('/__fun/(.*)', function ($requestpath) use ($router, $ds) {
     exit;
 });
 
+dbg("++ image path", $config['assets']['path']);
+
+$router->get($config['assets']['path'].'/'.'(.*\.\w{1,4})', function ($requestpath) use ($router, $ds, $config) {
+    $docbase = $_SERVER['DOCUMENT_ROOT'].'/../cache';
+    dbg("++ image path base", $docbase, $requestpath);
+    send_file($docbase, $requestpath);
+    exit;
+});
+
 $router->get('(.*\.\w{1,4})', function ($requestpath) use ($router, $ds) {
     $docbase = $_SERVER['DOCUMENT_ROOT'];
     send_file($docbase, $requestpath);
