@@ -1,9 +1,9 @@
 
 <script src="/__sf/inspector-json.js"></script>
 
-<div id="debug-panel" style="display:none;position:fixed;z-index:122;padding:16px;max-height:90vh;max-width:60vw;overflow-y:scroll;top:16px;left:16px;background-color:white;color:black;font-size:14px;line-height:16px;">
+<div id="debug-panel" style="display:none;position:fixed;z-index:122;max-height:90vh;max-width:100vw;overflow-y:scroll;top:32px;left:16px;background-color:#eee;color:black;font-size:14px;line-height:16px;">
 <div id="debug-panel-nav"><a href="/__ui/" target="_sf_navigator">navigator</a></div>
-<code><pre id="debug-panel-content" style="white-space: pre-wrap;"></pre></code></div>
+<pre id="debug-panel-content" style="white-space: pre-wrap;"></pre></div>
 <script>
     var ___debug = <?=debug_js()?>;
     var ___debug_e = document.getElementById('debug-panel')
