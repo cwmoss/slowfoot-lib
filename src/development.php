@@ -1,16 +1,16 @@
 <?php
 require __DIR__ . '/boot.php';
 #require_once __DIR__.'/../vendor/autoload.php';
-dbg("++start");
+#dbg("++start");
 require_once __DIR__.'/utils_server.php';
-dbg("++start");
+#dbg("++start");
 use function slowfoot\template\page;
 use function slowfoot\template\template;
 use function slowfoot\template\remove_tags;
 use function slowfoot\template\preprocess;
 
-dbg("++start");
-dbg("SERVER", $_SERVER);
+#dbg("++start");
+#dbg("SERVER", $_SERVER);
 ini_set("precision", 16);
 define('START_TIME', microtime(true));
 
@@ -18,7 +18,7 @@ error_reporting(E_ALL & ~E_NOTICE);
 
 if (PHP_SAPI == 'cli-server') {
     if (strpos($_SERVER['REQUEST_URI'], '.') !== false) {
-        dbg('+++ env hack!');
+        #dbg('+++ env hack!');
         $_SERVER['SCRIPT_NAME'] = '/' . basename($_SERVER['SCRIPT_FILENAME']);
     }
 }
@@ -29,7 +29,7 @@ $hr = false;
 $debug = true;
 
 $router->mount('/__api', function () use ($router, $ds) {
-    dbg('server', $_SERVER);
+    #dbg('server', $_SERVER);
     send_cors();
     $router->get('/index', function () use ($router, $ds) {
 
@@ -68,7 +68,7 @@ $router->mount('/__api', function () use ($router, $ds) {
 $router->mount('/__ui', function () use ($router, $ds) {
     $router->get('/', function () use ($router, $ds) {
         $uibase = __DIR__.'/../ui/build';
-        dbg("+++ ui index ++++", $uibase);
+        #dbg("+++ ui index ++++", $uibase);
         send_file($uibase, 'index.html');
         exit;
     });
@@ -102,11 +102,11 @@ $router->post('/__fun/(.*)', function ($requestpath) use ($router, $ds) {
     exit;
 });
 
-dbg("++ image path", $config['assets']['path']);
+#dbg("++ image path", $config['assets']['path']);
 
 $router->get($config['assets']['path'].'/'.'(.*\.\w{1,4})', function ($requestpath) use ($router, $ds, $config) {
     $docbase = $_SERVER['DOCUMENT_ROOT'].'/../cache';
-    dbg("++ image path base", $docbase, $requestpath);
+    #dbg("++ image path base", $docbase, $requestpath);
     send_file($docbase, $requestpath);
     exit;
 });
@@ -124,7 +124,7 @@ $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages
     if ($requestpath == '/' || $requestpath == '') {
         $requestpath = '/index';
     }
-    dbg("dev: req", $requestpath);
+    #dbg("dev: req", $requestpath);
     [$obj_id, $name] = $ds->get_by_path($requestpath);
 
     if ($obj_id) {
@@ -132,7 +132,7 @@ $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages
 
         // $template = $templates[$obj['_type']][$name]['template'];
         $template = template_name($config['templates'], $obj['_type'], $name);
-        dbg('template', $template, $obj);
+        #dbg('template', $template, $obj);
         $content = template(
             $template,
             [
@@ -148,11 +148,11 @@ $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages
     } else {
         list($dummy, $pagename, $pagenr) = explode('/', $requestpath);
         $pagename = '/' . $pagename;
-        dbg('page...', $pagename, $pagenr, $requestpath);
+        #dbg('page...', $pagename, $pagenr, $requestpath);
         $obj_id = array_search($pagename, $pages);
         #$pagination_query = check_pagination($pagename, $src);
         $pp = preprocess($pagename, $src);
-        dbg('page query', $pp);
+        #dbg('page query', $pp);
         if ($page_query = ($pp['page-query']??null)) {
             //var_dump($paginate);
             $qres = $ds->query($page_query['__content']);  // query_page($ds, $pagination_query, $pagenr);

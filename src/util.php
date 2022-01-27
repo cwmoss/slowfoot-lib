@@ -62,7 +62,7 @@ function dbg($txt, ...$vars)
     } else {
         $log[] = $txt;
     }
-    $log[] = join(' ', array_map('json_encode', $vars));
+    $log[] = join(' ~ ', array_map(fn ($v) =>json_encode($v, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), $vars));
     error_log(join(' ', $log));
 }
 

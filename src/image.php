@@ -35,7 +35,7 @@ function image($img, $opts = [], $gopts = [])
         $img = $gopts['map']($img);
     }
     
-    dbg("++ img", $img);
+    dbg("[image] start", $img['url'], $profile);
 
     if (is_remote($img['url'])) {
         $img['remote_src'] = true;
@@ -43,6 +43,9 @@ function image($img, $opts = [], $gopts = [])
         if ($gopts['download']) {
             $dl_name = $img['_id'];
             $download_file = $gopts['base'].'/download/'.$dl_name;
+
+            dbg("[image] download to ", $download_file);
+
             $resd = download_remote_image($img['url'], $download_file);
             if ($resd[0]) {
                 $img['download_file'] = '/download/'.$dl_name;
@@ -53,6 +56,8 @@ function image($img, $opts = [], $gopts = [])
             if (isset($gopts['resize_cdn'])) {
                 $cdn_url = $gopts['resize_cdn']($img, $profile);
                 $img['resize_url'] = $cdn_url;
+                dbg("[image] resize_cdn", $cdn_url);
+
                 return $img;
             }
         }
@@ -62,11 +67,13 @@ function image($img, $opts = [], $gopts = [])
     $dest = $gopts['base'] . '/' . $gopts['dest'] . '/' . $name;
 
     $src = $img['download_file']?:$img['path'];
+
+    dbg("[image] resizer", $src, $dest);
     $res = resize($resizer, $src, $dest, $profile);
     if ($profile['4c']) {
         set_tags($dest, $profile);
     }
-    dbg('+++ result', $res);
+    dbg('[image] finished', $res);
     $img['resize_url'] = $name;
     $img['resize'] = $res;
     return $img;
@@ -77,6 +84,9 @@ function image($img, $opts = [], $gopts = [])
 function image_tag($img, $opts = [], $gopts = [])
 {
     $resize = image($img, $opts, $gopts);
+    if (!$resize) {
+        return "";
+    }
 
     if (is_remote($resize['resize_url'])) {
         return html_cdn($resize, $gopts);
@@ -88,6 +98,10 @@ function image_tag($img, $opts = [], $gopts = [])
 function image_url($img, $opts = [], $gopts = [])
 {
     $resize = image($img, $opts, $gopts);
+    if (!$resize) {
+        return "";
+    }
+    
     return prefixed_url($resize['resize_url']);
 }
 
@@ -210,7 +224,7 @@ function html_cdn($res, $opts)
 }
 function resize($resizer, $src, $dest, $profile)
 {
-    dbg('++ resize', $src, $dest, $profile);
+    #dbg('++ resize', $src, $dest, $profile);
     if (!$profile['w'] || !$profile['h']) {
         $new = resize_one_side($resizer[0], $src, $dest, $profile['w'], $profile['h']);
     //var_dump($new);
@@ -236,7 +250,7 @@ function resize($resizer, $src, $dest, $profile)
 function resize_one_side($resizer, $src, $dest, $w, $h)
 {
     $p = $w ? ['w' => $w] : ['h' => $h];
-    dbg('+++ server', $src, $p);
+    #dbg('+++ server', $src, $p);
     return $resizer->makeImage($src, $p);
 }
 
@@ -244,7 +258,7 @@ function resize_two_sides($resizer, $src, $dest, $w, $h, $mode)
 {
     $mode = $mode == 'fit' ? 'contain' : 'crop';
     $p = ['w' => $w, 'h' => $h, 'fit' => $mode];
-    dbg('+++ server', $src, $p);
+    #dbg('+++ server', $src, $p);
     return $resizer->makeImage($src, $p);
 }
 /*
@@ -253,7 +267,7 @@ function resize_two_sides($resizer, $src, $dest, $w, $h, $mode)
 function resize_fp($resizer, $src, $dest, $w, $h, $fp)
 {
     $p = ['w' => $w, 'h' => $h, 'fit' => 'crop-' . round($fp[0] * 100) . '-' . round($fp[1] * 100)];
-    dbg('+++ server', $src, $p);
+    #dbg('+++ server', $src, $p);
     return $resizer->makeImage($src, $p);
 }
 

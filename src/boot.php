@@ -88,4 +88,4 @@ $pages = array_map(function ($p) {
     return '/' . basename($p, '.php');
 }, $pages);
 
-dbg('dataset info', $ds->info);
+dbg('[dataset] info', $ds->info);
