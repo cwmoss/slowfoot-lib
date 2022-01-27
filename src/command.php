@@ -57,8 +57,10 @@ if ($args['dev']) {
     print "starting development server\n\n";
     print "   🌈 http://localhost:1199\n\n";
     print "have fun!\n\n";
-    `php {$slft_lib_base}/development.php`;
-#    `$command`;
+    $wss = "php {$slft_lib_base}/wss.php ".SLOWFOOT_BASE;
+    #shell_exec("$wss &");
+    #print "end";
+    `$command`;
 }
 if ($args['build']) {
     print $logo."\n";

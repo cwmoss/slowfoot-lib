@@ -1,4 +1,6 @@
 <?php
+$base = $argv[1];
+require_once $base.'/vendor/autoload.php';
 
 // require necessary files here
 
