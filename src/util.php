@@ -12,7 +12,11 @@ function send_file($base, $file)
         if (file_exists($scss)) {
             // die(" sassc $scss $full");
             //print "sassc $scss $full";
-            $ok = `sassc $scss $full`;
+            $resp = shell_command('sassc {in} {out} 2>&1', ['in'=>$scss, 'out'=>$full]);
+            // $ok = `sassc $scss $full`;
+            if ($resp[1]!==0) {
+                dbg("[sassc] error", $resp);
+            }
             //var_dump($ok);
         }
     } elseif (preg_match('/js$/', $name)) {

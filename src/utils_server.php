@@ -210,7 +210,16 @@ function get_trace_from_exception($e)
 }
 
 
-
+function text_for($muster, $vars=array())
+{
+    $repl = array();
+    foreach ($vars as $k=>$v) {
+        $repl['{'.strtolower($k).'}']=$v;
+    }
+    $txt = $muster;
+    $txt = str_replace(array_keys($repl), $repl, $txt);
+    return $txt;
+}
 
 
 
@@ -222,7 +231,7 @@ function shell_command($cmd, $parms, $opts=[])
 
     exec($cmd, $output, $ok);
     if ($ok!==0) {
-        e500("shell command failed: $cmd");
+        #e500("shell command failed: $cmd");
     }
     return [$output, $ok];
 }
@@ -234,12 +243,12 @@ function shell_command($cmd, $parms, $opts=[])
 function resp($data)
 {
     $elapsed = microtime(true) - START_TIME;
-    if(!isset($data['res'])){
+    if (!isset($data['res'])) {
         $data = ['res'=>$data];
     }
-    if(isset($data['__meta'])){
+    if (isset($data['__meta'])) {
         $data['__meta']['time'] = $elapsed;
-    }else{
+    } else {
         $data['__meta']=['time'=>$elapsed];
     }
     $data['__meta']['time_ms'] = (int)($elapsed * 1000);
@@ -331,7 +340,8 @@ function send_cors()
     header('Access-Control-Expose-Headers: Upload-Key, Upload-Checksum, Upload-Length, Upload-Offset, Upload-Metadata, Tus-Version, Tus-Resumable, Tus-Extension, Location');
 }
 
-function send_nocache(){
+function send_nocache()
+{
     header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
     header('Cache-Control: post-check=0, pre-check=0', false);
     header('Pragma: no-cache');
