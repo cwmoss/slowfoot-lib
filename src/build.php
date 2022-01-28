@@ -1,6 +1,9 @@
 <?php
 
-use function slowfoot\template\{page, template, remove_tags, preprocess};
+use function slowfoot\template\page;
+use function slowfoot\template\template;
+use function slowfoot\template\remove_tags;
+use function slowfoot\template\preprocess;
 
 $console = console();
 
@@ -50,7 +53,7 @@ foreach ($templates as $type => $conf) {
             if ($path == '/index') {
                 $path = '/';
             }
-            if($path=="/"){
+            if ($path=="/") {
                 var_dump($row);
                 exit;
             }
@@ -95,14 +98,14 @@ foreach ($pages as $pagename) {
             $pagenr++;
             $pagepath = $path . '/' . $pagenr;
         }
-    }elseif($page_query){
+    } elseif ($page_query) {
         $qres = $ds->query($page_query['__content']);  // query_page($ds, $pagination_query, $pagenr);
         #var_dump($qres);
         //print_r($coll);
         $content = page($pagename, ['page' => $qres], $template_helper, $src);
         $content = remove_tags($content, ['page-query']);
         write($content, $pagepath, $dist);
-    }else {
+    } else {
         $content = page($pagename, [], $template_helper, $src);
         write($content, $pagepath, $dist);
     }
@@ -116,7 +119,7 @@ foreach ($pages as $pagename) {
 
 shell_info("copy assets");
 
-`cp -R $src/css $src/js $dist/`;
+`cp -R $src/css $src/js $src/fonts $src/gfx $dist/`;
 `cp -R $base/cache $dist/images`;
 
 shell_info();
