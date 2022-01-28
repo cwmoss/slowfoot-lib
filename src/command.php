@@ -61,6 +61,7 @@ if ($args['dev']) {
     #shell_exec("$wss &");
     #print "end";
     `$command`;
+    #`($command &) && ($wss &)`;
 }
 if ($args['build']) {
     print $logo."\n";

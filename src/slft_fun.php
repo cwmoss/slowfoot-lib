@@ -410,7 +410,18 @@ function template_name($tconfig, $type, $name)
 
 function path_asset($asset, $cachebust = false)
 {
-    return PATH_PREFIX . $asset . ($cachebust ? '?' . time() : '');
+    return PATH_PREFIX . $asset . cachebuster($cachebust);
+}
+
+function cachebuster($cachebust=false)
+{
+    if ($cachebust===false) {
+        return "";
+    }
+    if ($cachebust===true) {
+        return "?".time();
+    }
+    return "?rev=".$cachebust;
 }
 
 function path_page($page)
