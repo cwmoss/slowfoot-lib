@@ -183,6 +183,9 @@ function load_data($sources, $hooks, $config)
         shell_info("fetching $name");
     
         foreach ($fun($opts, $config) as $row) {
+            if (!$row['_type']) {
+                $row['_type'] = $opts['type'];
+            }
             $otype = $row['_type'];
             $row['_src'] = $name;
             if ($hooks['on_load']) {
@@ -191,12 +194,10 @@ function load_data($sources, $hooks, $config)
             if (!$row) {
                 $db->rejected($otype);
             } else {
-                if (!$row['_type']) {
-                    $row['_type'] = $opts['type'];
-                }
                 if (!$row['_id']) {
                     $row['_id'] = $row['id'];
                 }
+                // $row['_id'] = str_replace('/', '-', $row['_id']);
                 $db->add($row['_id'], $row);
             }
         }
@@ -229,10 +230,24 @@ function load_json($opts, $config)
 
 function load_markdown($opts, $config)
 {
+    $front = new Mni\FrontYAML\Parser;
     $filep = $config['base'] . '/' . $opts['file'];
+    dbg("++ md glob:", $filep);
+    $prefix = $config['base'] . '/';
+
     $files = globstar($filep);
     foreach ($files as $f) {
-        $row = ['name'=>$f, 'content'=>file_get_contents($f)];
+        dbg("++ md file:", $f);
+      
+        $fname = str_replace($prefix, '', $f);
+        $document = $front->parse(file_get_contents($f), false);
+        $data = $document->getYAML() ?? [];
+        $md = $document->getContent() ?? '';
+        $id = $data['_id']??($data['id']??$fname);
+
+        // TODO: anything goes
+        $id = str_replace('/', '-', $id);
+        $row = array_merge($data, ['mdbody'=> $md, '_id'=>$id, '_file'=>$fname]);
         yield $row;
     }
     return;
