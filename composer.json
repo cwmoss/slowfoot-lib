@@ -16,6 +16,7 @@
         "php-parallel-lint/php-console-color": "^1.0",
         "docopt/docopt": "^1.0",
         "phplucidframe/console-table": "^1.2",
-        "bloatless/php-websocket": "^3.0"
+        "bloatless/php-websocket": "^3.0",
+        "mnapoli/front-yaml": "^2.0"
     }
 }

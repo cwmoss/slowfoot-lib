@@ -227,6 +227,17 @@ function load_json($opts, $config)
     return;
 }
 
+function load_markdown($opts, $config)
+{
+    $filep = $config['base'] . '/' . $opts['file'];
+    $files = globstar($filep);
+    foreach ($files as $f) {
+        $row = ['name'=>$f, 'content'=>file_get_contents($f)];
+        yield $row;
+    }
+    return;
+}
+
 function load_csv($opts, $config)
 {
     $file = $config['base'] . '/' . $opts['file'];
