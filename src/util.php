@@ -6,8 +6,30 @@ function send_file($base, $file)
     $name = basename($file);
     $full = $base . '/' . $file;
 
-    if (preg_match('/\.css$/', $name)) {
-        header('Content-Type: text/css');
+    if (!file_exists($full)) {
+        header('HTTP/1.1 404 Not Found');
+        return;
+    }
+
+    $ext = pathinfo($name, PATHINFO_EXTENSION);
+
+    $types = [
+        'css' => 'text/css',
+        'js'   => 'text/javascript',
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'png' => 'image/png',
+        'svg' => 'image/svg+xml',
+        'html' => 'text/html',
+        'woff' => 'font/woff',
+        'woff2' => 'font/woff2',
+        'ttf' => 'font/ttf',
+        'otf' => 'font/otf'
+    ];
+
+    $type = $types[$ext];
+
+    if ($ext=='css') {
         $scss = $full . '.scss';
         if (file_exists($scss)) {
             // die(" sassc $scss $full");
@@ -19,26 +41,17 @@ function send_file($base, $file)
             }
             //var_dump($ok);
         }
-    } elseif (preg_match('/js$/', $name)) {
-        header('Content-Type: text/javascript');
-    } elseif (preg_match('/jpe?g$/', $name)) {
-        header('Content-Type: image/jpeg');
-    } elseif (preg_match('/png$/', $name)) {
-        header('Content-Type: image/png');
-    } elseif (preg_match('/svg$/', $name)) {
-        header('Content-Type: image/svg+xml');
-    } elseif (preg_match('/html$/', $name)) {
+    } 
+    header('Content-Type: '.$type);
+
+    if ($ext=='html'){
         header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
         header('Cache-Control: post-check=0, pre-check=0', false);
         header('Pragma: no-cache');
         header('Content-Type: text/html');
     }
-    // dbg('sending', $full);
-    if (file_exists($full)) {
-        readfile($full);
-    } else {
-        header('HTTP/1.1 404 Not Found');
-    }
+
+    readfile($full);
 }
 
 function send_asset_file($base, $file, $orig, $cache)
