@@ -50,12 +50,14 @@ if ($args['dev']) {
     // this wont work :)
     // `(sleep 1 ; open http://localhost:1199/ )&`;
     // this works!
-    shell_exec('(sleep 1 ; open http://localhost:1199/ ) 2>/dev/null >/dev/null &');
+    # automatisches öffnen gefällt mir nicht mehr
+    # shell_exec('(sleep 1 ; open http://localhost:1199/ ) 2>/dev/null >/dev/null &');
     $command = "PHP_CLI_SERVER_WORKERS=4 php -S localhost:1199 -t src/ {$slft_lib_base}/development.php";
     print "\n\n";
 
     print "starting development server\n\n";
     print "   🌈 http://localhost:1199\n\n";
+    print "<cmd> click\n";
     print "have fun!\n\n";
     $wss = "php {$slft_lib_base}/wss.php ".SLOWFOOT_BASE;
     #shell_exec("$wss &");
