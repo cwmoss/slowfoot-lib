@@ -240,6 +240,8 @@ function load_markdown($opts, $config)
         dbg("++ md file:", $f);
       
         $fname = str_replace($prefix, '', $f);
+        $path_parts = pathinfo($fname);
+
         $document = $front->parse(file_get_contents($f), false);
         $data = $document->getYAML() ?? [];
         $md = $document->getContent() ?? '';
@@ -247,7 +249,15 @@ function load_markdown($opts, $config)
 
         // TODO: anything goes
         $id = str_replace('/', '-', $id);
-        $row = array_merge($data, ['mdbody'=> $md, '_id'=>$id, '_file'=>$fname]);
+        $row = array_merge($data, [
+            'mdbody'=> $md, 
+            '_id'=>$id, 
+            '_file'=>[
+                'path' => $fname, 
+                'name' => $path_parts['filename'],
+                'ext' => $path_parts['extension']
+            ]
+        ]);
         yield $row;
     }
     return;
