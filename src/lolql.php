@@ -58,7 +58,10 @@ function parse($string) {
         );
     }
     $order = build_order_fun($parts['order'][0]);
-    return ['q' => $q, 'order' => $order, 'limit' => $parts['limit'][0]];
+    return ['q' => $q, 
+        'order' => $order[0],
+        'order_raw' => $order[1], 
+        'limit' => $parts['limit'][0]];
 }
 
 function eval_cond($db, $query) {
@@ -188,18 +191,21 @@ function build_order_fun($order) {
         ];
     }
     $coll = collator_create('de_DE');
-    return function ($a, $b) use ($os, $coll) {
-        foreach ($os as $order) {
-            //$cmp = 'strnatcasecmp';
-            $cmp = 'collator_compare';
-            $r = $cmp($coll, $a[$order['k']], $b[$order['k']]);
-            if ($r) {
-                return $order['d'] == 'desc' ? (-1 * $r) : $r;
+    return [
+        function ($a, $b) use ($os, $coll) {
+            foreach ($os as $order) {
+                //$cmp = 'strnatcasecmp';
+                $cmp = 'collator_compare';
+                $r = $cmp($coll, $a[$order['k']], $b[$order['k']]);
+                if ($r) {
+                    return $order['d'] == 'desc' ? (-1 * $r) : $r;
+                }
             }
-        }
-        return 0;
-        //return strnatcmp($a[$key], $b[$key]);
-    };
+            return 0;
+            //return strnatcmp($a[$key], $b[$key]);
+        },
+        $os
+    ];
 }
 
 function parse_order($order) {

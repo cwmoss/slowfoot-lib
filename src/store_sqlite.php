@@ -82,19 +82,37 @@ CREATE INDEX IF NOT EXISTS paths_id on paths(id);
         return [$res, count($res)];
     }
 
-    public function query($q, $limit=20){
+    public function query($q, $order="", $limit=20){
         $query = \lolql\parse($q);
         $fn = \lolql\eval_cond_as_sql_function($query['q']);
         $name = 'lolql_'.bin2hex(\random_bytes(8));
         #$name = 'lolq';
         $pdo = $this->db->getPdo();
         $pdo->sqliteCreateFunction($name, $fn, 1);
-        $res = $this->db->run('SELECT body from docs WHERE '.$name.'(body)');
+        $q = 'SELECT body from docs WHERE '.$name.'(body)';
+        $order = $this->build_order($query['order_raw']);
+        if($order) $q.=' ORDER BY '.$order;
+        dbg("[store sqlite] query", $q, $query['order_raw']);
+        $res = $this->db->run($q);
         $res = array_map(function($r){return json_decode($r['body'], true);}, $res);
         return $res;
         return [[], 0];
         $res = lquery($this->docs, $q);
         return [$res, count($res)];
+    }
+
+    public function build_order($o=[]){
+        if(!$o) return "";
+        $sql = [];
+        foreach($o as $order){
+            $sql[]=$this->propname($order['k']).' '.$order['d'];
+        }
+        return join(", ", $sql);
+    }
+    public function propname($n){
+        $name = sprintf("json_extract(body, '\$.%s')",
+            $n);
+        return $name;
     }
 
     public function query_type($type){

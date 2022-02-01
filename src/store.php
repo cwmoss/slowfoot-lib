@@ -28,8 +28,8 @@ class store {
         return $this->db->query_sql($q, $params);
     }
 
-    public function query($q, $limit=20){
-        return $this->db->query($q, $limit);
+    public function query($q, $order="", $limit=20){
+        return $this->db->query($q, $order, $limit);
     }
 
     public function query_type($type){
