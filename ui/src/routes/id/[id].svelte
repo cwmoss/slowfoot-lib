@@ -3,7 +3,7 @@
     import Jinspector from '$lib/jinspector.svelte'
 
 	export async function load({ params, fetch, session, stuff }) {
-		const url = `${base_url}/id/${params.id}`;
+		const url = `${base_url}/id/?id=${params.id}`;
 		handle_resp(true)
 		const res = await fetch(url);
         

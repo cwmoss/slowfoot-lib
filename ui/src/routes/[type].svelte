@@ -35,6 +35,6 @@ export let rows
 <h1>_type: {$page.params.type}</h1>
 <ol>
     {#each rows as row}
-    <li><a href="id/{row._id}">{row._id}</a></li>
+    <li><a href="id/{encodeURIComponent(row._id)}">{row._id}</a></li>
     {/each}
 </ol>
