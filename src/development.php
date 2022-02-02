@@ -51,8 +51,8 @@ $router->mount('/__api', function () use ($router, $ds) {
         resp(['rows'=>$rows]);
     });
 
-    $router->get('/id/([-\w.]+)?', function ($id) use ($router, $ds) {
-
+    $router->get('/id', function () use ($router, $ds) {
+        $id = $_GET['id'];
         //$row = $db->row('SELECT _id, _type, body FROM docs WHERE _id = ? ', $id);
         $row = $ds->get($id);
         resp($row);

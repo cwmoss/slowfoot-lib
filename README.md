@@ -31,6 +31,13 @@ available hooks
       | build pages from src/pages folder
       => website
 
+## asset references
+
+~/path/to.jpg           relative to file-content-source-base
+../parent/path/to.jpg   relative to file-content-source-current-directory
+./path/to.jpg           relative to file-content-source-current-directory
+/path/to.jpg            relative to project-source-directory
+
 
 /*
 

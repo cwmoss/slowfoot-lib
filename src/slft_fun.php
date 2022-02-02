@@ -248,7 +248,7 @@ function load_markdown($opts, $config)
         $id = $data['_id']??($data['id']??$fname);
 
         // TODO: anything goes
-        $id = str_replace('/', '-', $id);
+        // $id = str_replace('/', '-', $id);
         $row = array_merge($data, [
             'mdbody'=> $md, 
             '_id'=>$id, 

@@ -58,8 +58,8 @@ $router->mount('/__api', function () use ($router, $dbf) {
         resp(['rows'=>$rows]);
     });
 
-    $router->get('/id/([-\w.]+)?', function ($id) use ($router, $db) {
-
+    $router->get('/id', function () use ($router, $db) {
+        $id = $_GET['id'];
         $row = $db->row('SELECT _id, _type, body FROM docs WHERE _id = ? ', $id);
         resp($row);
     });
