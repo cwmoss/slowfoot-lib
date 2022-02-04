@@ -1,6 +1,13 @@
 {
     "name": "cwmoss/slowfoot-lib",
     "version": "1.0",
+    "autoload": {
+        "files": [
+            "src/util.php",
+            "src/image.php",
+            "src/slft_fun.php"
+        ]
+    },
     "require": {
         "spatie/async": "^1.5",
         "erusev/parsedown": "^1.7",

@@ -30,10 +30,10 @@ if (file_exists("$base/.env")) {
 $src = $base . '/src';
 $dist = $base . '/dist/';
 
-require_once 'util.php';
+#require_once 'util.php';
 
-require_once 'image.php';
-require_once 'slft_fun.php';
+#require_once 'image.php';
+#require_once 'slft_fun.php';
 
 $config = load_config($base);
 //print_r($_ENV);
