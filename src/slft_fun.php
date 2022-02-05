@@ -72,7 +72,12 @@ function normalize_store_config($conf)
 function normalize_assets_config($conf)
 {
     $assets = $conf['assets'] ?: [];
-    $default = ['base' => $conf['base'], 'src' => 'images', 'dest' => 'cache', 'profiles' => []];
+    $default = [
+        'base' => $conf['base'], 
+        'src' => '', 
+        'dest' => 'rendered-images', 
+        'profiles' => []
+    ];
     $assets = array_merge($default, $assets);
     return $assets;
 }

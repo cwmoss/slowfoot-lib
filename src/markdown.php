@@ -66,9 +66,11 @@ class markdown_sfp extends Parsedown
             $href = $this->resolve_link($href);
             $link['element']['attributes']['href'] = $href;
         }
+        dbg("++ final link", $link);
         return $link;
     }
 
+    // wird auch für !image tags aufgerufen
     protected function resolve_link($href){
         if($href[0]=='/') return $href;
         #TODO: parse_url
@@ -78,6 +80,9 @@ class markdown_sfp extends Parsedown
             dirname($this->current_obj['page']['_id']), 
             $this->context['conf']['base']);
         
+        if(pathinfo($href, PATHINFO_EXTENSION)){
+            return $id;
+        }
         $src_conf = $this->context['conf'];
         dbg("+++ id-> link", $href, $id);
         return $this->context['ds']->get_path($id);
@@ -92,7 +97,10 @@ class markdown_sfp extends Parsedown
         $img = parent::inlineImage($Excerpt);
         if(is_array($img)){
             dbg("+++ img", $img);
-            $img['element']['attributes']['data-from']='slowfoot';
+            $pipe = \slowfoot\image_url($img['element']['attributes']['src'], 
+                ['size'=>""], $this->context['conf']['assets']);
+            $img['element']['attributes']['src'] = $pipe;
+            $img['element']['attributes']['data-slft']='ok';
         }
         return $img;
     }

@@ -8,11 +8,13 @@ namespace slowfoot;
     500x400
     500x
     x400
+    "" (empty) => only copy, don't resize
 
     mode
     - fit, fit image to max constraints => whole image visible
     - fill, crop if aspect-ratio needs to, use fp (focalpoint if available)
 
+    cache: rendered-images
 */
 function image($img, $opts = [], $gopts = [])
 {
@@ -102,7 +104,7 @@ function image_url($img, $opts = [], $gopts = [])
         return "";
     }
     
-    return prefixed_url($resize['resize_url']);
+    return prefixed_url($resize['resize_url'], $gopts);
 }
 
 function prefixed_url($url, $opts=[])
@@ -194,7 +196,7 @@ function asset_from_file($path, $gopts)
         '_id' => $path,
         '_src' => $gopts['src'],
         'url' => $fname,
-        'path' => $gopts['src'] . '/' . $path,
+        'path' => $fname,
         'w' => $info[0],
         'h' => $info[1],
         'mime' => $info['mime']
@@ -208,8 +210,8 @@ function html($res, $opts)
         prefixed_url($res['resize_url'], $opts),
         $res['resize'][0],
         $res['resize'][1],
-        'ein bild',
-        ''
+        \htmlspecialchars($opts['alt']??''),
+        \htmlspecialchars($opts['class']??'')
     );
 }
 
@@ -218,13 +220,19 @@ function html_cdn($res, $opts)
     return sprintf(
         '<img src="%s" alt="%s" class="%s">',
         $res['resize_url'],
-        'ein bild',
-        ''
+        \htmlspecialchars($opts['alt']??''),
+        \htmlspecialchars($opts['class']??'')
     );
 }
 function resize($resizer, $src, $dest, $profile)
 {
     #dbg('++ resize', $src, $dest, $profile);
+    // copy-only
+    if(isset($profile['size'])&& !$profile['size']){
+        `cp $src $dest`;
+        return \getimagesize($dest);
+    }
+
     if (!$profile['w'] || !$profile['h']) {
         $new = resize_one_side($resizer[0], $src, $dest, $profile['w'], $profile['h']);
     //var_dump($new);
@@ -292,6 +300,9 @@ function get_name($url, $profile)
     ksort($profile);
     $info = \pathinfo($url);
     $hash = \md5($info['filename'] . '?'. http_build_query($profile));
+    if(!$profile['size']){
+        $profile['size'] = 'ypoc';
+    }
     return $info['filename'] . '--' . $hash . '-' . $profile['size'] . '.' . $info['extension'];
 }
 
