@@ -37,7 +37,8 @@ function load_template_helper($ds, $src, $config)
         'asset_from_file' => function ($path) use ($config) {
             //var_dump($config);
             return \slowfoot\asset_from_file($path, $config['assets']);
-        }
+        },
+        'markdown' => markdown_helper($config, $ds)
     ];
     return array_merge($default, $custom);
 }

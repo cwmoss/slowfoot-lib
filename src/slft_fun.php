@@ -5,6 +5,7 @@ require_once 'store_memory.php';
 require_once 'store_sqlite.php';
 require_once 'JsConverter.php';
 require_once 'template.php';
+require_once 'markdown.php';
 
 use slowfoot\store;
 use slowfoot\store_memory;
@@ -30,7 +31,7 @@ function load_config($dir)
         $tpls[$name] = normalize_template_config($name, $t);
     }
     $conf['templates'] = $tpls;
-    $conf['base'] = $dir;
+    $conf['base'] = '/'.get_absolute_path($dir);
     $conf['assets'] = normalize_assets_config($conf);
     $conf['store'] = normalize_store_config($conf);
     return $conf;
@@ -245,8 +246,8 @@ function load_markdown($opts, $config)
         $document = $front->parse(file_get_contents($f), false);
         $data = $document->getYAML() ?? [];
         $md = $document->getContent() ?? '';
-        $id = $data['_id']??($data['id']??$fname);
-
+        #$id = $data['_id']??($data['id']??$fname);
+        $id = $path_parts['dirname'].'/'.$path_parts['filename'];
         // TODO: anything goes
         // $id = str_replace('/', '-', $id);
         $row = array_merge($data, [
@@ -501,11 +502,22 @@ function layout($name = null)
     return \slowfoot\template\layout($name);
 }
 
-function get_absolute_path_from_base($path, $base){
+function get_absolute_path_from_base($path, $current, $base){
     if(substr($path, 0, 2)=='~/'){
         $path = $base.ltrim($path, '~');
+        dbg("+++ path ~ +++", $path);
+        $remove_base = true;
+    }else{
+        $path = $current.'/'.$path;
     }
+    
     $path = get_absolute_path($path);
+    dbg("+++ path +++", $path);
+    if($remove_base){
+        $path = str_replace($base.'/', '', '/'.$path);
+        dbg("+++ path +++ ++++ ", $path, $base);
+    }
+    return $path;
 }
 function get_absolute_path($path) {
     $path = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $path);
