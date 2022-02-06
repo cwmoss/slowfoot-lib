@@ -28,8 +28,8 @@ function load_template_helper($ds, $src, $config)
         'image' => function ($asset, $profile) use ($config) {
             return \slowfoot\image($asset, $profile, $config['assets']);
         },
-        'image_tag' => function ($asset, $profile) use ($config) {
-            return \slowfoot\image_tag($asset, $profile, $config['assets']);
+        'image_tag' => function ($asset, $profile, $tag=[]) use ($config) {
+            return \slowfoot\image_tag($asset, $profile, $tag, $config['assets']);
         },
         'image_url' => function ($asset, $profile) use ($config) {
             return \slowfoot\image_url($asset, $profile, $config['assets']);

@@ -28,6 +28,7 @@ function image($img, $opts = [], $gopts = [])
     // local images, die direkt genutzt werden
     if (\is_string($img)) {
         $img = asset_from_file($img, $gopts);
+        dbg("[image] asset from file", $img);
     }
 
     if ($img['_type']!='slft.asset') {
@@ -68,7 +69,7 @@ function image($img, $opts = [], $gopts = [])
     $name = get_name($img['url'], $profile);
     $dest = $gopts['base'] . '/' . $gopts['dest'] . '/' . $name;
 
-    $src = $img['download_file']?:$img['path'];
+    $src = $img['download_file']?:$img['_id'];
 
     dbg("[image] resizer", $src, $dest);
     $res = resize($resizer, $src, $dest, $profile);
@@ -83,7 +84,7 @@ function image($img, $opts = [], $gopts = [])
 }
 
 // <img> tag
-function image_tag($img, $opts = [], $gopts = [])
+function image_tag($img, $opts = [], $tagopts=[], $gopts = [])
 {
     $resize = image($img, $opts, $gopts);
     if (!$resize) {
@@ -177,7 +178,7 @@ function get_resizer($base)
 
     // The FilesystemOperator
     $cache = new \League\Flysystem\Filesystem($adapter);
-
+    dbg("+++ glide src path", $base);
     $server = \League\Glide\ServerFactory::create([
         'source' => $base,
         'cache' => $cache,
@@ -206,7 +207,7 @@ function asset_from_file($path, $gopts)
 function html($res, $opts)
 {
     return sprintf(
-        '<img src="%s" width="%s" height="%s" alt="%s" class="%s">',
+        '<img src="%s" width="%s" xheight="%s" alt="%s" loading="lazy" class="%s">',
         prefixed_url($res['resize_url'], $opts),
         $res['resize'][0],
         $res['resize'][1],
@@ -230,6 +231,10 @@ function resize($resizer, $src, $dest, $profile)
     // copy-only
     if(isset($profile['size'])&& !$profile['size']){
         `cp $src $dest`;
+        return \getimagesize($dest);
+    }
+
+    if(\file_exists($dest)){
         return \getimagesize($dest);
     }
 
@@ -259,6 +264,8 @@ function resize_one_side($resizer, $src, $dest, $w, $h)
 {
     $p = $w ? ['w' => $w] : ['h' => $h];
     #dbg('+++ server', $src, $p);
+    $p['q'] = 72;
+    $p['sharp'] = 5;
     return $resizer->makeImage($src, $p);
 }
 
@@ -266,6 +273,8 @@ function resize_two_sides($resizer, $src, $dest, $w, $h, $mode)
 {
     $mode = $mode == 'fit' ? 'contain' : 'crop';
     $p = ['w' => $w, 'h' => $h, 'fit' => $mode];
+    $p['q'] = 72;
+    $p['sharp'] = 5;
     #dbg('+++ server', $src, $p);
     return $resizer->makeImage($src, $p);
 }
@@ -275,6 +284,8 @@ function resize_two_sides($resizer, $src, $dest, $w, $h, $mode)
 function resize_fp($resizer, $src, $dest, $w, $h, $fp)
 {
     $p = ['w' => $w, 'h' => $h, 'fit' => 'crop-' . round($fp[0] * 100) . '-' . round($fp[1] * 100)];
+    $p['q'] = 72;
+    $p['sharp'] = 5;
     #dbg('+++ server', $src, $p);
     return $resizer->makeImage($src, $p);
 }
