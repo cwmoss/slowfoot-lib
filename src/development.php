@@ -67,13 +67,13 @@ $router->mount('/__api', function () use ($router, $ds, $config, $src, $template
 
     $router->get('/preview/(.*)', function($id_type) use($router, $db, $config, $src, $template_helper){
         list($id, $type) = explode('/', $id_type);
-        dbg("+++ slft api preview", $id_type);
+        dbg("[api/preview]", $id_type);
         
         $preview_obj = load_preview_object($id, $type, $config);
 
         #$template = $templates[$obj['_type']]['_']['template'];
         #$template = template_name($config['templates'], $obj['_type'], $name);
-        dbg('[api/preview] template', $preview_obj);
+        #dbg('[api/preview] template', $preview_obj);
         
         $content = template($preview_obj['template'], ['page' => $preview_obj['data']], $template_helper, $src);
 
