@@ -28,7 +28,7 @@ $router = new \Bramus\Router\Router();
 $hr = false;
 $debug = true;
 
-$router->mount('/__api', function () use ($router, $ds) {
+$router->mount('/__api', function () use ($router, $ds, $config, $src, $template_helper) {
     #dbg('server', $_SERVER);
     send_cors();
     $router->get('/index', function () use ($router, $ds) {
@@ -62,6 +62,27 @@ $router->mount('/__api', function () use ($router, $ds) {
         $q = $_GET['q'];
         $rows = $ds->q("SELECT _id, snippet(docs_fts,1, '<b>', '</b>', '[...]', 30) body FROM docs_fts WHERE docs_fts = ? ", $q);
         resp($rows);
+    });
+
+
+    $router->get('/preview/(.*)', function($id_type) use($router, $db, $config, $src, $template_helper){
+        list($id, $type) = explode('/', $id_type);
+        dbg("+++ slft api preview", $id_type);
+        
+        $preview_obj = load_preview_object($id, $type, $config);
+
+        #$template = $templates[$obj['_type']]['_']['template'];
+        #$template = template_name($config['templates'], $obj['_type'], $name);
+        dbg('[api/preview] template', $preview_obj);
+        
+        $content = template($preview_obj['template'], ['page' => $preview_obj['data']], $template_helper, $src);
+
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Cache-Control: post-check=0, pre-check=0', false);
+        header('Pragma: no-cache');
+        header('Content-Type: text/html');
+
+        print $content;
     });
 });
 

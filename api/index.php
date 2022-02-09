@@ -69,6 +69,7 @@ $router->mount('/__api', function () use ($router, $dbf) {
         $rows = $db->q("SELECT _id, snippet(docs_fts,1, '<b>', '</b>', '[...]', 30) body FROM docs_fts WHERE docs_fts = ? ", $q);
         resp($rows);
     });
+
 });
 
 $router->set404(function () {
