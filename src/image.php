@@ -238,6 +238,11 @@ function resize($resizer, $src, $dest, $profile)
         return \getimagesize($dest);
     }
 
+    if(!\file_exists($src)){
+        dbg("+++ not exists", $src);
+        return [];
+    }
+    
     if (!$profile['w'] || !$profile['h']) {
         $new = resize_one_side($resizer[0], $src, $dest, $profile['w'], $profile['h']);
     //var_dump($new);
