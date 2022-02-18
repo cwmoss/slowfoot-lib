@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="description" content="" />
-		<link rel="icon" href="%svelte.assets%/favicon-96x96.png" />
+		<link rel="icon" href="/__ui/favicon-96x96.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>slowfoot navigator</title>
 		<style>
@@ -168,26 +168,21 @@ a.logo{
 	}
 		</style>
 		
-
-		
-
-		<link rel="stylesheet" href="/__ui/_app/assets/start-61d1577b.css">
-		<link rel="modulepreload" href="/__ui/_app/start-3be9b6e2.js">
-		<link rel="modulepreload" href="/__ui/_app/chunks/vendor-4f9cac4b.js">
-		<link rel="modulepreload" href="/__ui/_app/chunks/paths-28a87002.js">
-
-		<script type="module">
-			import { start } from "/__ui/_app/start-3be9b6e2.js";
-			start({
-				target: document.querySelector("#svelte"),
-				paths: {"base":"/__ui","assets":"/__ui"},
-				session: {},
-				route: true,
-				spa: true,
-				trailing_slash: "never",
-				hydrate: null
-			});
-		</script>
+	<link rel="modulepreload" href="/__ui/_app/start-02727aeb.js">
+	<link rel="modulepreload" href="/__ui/_app/chunks/vendor-1e8d99af.js">
+	<link rel="modulepreload" href="/__ui/_app/chunks/paths-4b3c6e7e.js">
+			<script type="module">
+				import { start } from "/__ui/_app/start-02727aeb.js";
+				start({
+					target: document.querySelector("#svelte"),
+					paths: {"base":"/__ui","assets":"/__ui"},
+					session: {},
+					route: true,
+					spa: true,
+					trailing_slash: "never",
+					hydrate: null
+				});
+			</script>
 	</head>
 	<body>
 		<div id="svelte"></div>

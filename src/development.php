@@ -42,12 +42,16 @@ $router->mount('/__api', function () use ($router, $ds, $config, $src, $template
     });
 
     $router->get('/type/([-\w.]+)(/\d+)?', function ($type, $page=1) use ($router, $ds) {
-
+        dbg("[api] type", $type);
         #print "hallo";
-
+        if ($type=='__paths') {
+            $rows = $ds->db->db->safeQuery('SELECT * FROM paths LIMIT ? OFFSET ?', [20, 0]);
+        } else {
+            $rows = $ds->query_type($type);
+        }
         //$rows = $db->run('SELECT * FROM docs LIMIT 20');
         //$rows = $db->q('SELECT _id, body FROM docs WHERE _type = ? LIMIT 20', $type);
-        $rows = $ds->query_type($type);
+        
         resp(['rows'=>$rows]);
     });
 
@@ -65,7 +69,7 @@ $router->mount('/__api', function () use ($router, $ds, $config, $src, $template
     });
 
 
-    $router->get('/preview/(.*)', function($id_type) use($router, $db, $config, $src, $template_helper){
+    $router->get('/preview/(.*)', function ($id_type) use ($router, $db, $config, $src, $template_helper) {
         list($id, $type) = explode('/', $id_type);
         dbg("[api/preview]", $id_type);
         
