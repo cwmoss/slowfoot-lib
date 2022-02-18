@@ -28,13 +28,18 @@ function partial($base, $template, $data=[], $helper=[], $non_existent="")
     return $content;
 }
 
-
+function template_get_context($name, $props)
+{
+    $name = trim($name, '/');
+    return array_merge($props, ['name'=>$name]);
+}
 
 function template($_template, $data, $helper, $_base)
 {
     extract($data);
     extract($helper);
     extract(load_late_template_helper($helper, $_base, $data));
+    $_context = template_get_context($_template, ['is_template'=>true, 'is_page'=>false]);
     ob_start();
     include $_base . '/templates/' . $_template . '.php';
     $content = ob_get_clean();
@@ -52,6 +57,7 @@ function page($_template, $data, $helper, $_base)
     extract($data);
     extract($helper);
     extract(load_late_template_helper($helper, $_base, $data));
+    $_context = template_get_context($_template, ['is_template'=>false, 'is_page'=>true]);
     ob_start();
     include $_base . '/pages/' . $_template . '.php';
 
