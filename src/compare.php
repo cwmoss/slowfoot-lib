@@ -3,7 +3,8 @@
 namespace lolql;
 
 if (!function_exists('str_ends_with')) {
-    function str_ends_with($haystack, $needle) {
+    function str_ends_with($haystack, $needle)
+    {
         $len = strlen($needle);
         if ($haystack < $len) {
             return false;
@@ -14,19 +15,22 @@ if (!function_exists('str_ends_with')) {
 }
 
 if (!function_exists('str_starts_with')) {
-    function str_starts_with($haystack, $needle) {
+    function str_starts_with($haystack, $needle)
+    {
         return strpos($haystack, $needle) === 0;
     }
 }
 
 if (!function_exists('str_contains')) {
-    function str_contains($haystack, $needle) {
+    function str_contains($haystack, $needle)
+    {
         return strpos($haystack, $needle) !== false;
     }
 }
 
 if (!function_exists('is_assoc')) {
-    function is_assoc(array $arr) {
+    function is_assoc(array $arr)
+    {
         if ([] === $arr) {
             return false;
         }
@@ -39,7 +43,8 @@ title == "hello"
 title == subtitle
 authors._ref == "a19"
 */
-function cmp_eq($l, $r) {
+function cmp_eq($l, $r)
+{
     // dbg('cmp +++ ', $l, $r);
 
     if ($l['t'] == 'k' && is_array($l['v'])) {
@@ -57,12 +62,51 @@ function cmp_eq($l, $r) {
     return ($l['v'][0] == $r['v'][0]);
 }
 
+function cmp_lt($l, $r)
+{
+    dbg('cmp +++ < ', $l, $r);
+
+    if ($l['t'] == 'k' && is_array($l['v'])) {
+        return false;
+    }
+    if ($l['t'] == 'k') {
+        return ($l['v'] < $r['v'][0]);
+    }
+    if ($r['t'] == 'k' && is_array($r['v'])) {
+        return false;
+    }
+    if ($r['t'] == 'k') {
+        return ($l['v'][0] < $r['v']);
+    }
+    return ($l['v'][0] < $r['v'][0]);
+}
+
+function cmp_gt($l, $r)
+{
+    dbg('cmp +++ > ', $l, $r);
+
+    if ($l['t'] == 'k' && is_array($l['v'])) {
+        return false;
+    }
+    if ($l['t'] == 'k') {
+        return ($l['v'] > $r['v'][0]);
+    }
+    if ($r['t'] == 'k' && is_array($r['v'])) {
+        return false;
+    }
+    if ($r['t'] == 'k') {
+        return ($l['v'][0] > $r['v']);
+    }
+    return ($l['v'][0] > $r['v'][0]);
+}
+
 /*
 title matches "world"
 title matches "world*"
 title matches "*world"
 */
-function cmp_matches($l, $r) {
+function cmp_matches($l, $r)
+{
     if ($r['t'] != 'v') {
         return false;
     }
@@ -83,7 +127,8 @@ function cmp_matches($l, $r) {
 title in ["Aliens", "Interstellar", "Passengers"]
 "yolo" in tags
 */
-function cmp_in($l, $r) {
+function cmp_in($l, $r)
+{
     if ($l['t'] == 'k') {
         $haystack = $l['v'];
         $needle = $r['v'][0];

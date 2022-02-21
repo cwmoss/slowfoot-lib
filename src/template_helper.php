@@ -22,8 +22,9 @@ function load_template_helper($ds, $src, $config)
         'q' => function ($query_string, $params=[]) use ($ds) {
             return $ds->query_sql($query_string, $params);
         },
-        'query' => function ($q) use ($ds) {
-            return lquery($ds->data, $q);
+        'query' => function ($q, $params=[]) use ($ds) {
+            return $ds->query($q, $params);
+        //lquery($ds->data, $q);
         },
         'image' => function ($asset, $profile) use ($config) {
             return \slowfoot\image($asset, $profile, $config['assets']);
