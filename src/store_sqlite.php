@@ -92,6 +92,33 @@ CREATE INDEX IF NOT EXISTS paths_id on paths(id);
         return [$res, count($res)];
     }
 
+    public function query_paginated($q, $limit_per_page, $params=[])
+    {
+        $query = \lolql\parse($q, $params);
+        $fn = \lolql\eval_cond_as_sql_function($query['q']);
+        $name = 'lolql_'.bin2hex(\random_bytes(8));
+        $pdo = $this->db->getPdo();
+        $pdo->sqliteCreateFunction($name, $fn, 1);
+        $q = 'SELECT body from docs WHERE '.$name.'(body)';
+        $order = $this->build_order($query['order_raw']);
+        if ($order) {
+            $q.=' ORDER BY '.$order;
+        }
+        $q_count = 'SELECT count(*) from docs WHERE '.$name.'(body)';
+        $total = $this->db->cell($q_count);
+        $db = $this->db;
+        $page_query = function ($page) use ($db, $q, $total, $limit_per_page) {
+            $off = ($page - 1) * $limit_per_page;
+            $q .= " LIMIT {$limit_per_page} OFFSET $off";
+            $res = $this->db->run($q);
+            $res = array_map(function ($r) {
+                return json_decode($r['body'], true);
+            }, $res);
+            return $res;
+        };
+        return [$total, $page_query];
+    }
+
     public function query($q, $params)
     {
         $query = \lolql\parse($q, $params);

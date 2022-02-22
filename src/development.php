@@ -173,17 +173,33 @@ $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages
     } else {
         list($dummy, $pagename, $pagenr) = explode('/', $requestpath);
         $pagename = '/' . $pagename;
-        #dbg('page...', $pagename, $pagenr, $requestpath);
+        if ($pagename=='') {
+            //    $pagename='/index';
+        }
+        
+        dbg('page...', $pagename, $pagenr, $requestpath);
         $obj_id = array_search($pagename, $pages);
         #$pagination_query = check_pagination($pagename, $src);
         $pp = preprocess($pagename, $src);
         #dbg('page query', $pp);
         if ($page_query = ($pp['page-query']??null)) {
             //var_dump($paginate);
-            $qres = $ds->query($page_query['__content']);  // query_page($ds, $pagination_query, $pagenr);
+            dbg('[page] query', $page_query);
+            if ($page_query['paginate']) {
+                [$info, $pagequery] = $ds->query_paginated($page_query['__content'], $page_query['paginate'], []);
+                
+                //foreach (range(1, $pages) as $page) {
+                $qres = $pagequery($pagenr);
+                $pagination = pagination($info, $pagenr?:1);
+            //}
+            } else {
+                $pagination = [];
+                $qres = $ds->query($page_query['__content']);  // query_page($ds, $pagination_query, $pagenr);
+            }
+            
             #var_dump($qres);
             //print_r($coll);
-            $content = page($pagename, ['page' => $qres], $template_helper, $src);
+            $content = page($pagename, ['page' => $qres, 'pagination'=>$pagination], $template_helper, $src);
             $content = remove_tags($content, ['page-query']);
 
             debug_js("page", $qres);

@@ -74,9 +74,9 @@ function normalize_assets_config($conf)
 {
     $assets = $conf['assets'] ?: [];
     $default = [
-        'base' => $conf['base'], 
-        'src' => '', 
-        'dest' => 'rendered-images', 
+        'base' => $conf['base'],
+        'src' => '',
+        'dest' => 'rendered-images',
         'profiles' => []
     ];
     $assets = array_merge($default, $assets);
@@ -257,10 +257,10 @@ function load_markdown($opts, $config)
         // TODO: anything goes
         // $id = str_replace('/', '-', $id);
         $row = array_merge($data, [
-            'mdbody'=> $md, 
-            '_id'=>$id, 
+            'mdbody'=> $md,
+            '_id'=>$id,
             '_file'=>[
-                'path' => $fname, 
+                'path' => $fname,
                 'name' => $path_parts['filename'],
                 'ext' => $path_parts['extension']
             ]
@@ -336,6 +336,14 @@ function build_sorter($key)
     return function ($a, $b) use ($key) {
         return strnatcasecmp($a[$key], $b[$key]);
     };
+}
+function pagination($info, $page)
+{
+    return array_merge($info, [
+        'page' => $page,
+        'prev' => ($page - 1) ?: null,
+        'next' => (($page + 1) <= $info['totalpages']) ?: null
+    ]);
 }
 
 function chunked_paginate($ds, $rule)
@@ -508,29 +516,33 @@ function layout($name = null)
     return \slowfoot\template\layout($name);
 }
 
-function get_absolute_path_from_base($path, $current, $base){
-    if(substr($path, 0, 2)=='~/'){
+function get_absolute_path_from_base($path, $current, $base)
+{
+    if (substr($path, 0, 2)=='~/') {
         $path = $base.ltrim($path, '~');
         dbg("+++ path ~ +++", $path);
         $remove_base = true;
-    }else{
+    } else {
         $path = $current.'/'.$path;
     }
     
     $path = get_absolute_path($path);
     dbg("+++ path +++", $path);
-    if($remove_base){
+    if ($remove_base) {
         $path = str_replace($base.'/', '', '/'.$path);
         dbg("+++ path +++ ++++ ", $path, $base);
     }
     return $path;
 }
-function get_absolute_path($path) {
+function get_absolute_path($path)
+{
     $path = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $path);
     $parts = array_filter(explode(DIRECTORY_SEPARATOR, $path), 'strlen');
     $absolutes = array();
     foreach ($parts as $part) {
-        if ('.' == $part) continue;
+        if ('.' == $part) {
+            continue;
+        }
         if ('..' == $part) {
             array_pop($absolutes);
         } else {

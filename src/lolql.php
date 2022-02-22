@@ -11,6 +11,7 @@ namespace lolql;
 
 require_once __DIR__ . '/compare.php';
 
+// TODO: slice/ limit
 function query($ds, $query, $params=[])
 {
     $query = is_string($query) ? parse($query, $params) : $query;

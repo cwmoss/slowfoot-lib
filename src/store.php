@@ -32,6 +32,18 @@ class store
         return $this->db->query_sql($q, $params);
     }
 
+    public function query_paginated($q, $limit, $params=[])
+    {
+        [$total, $page_query] = $this->db->query_paginated($q, $limit, $params);
+        $totalpages = ceil($total/$limit);
+        $info = ['total' => $total, 'totalpages' => $totalpages,
+            'minpage' => max(1, $totalpages),
+            'limit' => $limit,
+            
+        ];
+        return [$info, $page_query];
+    }
+
     public function query($q, $params=[])
     {
         return $this->db->query($q, $params);

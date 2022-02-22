@@ -28,6 +28,19 @@ class store_memory
         return [];
     }
     
+    public function query_paginated($q, $limit_per_page, $params=[])
+    {
+        $all = lquery($this->docs, $q, $params);
+        $total = count($all);
+        $page_query = function ($page) use ($all, $limit_per_page) {
+            $offset = ($page - 1) * $limit_per_page;
+            $res = array_slice($all, $offset, $limit_per_page);
+            return $res;
+        };
+        
+        return [$total, $page_query];
+    }
+
     public function query($q, $params=[])
     {
         $res = lquery($this->docs, $q, $params);
