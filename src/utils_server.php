@@ -209,18 +209,18 @@ function get_trace_from_exception($e)
     return $trace;
 }
 
-
-function text_for($muster, $vars=array())
-{
-    $repl = array();
-    foreach ($vars as $k=>$v) {
-        $repl['{'.strtolower($k).'}']=$v;
+if (!function_exists('text_for')) {
+    function text_for($muster, $vars=array())
+    {
+        $repl = array();
+        foreach ($vars as $k=>$v) {
+            $repl['{'.strtolower($k).'}']=$v;
+        }
+        $txt = $muster;
+        $txt = str_replace(array_keys($repl), $repl, $txt);
+        return $txt;
     }
-    $txt = $muster;
-    $txt = str_replace(array_keys($repl), $repl, $txt);
-    return $txt;
 }
-
 
 
 function shell_command($cmd, $parms, $opts=[])

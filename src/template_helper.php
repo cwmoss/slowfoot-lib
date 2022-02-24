@@ -43,3 +43,20 @@ function load_template_helper($ds, $src, $config)
     ];
     return array_merge($default, $custom);
 }
+
+function h($str)
+{
+    return htmlspecialchars($str);
+}
+
+
+function text_for($pattern, $vars=[])
+{
+    $repl = [];
+    foreach ($vars as $k=>$v) {
+        $repl['{'.strtolower($k).'}']=$v;
+    }
+    $txt = $pattern;
+    $txt = str_replace(array_keys($repl), $repl, $txt);
+    return $txt;
+}

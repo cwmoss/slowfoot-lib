@@ -36,10 +36,11 @@ class store
     {
         [$total, $page_query] = $this->db->query_paginated($q, $limit, $params);
         $totalpages = ceil($total/$limit);
-        $info = ['total' => $total, 'totalpages' => $totalpages,
+        $info = [
+            'total' => $total,
+            'totalpages' => $totalpages,
             'minpage' => max(1, $totalpages),
             'limit' => $limit,
-            
         ];
         return [$info, $page_query];
     }

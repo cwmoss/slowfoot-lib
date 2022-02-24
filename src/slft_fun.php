@@ -342,7 +342,7 @@ function pagination($info, $page)
     return array_merge($info, [
         'page' => $page,
         'prev' => ($page - 1) ?: null,
-        'next' => (($page + 1) <= $info['totalpages']) ?: null
+        'next' => (($page + 1) <= $info['totalpages']) ?($page + 1) : null
     ]);
 }
 
