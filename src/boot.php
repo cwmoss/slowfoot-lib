@@ -8,12 +8,20 @@
 if (!defined('SLOWFOOT_BASE')) {
     // via php cli webserver
 #    print_r($_SERVER);
-    
+#    print_r($_SERVER);
+    // different project path without vendor/ dir?
+    // TODO: better ideas
+    $internal = str_replace('vendor/cwmoss/slowfoot-lib/docs/src', '', $_SERVER['DOCUMENT_ROOT']);
+    if ($internal == $_SERVER['DOCUMENT_ROOT']) {
+        unset($internal);
+    }
     define('SLOWFOOT_BASE', $_SERVER['DOCUMENT_ROOT'] . '/../');
 } else {
 }
 
-require_once SLOWFOOT_BASE.'/vendor/autoload.php';
+$autoload = $internal??SLOWFOOT_BASE;
+
+require_once $autoload.'/vendor/autoload.php';
 
 if (!defined('SLOWFOOT_PREVIEW')) {
     define('SLOWFOOT_PREVIEW', false);
@@ -22,6 +30,11 @@ if (!defined('SLOWFOOT_WEBDEPLOY')) {
     define('SLOWFOOT_WEBDEPLOY', false);
 }
 $base = SLOWFOOT_BASE;
+// set a different directory as project base
+// independent from ./vendor dir
+if (isset($PDIR) && $PDIR) {
+    $base = $PDIR;
+}
 if (file_exists("$base/.env")) {
     //print "env: $base/.env";
     Dotenv\Dotenv::createImmutable("$base")->load();

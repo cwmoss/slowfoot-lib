@@ -5,8 +5,8 @@ $doc = <<<DOC
 slowfoot.
 
 Usage:
-  slowfoot dev [-S <server:port>] [-f | --fetch <content source>]
-  slowfoot build
+  slowfoot dev [-S <server:port>] [-f | --fetch <content source>] [-d <project directory>]
+  slowfoot build [-d <project directory>]
   slowfoot (-h | --help)
   slowfoot --version
 
@@ -16,6 +16,7 @@ Options:
   -h --help                 Show this screen.
   --version                 Show version.
   -S --server <server:port> Set server and port [default: localhost:1199]
+  -d <project directory>    Set the project base directory
 
 DOC;
 
@@ -41,6 +42,14 @@ if ($args['dev']) {
     print $logo."\n";
 
     $FETCH = $args['-f'];
+    $PDIR = $args['-d'];
+    if ($PDIR && $PDIR[0]!='/') {
+        $PDIR = SLOWFOOT_BASE.'/'.$PDIR;
+    }
+    $dev_src = 'src/';
+    if ($PDIR) {
+        $dev_src = $PDIR.'/src/';
+    }
 
     // evtl. fetching data
     require __DIR__ . '/boot.php';
@@ -52,7 +61,7 @@ if ($args['dev']) {
     // this works!
     # automatisches öffnen gefällt mir nicht mehr
     # shell_exec('(sleep 1 ; open http://localhost:1199/ ) 2>/dev/null >/dev/null &');
-    $command = "XXXPHP_CLI_SERVER_WORKERS=4 php -S localhost:1199 -t src/ {$slft_lib_base}/development.php";
+    $command = "XXXPHP_CLI_SERVER_WORKERS=4 php -S localhost:1199 -t {$dev_src} {$slft_lib_base}/development.php";
     print "\n\n";
 
     print "starting development server\n\n";
@@ -69,6 +78,11 @@ if ($args['build']) {
     print $logo."\n";
     
     $FETCH = true;
+    $PDIR = $args['-d'];
+    if ($PDIR && $PDIR[0]!='/') {
+        $PDIR = SLOWFOOT_BASE.'/'.$PDIR;
+    }
+    
     require __DIR__ . '/boot.php';
     include 'build.php';
 }

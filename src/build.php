@@ -99,12 +99,24 @@ foreach ($pages as $pagename) {
             $pagepath = $path . '/' . $pagenr;
         }
     } elseif ($page_query) {
-        $qres = $ds->query($page_query['__content']);  // query_page($ds, $pagination_query, $pagenr);
-        #var_dump($qres);
-        //print_r($coll);
-        $content = page($pagename, ['page' => $qres], $template_helper, $src);
-        $content = remove_tags($content, ['page-query']);
-        write($content, $pagepath, $dist);
+        if ($page_query['paginate']) {
+            [$info, $pagequery] = $ds->query_paginated($page_query['__content'], $page_query['paginate'], []);
+            
+            for ($pagenr=1; $pagenr <= $info['minpage']; $pagenr++) {
+                $qres = $pagequery($pagenr);
+                $pagination = pagination($info, $pagenr?:1);
+
+                $content = page($pagename, ['page' => $qres, 'pagination'=>$pagination], $template_helper, $src);
+                $content = remove_tags($content, ['page-query']);
+                $pagepath_pg = $pagepath . '/' . $pagenr;
+                write($content, $pagepath_pg, $dist);
+            }
+        } else {
+            $qres = $ds->query($page_query['__content']);
+            $content = page($pagename, ['page' => $qres, 'pagination'=>[]], $template_helper, $src);
+            $content = remove_tags($content, ['page-query']);
+            write($content, $pagepath, $dist);
+        }
     } else {
         $content = page($pagename, [], $template_helper, $src);
         write($content, $pagepath, $dist);

@@ -75,6 +75,7 @@ function normalize_assets_config($conf)
     $assets = $conf['assets'] ?: [];
     $default = [
         'base' => $conf['base'],
+        'path' => '/images',
         'src' => '',
         'dest' => 'rendered-images',
         'profiles' => []
@@ -189,8 +190,9 @@ function load_data($sources, $hooks, $config)
         
         shell_info("fetching $name");
     
-        foreach ($fun($opts, $config) as $row) {
+        foreach ($fun($opts, $config, $db) as $row) {
             if (!$row['_type']) {
+                #print_r($row);
                 $row['_type'] = $opts['type'];
             }
             $otype = $row['_type'];
@@ -213,7 +215,7 @@ function load_data($sources, $hooks, $config)
     return $db;
 }
 
-function load_dataset($opts, $config)
+function load_dataset($opts, $config, $db)
 {
     $file = $config['base'] . '/' . $opts['file'];
     foreach (file($file) as $row) {
@@ -222,7 +224,7 @@ function load_dataset($opts, $config)
     return;
 }
 
-function load_json($opts, $config)
+function load_json($opts, $config, $db)
 {
     $file = $config['base'] . '/' . $opts['file'];
     $rows = json_decode(file_get_contents($file), true);
@@ -235,7 +237,7 @@ function load_json($opts, $config)
     return;
 }
 
-function load_markdown($opts, $config)
+function load_markdown($opts, $config, $db)
 {
     $front = new Mni\FrontYAML\Parser;
     $filep = $config['base'] . '/' . $opts['file'];
@@ -261,6 +263,7 @@ function load_markdown($opts, $config)
             '_id'=>$id,
             '_file'=>[
                 'path' => $fname,
+                'dir' => $path_parts['dirname'],
                 'name' => $path_parts['filename'],
                 'ext' => $path_parts['extension']
             ]
@@ -270,7 +273,7 @@ function load_markdown($opts, $config)
     return;
 }
 
-function load_csv($opts, $config)
+function load_csv($opts, $config, $db)
 {
     $file = $config['base'] . '/' . $opts['file'];
     $opts = array_merge(['sep' => ',', 'enc' => '"'], $opts);

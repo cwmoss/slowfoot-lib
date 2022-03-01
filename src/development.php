@@ -130,6 +130,7 @@ $router->post('/__fun/(.*)', function ($requestpath) use ($router, $ds) {
 #dbg("++ image path", $config['assets']['path']);
 
 $router->get($config['assets']['path'].'/'.'(.*\.\w{1,5})', function ($requestpath) use ($router, $ds, $config) {
+    dbg('[dev] asssets', $requestpath);
     $docbase = $_SERVER['DOCUMENT_ROOT'].'/../rendered-images';
     #dbg("++ image path base", $docbase, $requestpath);
     send_file($docbase, $requestpath);
@@ -138,11 +139,13 @@ $router->get($config['assets']['path'].'/'.'(.*\.\w{1,5})', function ($requestpa
 
 $router->get('(.*\.\w{1,5})', function ($requestpath) use ($router, $ds) {
     $docbase = $_SERVER['DOCUMENT_ROOT'];
+    dbg('[dev] some.doc', $requestpath);
     send_file($docbase, $requestpath);
     exit;
 });
 
 $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages, $src, $template_helper) {
+    dbg('[dev] page/template', $requestpath);
     send_nocache();
     $requestpath = '/'.$requestpath;
     // startseite?
