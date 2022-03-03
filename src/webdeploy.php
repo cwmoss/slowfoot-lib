@@ -37,14 +37,14 @@ if ("OPTIONS" == $_SERVER['REQUEST_METHOD']) {
 $ok = check_referer($_SERVER);
 if (!$ok) {
     print "\nfailed\n";
-    print_r($_SERVER);
+    # print_r($_SERVER);
     exit;
 }
 
 $ok = check_token(getenv('SLFT_BUILD_KEY'));
 if (!$ok) {
     print "\nauth failed\n";
-    print_r($_SERVER);
+    # print_r($_SERVER);
     exit;
 }
 
@@ -62,14 +62,14 @@ $result = liveExecuteCommand($cmd, true, $converter);
 
 if ($result['exit_status'] === 0) {
     // do something if command execution succeeds
-    print "\nok\n";
+    print "ok\n\n";
 #`cd $dir; rsync -avz dist/ ../htdocs/`;
 } else {
     // do something on failure
-    print "\nfailed\n";
+    print "failed\n\n";
 }
 
-printf('<a href="%s" target="_slft_preview">Look here</a>', $_SERVER['HTTP_HOST'].'/'.getenv("SLFT_PATH_PREFIX"));
+printf('<a href="%s" target="_slft_preview">Look here</a>', '//'. $_SERVER['HTTP_HOST'].'/'.getenv("SLFT_PATH_PREFIX"));
 
 function check_referer($headers)
 {
