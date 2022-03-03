@@ -69,6 +69,8 @@ if ($result['exit_status'] === 0) {
     print "\nfailed\n";
 }
 
+printf('<a href="%s" target="_slft_preview">Look here</a>', $_SERVER['HTTP_HOST'].'/'.getenv("SLFT_PATH_PREFIX"));
+
 function check_referer($headers)
 {
     // local (dev) installation?
