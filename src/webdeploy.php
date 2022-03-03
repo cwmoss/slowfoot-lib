@@ -95,7 +95,7 @@ function check_token($token)
 {
     $hdrs = getallheaders();
     $hdrs = array_change_key_case($hdrs);
-    return $hdrs['x-deploy']==$token;
+    return $hdrs['x-slft-deploy']==$token;
 }
 
 function liveExecuteCommand($cmd, $err=false, $converter=null)
