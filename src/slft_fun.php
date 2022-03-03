@@ -33,6 +33,8 @@ function load_config($dir)
     $conf['templates'] = $tpls;
     #$conf['base'] = $dir;
     $conf['base'] = '/'.get_absolute_path($dir);
+    $conf['src'] = $conf['base'].'/src';
+    $conf['dist'] = $conf['base'].'/dist';
     $conf['assets'] = normalize_assets_config($conf);
     $conf['store'] = normalize_store_config($conf);
     return $conf;

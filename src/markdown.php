@@ -7,7 +7,18 @@ function markdown_sf($md, $config=null, $ds=null)
     //$parser->setUrlsLinked(false);
     return $parser->text($md);
 }
-function markdown_parser($config, $ds){
+
+function markdown_toc($content)
+{
+    $Parsedown = new \ParsedownToC();
+    $body = $Parsedown->body($content);
+    $toc  = $Parsedown->contentsList();
+    dbg("+++ toc", $toc);
+    return $toc;
+}
+
+function markdown_parser($config, $ds)
+{
     $parser = new markdown_sfp();
     $parser->set_context(['conf'=>$config, 'ds'=>$ds]);
     return $parser;
@@ -17,7 +28,7 @@ function markdown_helper($config=null, $ds=null)
 {
     $parser = markdown_parser($config, $ds);
 
-    return function ($text, $obj=null) use($parser){
+    return function ($text, $obj=null) use ($parser) {
         $parser->set_current_obj($obj);
         return $parser->text($text);
     };
@@ -26,7 +37,7 @@ function markdown_helper($config=null, $ds=null)
 function markdown_helper_obj($parser, $data=null)
 {
     #var_dump($data);
-    return function($text)use($parser, $data){
+    return function ($text) use ($parser, $data) {
         return $parser($text, $data);
     };
 }
@@ -37,31 +48,34 @@ https://github.com/erusev/parsedown/wiki/Tutorial:-Create-Extensions#change-elem
 https://github.com/Nessworthy/parsedown-extension-manager
 
 */
-class markdown_sfp extends Parsedown
+class markdown_sfp extends ParsedownToC
 {
     public $context;
     public $current_obj;
 
-    public function set_context($ctx){
+    public function set_context($ctx)
+    {
         $this->context=$ctx;
     }
 
-    public function set_current_obj($obj){
+    public function set_current_obj($obj)
+    {
         $this->current_obj = $obj;
     }
 
-    public function __construct()
+    public function xxx__construct()
     {
-        $this->InlineTypes['['][]= 'Shortcode';
+        //$this->InlineTypes['['][]= 'Shortcode';
         // $this->inlineMarkerList .= '^';
     }
 
     # TODO:
     #   - check protocol
     #   - check images
-    protected function inlineLink($Excerpt){
+    protected function inlineLink($Excerpt)
+    {
         $link = parent::inlineLink($Excerpt);
-        if(is_array($link)){
+        if (is_array($link)) {
             $href = $link['element']['attributes']['href'];
             $href = $this->resolve_link($href);
             $link['element']['attributes']['href'] = $href;
@@ -71,16 +85,21 @@ class markdown_sfp extends Parsedown
     }
 
     // wird auch für !image tags aufgerufen
-    protected function resolve_link($href){
-        if($href[0]=='/') return $href;
+    protected function resolve_link($href)
+    {
+        if ($href[0]=='/') {
+            return $href;
+        }
         #TODO: parse_url
         
         #$id = get_absolute_path(dirname($this->current_obj['page']['_id']).'/'.$href );
-        $id = get_absolute_path_from_base($href, 
-            dirname($this->current_obj['page']['_id']), 
-            $this->context['conf']['base']);
+        $id = get_absolute_path_from_base(
+            $href,
+            dirname($this->current_obj['page']['_id']),
+            $this->context['conf']['base']
+        );
         
-        if(pathinfo($href, PATHINFO_EXTENSION)){
+        if (pathinfo($href, PATHINFO_EXTENSION)) {
             return $id;
         }
         $src_conf = $this->context['conf'];
@@ -95,10 +114,13 @@ class markdown_sfp extends Parsedown
     {
         dbg("+++ img excerpt", $Excerpt);
         $img = parent::inlineImage($Excerpt);
-        if(is_array($img)){
+        if (is_array($img)) {
             dbg("+++ img", $img);
-            $pipe = \slowfoot\image_url($img['element']['attributes']['src'], 
-                ['size'=>""], $this->context['conf']['assets']);
+            $pipe = \slowfoot\image_url(
+                $img['element']['attributes']['src'],
+                ['size'=>""],
+                $this->context['conf']['assets']
+            );
             $img['element']['attributes']['src'] = $pipe;
             $img['element']['attributes']['data-slft']='ok';
         }

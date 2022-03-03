@@ -114,6 +114,22 @@ article {
   padding: 0 2em;
   flex-grow: 1; }
 
+aside {
+  width: 220px;
+  min-width: 220px;
+  position: sticky;
+  margin-top: 2em; }
+  aside ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 8px 8px 0 0;
+    margin-right: 1em; }
+    aside ul a {
+      text-decoration: none; }
+    aside ul li {
+      margin-bottom: 8px;
+      border-bottom: 1px solid #eee; }
+
 code {
   white-space: pre-wrap; }
 

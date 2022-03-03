@@ -136,4 +136,7 @@ shell_info("copy assets");
 
 shell_info();
 
+if (isset($config['hooks']['after_build'])) {
+    $config['hooks']['after_build']($config);
+}
 shell_info("⚡️ done", true);
