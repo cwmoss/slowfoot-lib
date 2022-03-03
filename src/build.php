@@ -68,7 +68,7 @@ foreach ($templates as $type => $conf) {
                 $template_helper,
                 $src
             );
-            write($content, $path, $dist);
+            write($content, $path, null, $dist);
         }
     }
     shell_info();
@@ -109,17 +109,17 @@ foreach ($pages as $pagename) {
                 $content = page($pagename, ['page' => $qres, 'pagination'=>$pagination], $template_helper, $src);
                 $content = remove_tags($content, ['page-query']);
                 $pagepath_pg = $pagepath . '/' . $pagenr;
-                write($content, $pagepath_pg, $dist);
+                write($content, $pagepath, $pagenr, $dist);
             }
         } else {
             $qres = $ds->query($page_query['__content']);
             $content = page($pagename, ['page' => $qres, 'pagination'=>[]], $template_helper, $src);
             $content = remove_tags($content, ['page-query']);
-            write($content, $pagepath, $dist);
+            write($content, $pagepath, null, $dist);
         }
     } else {
         $content = page($pagename, [], $template_helper, $src);
-        write($content, $pagepath, $dist);
+        write($content, $pagepath, null, $dist);
     }
     shell_info();
 }

@@ -490,9 +490,17 @@ function prefix_endpoint($ep)
     return PATH_PREFIX .'/__fun'.$ep;
 }
 
-function write($content, $path, $base)
+function write($content, $path, $pagenr, $base)
 {
-    $file = $base . '/' . $path . '/index.html';
+    if ($pagenr && $pagenr != 1) {
+        $path .= '/'.$pagenr;
+    }
+    if ($path != '/404') {
+        $path .= '/index';
+    }
+    $path .= '.html';
+
+    $file = $base . '/' . $path;
     $dir = dirname($file);
     if (!is_dir($dir)) {
         mkdir($dir, 0777, true);
