@@ -16,6 +16,7 @@ Options:
   -h --help                 Show this screen.
   --version                 Show version.
   -S --server <server:port> Set server and port [default: localhost:1199]
+  -P --port   <port>        Set port only [default: 1199]
   -d <project directory>    Set the project base directory
 
 DOC;
