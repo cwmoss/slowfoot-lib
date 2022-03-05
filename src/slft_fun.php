@@ -533,6 +533,7 @@ function get_absolute_path_from_base($path, $current, $base)
         $remove_base = true;
     } else {
         $path = $current.'/'.$path;
+        $remove_base = false;
     }
     
     $path = get_absolute_path($path);
