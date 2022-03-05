@@ -26,7 +26,7 @@ DOC;
 $parsed = Docopt::handle($doc, array('version'=>'slowfoot 0.1'));
 #var_dump($parsed);
 $args = $parsed->args;
-var_dump($args);
+#var_dump($args);
 
 // https://www.kammerl.de/ascii/AsciiSignature.php rounded
 
