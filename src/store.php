@@ -83,6 +83,7 @@ class store
         }
         $row['_id'] = $id;
         $this->db->add("docs", $id, $row);
+        $this->info['loaded'][$row['_type']] ??= 0;
         $this->info['loaded'][$row['_type']]++;
         $this->add_path($row);
         return true;

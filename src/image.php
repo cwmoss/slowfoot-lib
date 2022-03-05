@@ -29,6 +29,9 @@ function image($img, $opts = [], $gopts = [])
     if (\is_string($img)) {
         $img = asset_from_file($img, $gopts);
         dbg("[image] asset from file", $img);
+        if (!$img) {
+            return;
+        }
     }
 
     if ($img['_type']!='slft.asset') {
@@ -192,6 +195,9 @@ function asset_from_file($path, $gopts)
     //var_dump($gopts);
     $fname = $gopts['base'] . '/' . $gopts['src'] . '/' . $path;
     $info = \getimagesize($fname);
+    if (!$info) {
+        return null;
+    }
     return [
         '_type' => 'slft.asset',
         '_id' => $path,
@@ -229,16 +235,16 @@ function resize($resizer, $src, $dest, $profile)
 {
     #dbg('++ resize', $src, $dest, $profile);
     // copy-only
-    if(isset($profile['size'])&& !$profile['size']){
+    if (isset($profile['size'])&& !$profile['size']) {
         `cp $src $dest`;
         return \getimagesize($dest);
     }
 
-    if(\file_exists($dest)){
+    if (\file_exists($dest)) {
         return \getimagesize($dest);
     }
 
-    if(!\file_exists($src)){
+    if (!\file_exists($src)) {
         dbg("+++ not exists", $src);
         return [];
     }
@@ -316,7 +322,7 @@ function get_name($url, $profile)
     ksort($profile);
     $info = \pathinfo($url);
     $hash = \md5($info['filename'] . '?'. http_build_query($profile));
-    if(!$profile['size']){
+    if (!$profile['size']) {
         $profile['size'] = 'ypoc';
     }
     return $info['filename'] . '--' . $hash . '-' . $profile['size'] . '.' . $info['extension'];

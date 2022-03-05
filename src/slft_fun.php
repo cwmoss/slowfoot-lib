@@ -53,7 +53,7 @@ function normalize_template_config($name, $config)
         if (is_string($t['path'])) {
             $t['path'] = make_path_fn($t['path']);
         }
-        $subname = $t['name'] ?: '_';
+        $subname = $t['name'] ?? '_';
         $tpl[$subname] = array_merge(['type' => $name, 'template' => $name, 'name' => $subname], $t);
     }
     return $tpl;
@@ -181,19 +181,15 @@ function load_data($sources, $hooks, $config)
         if (!is_array($opts)) {
             $opts = ['file' => $opts];
         }
-        if (!$opts['loader']) {
-            $opts['loader'] = $name;
-        }
-        if (!$opts['type']) {
-            $opts['type'] = $name;
-        }
-        $opts['name'] = $name;
+        $def = ['loader'=>$name, 'type'=>$name, 'name'=>$name];
+        $opts = array_merge($def, $opts);
+       
         $fun = 'load_' . $opts['loader'];
         
         shell_info("fetching $name");
     
         foreach ($fun($opts, $config, $db) as $row) {
-            if (!$row['_type']) {
+            if (!isset($row['_type']) || !$row['_type']) {
                 #print_r($row);
                 $row['_type'] = $opts['type'];
             }

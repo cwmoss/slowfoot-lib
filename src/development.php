@@ -69,7 +69,7 @@ $router->mount('/__api', function () use ($router, $ds, $config, $src, $template
     });
 
 
-    $router->get('/preview/(.*)', function ($id_type) use ($router, $db, $config, $src, $template_helper) {
+    $router->get('/preview/(.*)', function ($id_type) use ($router, $ds, $config, $src, $template_helper) {
         list($id, $type) = explode('/', $id_type);
         dbg("[api/preview]", $id_type);
         
