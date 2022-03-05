@@ -5,7 +5,7 @@ $doc = <<<DOC
 slowfoot.
 
 Usage:
-  slowfoot dev [-S <server:port>] [-f | --fetch <content source>] [-d <project directory>]
+  slowfoot dev [-S <server:port>] [-P <port>] [-f | --fetch <content source>] [-d <project directory>]
   slowfoot build [-d <project directory>]
   slowfoot (-h | --help)
   slowfoot --version
@@ -16,7 +16,7 @@ Options:
   -h --help                 Show this screen.
   --version                 Show version.
   -S --server <server:port> Set server and port [default: localhost:1199]
-  -P --port   <port>        Set port only [default: 1199]
+  -P --port <port>          Set port only 
   -d <project directory>    Set the project base directory
 
 DOC;
@@ -26,6 +26,7 @@ DOC;
 $parsed = Docopt::handle($doc, array('version'=>'slowfoot 0.1'));
 #var_dump($parsed);
 $args = $parsed->args;
+var_dump($args);
 
 // https://www.kammerl.de/ascii/AsciiSignature.php rounded
 
@@ -52,6 +53,12 @@ if ($args['dev']) {
         $dev_src = $PDIR.'/src/';
     }
 
+    $devserver = explode(':', $args['--server']??'localhost:1199');
+    if ($args['--port']) {
+        $devserver[1]=$args['--port'];
+    }
+    $devserver = join(":", $devserver);
+
     // evtl. fetching data
     require __DIR__ . '/boot.php';
 
@@ -62,11 +69,11 @@ if ($args['dev']) {
     // this works!
     # automatisches öffnen gefällt mir nicht mehr
     # shell_exec('(sleep 1 ; open http://localhost:1199/ ) 2>/dev/null >/dev/null &');
-    $command = "XXXPHP_CLI_SERVER_WORKERS=4 php -S localhost:1199 -t {$dev_src} {$slft_lib_base}/development.php";
+    $command = "XXXPHP_CLI_SERVER_WORKERS=4 php -S {$devserver} -t {$dev_src} {$slft_lib_base}/development.php";
     print "\n\n";
 
     print "starting development server\n\n";
-    print "   🌈 http://localhost:1199\n\n";
+    print "   🌈 http://$devserver\n\n";
     print "<cmd> click\n";
     print "have fun!\n\n";
     $wss = "php {$slft_lib_base}/wss.php ".SLOWFOOT_BASE;
