@@ -42,6 +42,7 @@ function template($_template, $data, $helper, $__context)
     extract($helper);
     extract(load_late_template_helper($helper, $_base, $data));
     $_context = template_get_context($_template, $__context, ['is_template'=>true, 'is_page'=>false]);
+    \collect_data();
     \collect_data('meta', $_context, true);
     ob_start();
     include $_base . '/templates/' . $_template . '.php';
@@ -62,6 +63,7 @@ function page($_template, $data, $helper, $__context)
     extract($helper);
     extract(load_late_template_helper($helper, $_base, $data));
     $_context = template_get_context($_template, $__context, ['is_template'=>false, 'is_page'=>true]);
+    \collect_data();
     \collect_data('meta', $_context, true);
     ob_start();
     include $_base . '/pages/' . $_template . '.php';

@@ -26,19 +26,21 @@ function collect_data($storename=null, $data=null, $val=null)
         $store=[];
         return;
     }
-    if (!isset($store[$storename])) {
-        $store[$storename]=[];
-        return;
-    }
-    if (is_null($data) && is_null($val)) {
-        $store[$storename]=[];
-    }
     if (is_array($data) && $val===true) {
         $store[$storename] = $data;
         return;
     }
+    
+    if (is_null($data) && is_null($val)) {
+        $store[$storename]=[];
+        return;
+    }
+    
     if ($data===true) {
-        return $store[$sorename];
+        return $store[$storename];
+    }
+    if (!isset($store[$storename])) {
+        $store[$storename]=[];
     }
     if (!is_array($data)) {
         $data=[$data=>$val];
@@ -48,7 +50,7 @@ function collect_data($storename=null, $data=null, $val=null)
 
 function meta_tags($data)
 {
-    $image = $data['img']??'';
+    $image = $data['image']??'';
     $site_name = $data['site_name']??null;
     $color = $data['color']??null;
     $pubdate = $data['pubdate']??null;
@@ -68,6 +70,7 @@ function meta_tags($data)
         $meta['twitter:image']=$data['twitter:image']??$image;
     }
     $meta['article:published_time']=$data['article:published_time']??$pubdate;
+    return html_meta_tags($meta);
 }
 
 function html_meta_tags($meta)
@@ -79,6 +82,7 @@ function html_meta_tags($meta)
         }
         if ($key=='title') {
             $tags[]=html_tag('title', null, null, $value);
+            continue;
         }
         $value = (array) $value;
         if (preg_match('/^twitter/', $key)) {
@@ -145,19 +149,24 @@ function html_arributes($attrs, $prefix=null)
 
 function html_tag($tag, $attrs=[], $data=[], $content=false)
 {
+    $htmlattrs = trim(
+        html_arributes($attrs).
+        html_arributes($data, 'data')
+    );
+    
     if ($content===false) {
         return sprintf(
-            "<%s %s %s>",
+            "<%s%s%s>",
             $tag,
-            html_arributes($attrs),
-            html_arributes($data, 'data'),
+            ($htmlattrs?' ':''),
+            $htmlattrs
         );
     }
     return sprintf(
-        "<%s %s %s>%s</%s>",
+        "<%s%s%s>%s</%s>",
         $tag,
-        html_arributes($attrs),
-        html_arributes($data, 'data'),
+        ($htmlattrs?' ':''),
+        $htmlattrs,
         htmlspecialchars($content),
         $tag
     );

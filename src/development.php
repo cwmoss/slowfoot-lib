@@ -155,6 +155,16 @@ $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages
     #dbg("dev: req", $requestpath);
     [$obj_id, $name] = $ds->get_by_path($requestpath);
 
+    $context = [
+        'mode'=>'dev',
+        'src'=>$src,
+        'path'=>$requestpath,
+        'site_name'=>$config['site_name']??'',
+        'site_description'=>$config['site_description']??'',
+        'site_url'=>$config['site_url']??'',
+        
+    ];
+
     if ($obj_id) {
         $obj = $ds->get($obj_id);
 
@@ -170,7 +180,7 @@ $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages
                 'path_name' => $name
             ],
             $template_helper,
-            $src
+            $context
         );
         debug_js("page", $obj);
     } else {
@@ -202,12 +212,12 @@ $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages
             
             #var_dump($qres);
             //print_r($coll);
-            $content = page($pagename, ['page' => $qres, 'pagination'=>$pagination], $template_helper, $src);
+            $content = page($pagename, ['page' => $qres, 'pagination'=>$pagination], $template_helper, $context);
             $content = remove_tags($content, ['page-query']);
 
             debug_js("page", $qres);
         } else {
-            $content = page($requestpath, [], $template_helper, $src);
+            $content = page($requestpath, [], $template_helper, $context);
 
             debug_js("page", []);
         }

@@ -57,7 +57,7 @@ if ($obj_id) {
 
         debug_js("page", $qres);
     } else {
-        $content = page($requestpath, [], $template_helper, $src);
+        $content = page($requestpath, [], $template_helper, $context);
 
         debug_js("page", []);
     }
