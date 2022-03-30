@@ -1,7 +1,13 @@
 <?php
 /*
+    reset all stores
+        collect_data();
+
     reset store "meta"
         collect_data('meta');
+
+    init store "meta"
+        collect_data('meta', ['title' => 'blog // 2022', 'og:title' => 'blog year 2022'], true);
 
     add or update store "meta" title='blog // 2022'
         collect_data('meta', 'title', 'blog // 2022');
@@ -13,14 +19,23 @@
         collect_data('meta', true);
 
 */
-function collect_data($storename, $data=null, $val=null)
+function collect_data($storename=null, $data=null, $val=null)
 {
     static $store=[];
+    if (is_null($storename)) {
+        $store=[];
+        return;
+    }
     if (!isset($store[$storename])) {
         $store[$storename]=[];
+        return;
     }
     if (is_null($data) && is_null($val)) {
         $store[$storename]=[];
+    }
+    if (is_array($data) && $val===true) {
+        $store[$storename] = $data;
+        return;
     }
     if ($data===true) {
         return $store[$sorename];

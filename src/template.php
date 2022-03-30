@@ -28,18 +28,21 @@ function partial($base, $template, $data=[], $helper=[], $non_existent="")
     return $content;
 }
 
-function template_get_context($name, $props)
+function template_get_context($name, $context, $props)
 {
     $name = trim($name, '/');
-    return array_merge($props, ['name'=>$name]);
+    return array_merge($context, $props, ['name'=>$name]);
 }
 
-function template($_template, $data, $helper, $_base)
+function template($_template, $data, $helper, $__context)
 {
+    #var_dump($__context);
+    $_base = $__context['src'];
     extract($data);
     extract($helper);
     extract(load_late_template_helper($helper, $_base, $data));
-    $_context = template_get_context($_template, ['is_template'=>true, 'is_page'=>false]);
+    $_context = template_get_context($_template, $__context, ['is_template'=>true, 'is_page'=>false]);
+    \collect_data('meta', $_context, true);
     ob_start();
     include $_base . '/templates/' . $_template . '.php';
     $content = ob_get_clean();
@@ -52,12 +55,14 @@ function template($_template, $data, $helper, $_base)
     return $content;
 }
 
-function page($_template, $data, $helper, $_base)
+function page($_template, $data, $helper, $__context)
 {
+    $_base = $__context['src'];
     extract($data);
     extract($helper);
     extract(load_late_template_helper($helper, $_base, $data));
-    $_context = template_get_context($_template, ['is_template'=>false, 'is_page'=>true]);
+    $_context = template_get_context($_template, $__context, ['is_template'=>false, 'is_page'=>true]);
+    \collect_data('meta', $_context, true);
     ob_start();
     include $_base . '/pages/' . $_template . '.php';
 

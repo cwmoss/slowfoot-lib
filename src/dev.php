@@ -1,10 +1,22 @@
 <?php
 require __DIR__ . '/boot.php';
-use function slowfoot\template\{page, template, remove_tags, preprocess};
-
+use function slowfoot\template\page;
+use function slowfoot\template\template;
+use function slowfoot\template\remove_tags;
+use function slowfoot\template\preprocess;
 
 $hr = false;
 $debug = true;
+
+$context = [
+    'mode'=>'dev',
+    'src'=>$src,
+    'path'=>$requestpath,
+    'site_name'=>$config['site_name']??'',
+    'site_description'=>$config['site_description']??'',
+    'site_url'=>$config['site_url']??'',
+    
+];
 
 // $obj_id = array_search($requestpath, $paths);
 [$obj_id, $name] = $ds->get_by_path($requestpath);
@@ -24,10 +36,9 @@ if ($obj_id) {
             'path_name' => $name
         ],
         $template_helper,
-        $src
+        $context
     );
     debug_js("page", $obj);
-
 } else {
     list($dummy, $pagename, $pagenr) = explode('/', $requestpath);
     $pagename = '/' . $pagename;
@@ -41,11 +52,10 @@ if ($obj_id) {
         $qres = $ds->query($page_query['__content']);  // query_page($ds, $pagination_query, $pagenr);
         #var_dump($qres);
         //print_r($coll);
-        $content = page($pagename, ['page' => $qres], $template_helper, $src);
+        $content = page($pagename, ['page' => $qres], $template_helper, $context);
         $content = remove_tags($content, ['page-query']);
 
         debug_js("page", $qres);
-
     } else {
         $content = page($requestpath, [], $template_helper, $src);
 
@@ -64,7 +74,7 @@ if ($hr) {
     $js = $htrldr->init();
     $content = str_replace('</html>', $js . '</html>', $content);
 }
-if($debug){
+if ($debug) {
     $inspector = include_to_buffer(__DIR__.'/assets/debug.php');
     $inspector_css = '<link rel="stylesheet" href="/inspector-json.css">';
     $content = str_replace('</head>', $inspector_css.'</head>', $content);

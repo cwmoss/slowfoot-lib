@@ -35,6 +35,11 @@ shell_info();
 #array_map('unlink', array_filter((array) globstar("$dist/**/*.*")));
 // exit;
 
+$context = ['mode'=>'build', 'src'=>$src, 'path'=>'',
+    'site_name'=>$config['site_name']??'',
+    'site_description'=>$config['site_description']??'',
+    'site_url'=>$config['site_url']??''
+];
 
 shell_info("writing templates", true);
 
@@ -57,6 +62,7 @@ foreach ($templates as $type => $conf) {
                 var_dump($row);
                 exit;
             }
+            $context['path']=$path;
             $content = template(
                 $templateconf['template'],
                 [
@@ -66,7 +72,7 @@ foreach ($templates as $type => $conf) {
                     'path_name' => $templateconf['name']
                 ],
                 $template_helper,
-                $src
+                $context
             );
             write($content, $path, null, $dist);
         }
@@ -92,7 +98,8 @@ foreach ($pages as $pagename) {
         $path = $pagepath;
         foreach (chunked_paginate($ds, $paginate) as $coll) {
             dbg('page', $pagenr);
-            $content = page($pagename, ['collection' => $coll], $template_helper, $src);
+            $context['path']=$pagepath;
+            $content = page($pagename, ['collection' => $coll], $template_helper, $context);
             $content = remove_tags($content);
             write($content, $pagepath, $dist);
             $pagenr++;
@@ -106,14 +113,16 @@ foreach ($pages as $pagename) {
                 $qres = $pagequery($pagenr);
                 $pagination = pagination($info, $pagenr?:1);
 
-                $content = page($pagename, ['page' => $qres, 'pagination'=>$pagination], $template_helper, $src);
+                $context['path']=$pagepath;
+                $content = page($pagename, ['page' => $qres, 'pagination'=>$pagination], $template_helper, $context);
                 $content = remove_tags($content, ['page-query']);
                 $pagepath_pg = $pagepath . '/' . $pagenr;
                 write($content, $pagepath, $pagenr, $dist);
             }
         } else {
             $qres = $ds->query($page_query['__content']);
-            $content = page($pagename, ['page' => $qres, 'pagination'=>[]], $template_helper, $src);
+            $context['path']=$pagepath;
+            $content = page($pagename, ['page' => $qres, 'pagination'=>[]], $template_helper, $context);
             $content = remove_tags($content, ['page-query']);
             write($content, $pagepath, null, $dist);
         }
