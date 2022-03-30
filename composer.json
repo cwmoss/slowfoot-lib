@@ -4,6 +4,7 @@
     "autoload": {
         "files": [
             "src/util.php",
+            "src/utils_html.php",
             "src/image.php",
             "src/slft_fun.php"
         ]
