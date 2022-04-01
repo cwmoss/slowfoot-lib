@@ -3,6 +3,7 @@
     "version": "1.0",
     "autoload": {
         "files": [
+            "src/compat.php",
             "src/util.php",
             "src/utils_html.php",
             "src/image.php",
