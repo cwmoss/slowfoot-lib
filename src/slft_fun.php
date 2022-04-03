@@ -487,6 +487,7 @@ function prefix_endpoint($ep)
 
 function write($content, $path, $pagenr, $base)
 {
+    if(!$content) return;
     if ($pagenr && $pagenr != 1) {
         $path .= '/'.$pagenr;
     }

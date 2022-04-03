@@ -44,6 +44,7 @@ function template($_template, $data, $helper, $__context)
     $_context = template_get_context($_template, $__context, ['is_template'=>true, 'is_page'=>false]);
     \collect_data();
     \collect_data('meta', $_context, true);
+    layout('-');
     ob_start();
     include $_base . '/templates/' . $_template . '.php';
     $content = ob_get_clean();
@@ -65,6 +66,7 @@ function page($_template, $data, $helper, $__context)
     $_context = template_get_context($_template, $__context, ['is_template'=>false, 'is_page'=>true]);
     \collect_data();
     \collect_data('meta', $_context, true);
+    layout('-');
     ob_start();
     include $_base . '/pages/' . $_template . '.php';
 
@@ -85,8 +87,9 @@ function layout($name = null)
         // reset layout name
         if ($name == '-') {
             $layout = null;
+        }else{
+            $layout = $name;
         }
-        $layout = $name;
     }
     return $layout;
 }

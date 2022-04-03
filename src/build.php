@@ -59,8 +59,8 @@ foreach ($templates as $type => $conf) {
                 $path = '/';
             }
             if ($path=="/") {
-                var_dump($row);
-                exit;
+                #var_dump($row);
+                #exit;
             }
             $context['path']=$path;
             $content = template(
