@@ -1,6 +1,10 @@
 <?php
 use function lolql\query as lquery;
 
+function add_template_helper($name, $fun){
+
+}
+
 function load_template_helper($ds, $src, $config)
 {
     if (file_exists($src.'/template_helper.php')) {
@@ -8,6 +12,10 @@ function load_template_helper($ds, $src, $config)
     } else {
         $custom = [];
     }
+    foreach(hook::invoke('bind_template_helper', [], $ds, $src, $config) as $hlp){
+        $custom[$hlp[0]] = $hlp[1]; 
+    }
+    #var_dump($custom);
     $default = [
         'path' => function ($oid, $name = null) use ($ds) {
             //print "-- $oid";

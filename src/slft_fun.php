@@ -5,7 +5,9 @@ require_once 'store_memory.php';
 require_once 'store_sqlite.php';
 require_once 'JsConverter.php';
 require_once 'template.php';
-require_once 'markdown.php';
+require_once 'hook.php';
+require_once 'plugins/markdown.php';
+require_once 'plugins/sanity.php';
 
 use slowfoot\store;
 use slowfoot\store_memory;
@@ -80,7 +82,10 @@ function normalize_assets_config($conf)
         'path' => '/images',
         'src' => '',
         'dest' => 'rendered-images',
-        'profiles' => []
+        'profiles' => [],
+        'map' => function($img){
+            return hook::invoke_filter('assets_map', $img);
+        }
     ];
     $assets = array_merge($default, $assets);
     return $assets;
@@ -429,13 +434,7 @@ function array_find($haystack, $needle, $prop)
     return false;
 }
 
-function is_assoc(array $arr)
-{
-    if ([] === $arr) {
-        return false;
-    }
-    return array_keys($arr) !== range(0, count($arr) - 1);
-}
+
 
 function slow_query($q, $vars = [])
 {

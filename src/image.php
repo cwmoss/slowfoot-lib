@@ -54,7 +54,7 @@ function image($img, $opts = [], $gopts = [])
 
             $resd = download_remote_image($img['url'], $download_file);
             if ($resd[0]) {
-                $img['download_file'] = '/download/'.$dl_name;
+                $img['download_file'] = $download_file; #'/download/'.$dl_name;
             } else {
                 return "";
             }
@@ -75,7 +75,7 @@ function image($img, $opts = [], $gopts = [])
     $src = $img['download_file']?:$img['_id'];
 
     dbg("[image] resizer", $src, $dest);
-    $res = resize($resizer, $src, $dest, $profile);
+    $res = resize($resizer, $src, $dest, $profile, $gopts['base']);
     if ($profile['4c']) {
         set_tags($dest, $profile);
     }
@@ -95,9 +95,9 @@ function image_tag($img, $opts = [], $tagopts=[], $gopts = [])
     }
 
     if (is_remote($resize['resize_url'])) {
-        return html_cdn($resize, $gopts);
+        return html_cdn($resize, $gopts, $tagopts);
     } else {
-        return html($resize, $gopts);
+        return html($resize, $gopts, $tagopts);
     }
 }
 
@@ -210,28 +210,29 @@ function asset_from_file($path, $gopts)
     ];
 }
 
-function html($res, $opts)
+function html($res, $opts, $tagopts)
 {
+    //print_r($opts);
     return sprintf(
         '<img src="%s" width="%s" xheight="%s" alt="%s" loading="lazy" class="%s">',
         prefixed_url($res['resize_url'], $opts),
         $res['resize'][0],
         $res['resize'][1],
-        \htmlspecialchars($opts['alt']??''),
-        \htmlspecialchars($opts['class']??'')
+        \htmlspecialchars($tagopts['alt']??''),
+        \htmlspecialchars($tagopts['class']??'')
     );
 }
 
-function html_cdn($res, $opts)
+function html_cdn($res, $opts, $tagopts)
 {
     return sprintf(
         '<img src="%s" alt="%s" class="%s">',
         $res['resize_url'],
-        \htmlspecialchars($opts['alt']??''),
-        \htmlspecialchars($opts['class']??'')
+        \htmlspecialchars($tagopts['alt']??''),
+        \htmlspecialchars($tagopts['class']??'')
     );
 }
-function resize($resizer, $src, $dest, $profile)
+function resize($resizer, $src, $dest, $profile, $base)
 {
     #dbg('++ resize', $src, $dest, $profile);
     // copy-only
@@ -249,6 +250,9 @@ function resize($resizer, $src, $dest, $profile)
         return [];
     }
     
+    // TODO: this should not be needed
+    $src = \str_replace($base, '', $src);
+
     if (!$profile['w'] || !$profile['h']) {
         $new = resize_one_side($resizer[0], $src, $dest, $profile['w'], $profile['h']);
     //var_dump($new);
