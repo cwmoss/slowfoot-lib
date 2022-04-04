@@ -4,12 +4,10 @@ use Sanity\BlockContent;
 use Sanity\Client as SanityClient;
 
 hook::add('bind_template_helper', function ($ds, $src, $config) {
-
     return ['sanity_text', function ($text, $opts = []) use ($ds, $config) {
         //print_r($sl);
         return sanity_text($text, $ds, $config);
     }];
-
 });
 hook::add_filter('assets_map', function ($img) {
     // sanity images
@@ -19,7 +17,8 @@ hook::add_filter('assets_map', function ($img) {
     return $img;
 });
 
-function load_preview_object($id, $type = null, $config) {
+function load_preview_object($id, $type = null, $config)
+{
     // print_r($config);
     //print_r(apache_request_headers());
     //print_r($_COOKIE);
@@ -37,14 +36,22 @@ function load_preview_object($id, $type = null, $config) {
     ];
 }
 
-function load_sanity($opts, $config) {
+function load_sanity($opts, $config, $store)
+{
     $client = sanity_client($opts);
-    $query = $config['query'] ?? '*[!(_type match "system.*") && !(_id in path("drafts.**"))]';
+    $query = $opts['query'] ?? '*[!(_type match "system.*") && !(_id in path("drafts.**"))]';
+    #print "\n".$query."\n";
     $res = $client->fetch($query);
-    return $res;
+    // falls mehrteilige query => flach machen
+    if ($res && !isset($res[0])) {
+        return array_merge(...array_values($res));
+    }
+    
+    return array_values($res);
 }
 
-function sanity_client($config) {
+function sanity_client($config)
+{
     return new SanityClient($config);
 }
 
@@ -53,7 +60,8 @@ $sl could be
 - a sanity#link object
 - a sanity#nav_item
  */
-function xsanity_link($sl, $opts = [], $ds) {
+function xsanity_link($sl, $opts = [], $ds)
+{
     $link = $sl['link'];
     if (!$link) {
         $link = $sl;
@@ -74,12 +82,14 @@ function xsanity_link($sl, $opts = [], $ds) {
     return sprintf('<a href="%s">%s</a>', $url, $text);
 }
 
-function xsanity_link_url($link, $ds) {
+function xsanity_link_url($link, $ds)
+{
     var_dump($link);
     return $link['internal'] ? $ds->get_path($link['internal']['_ref']) : ($link['route'] ? path_page($link['route']) : $link['external']);
 }
 
-function sanity_text($block, $ds, $config) {
+function sanity_text($block, $ds, $config)
+{
     $conf = $config['sources']['sanity'];
     #var_dump($conf);
     $serializer = hook::invoke_filter('sanity.block_serializers', [], $ds, $config);
@@ -93,7 +103,8 @@ function sanity_text($block, $ds, $config) {
     return nl2br($html);
 }
 
-function sanity_image_to_slft($img) {
+function sanity_image_to_slft($img)
+{
     $img['w'] = $img['metadata']['dimensions']['width'];
     $img['h'] = $img['metadata']['dimensions']['height'];
     $img['mime'] = $img['mimeType'];
@@ -109,7 +120,8 @@ function sanity_image_to_slft($img) {
     return $img;
 }
 
-function sanity_resize($img, $opts) {
+function sanity_resize($img, $opts)
+{
     print_r($opts);
     $params = ['q' => 90];
     if ($opts['w']) {
