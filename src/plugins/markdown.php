@@ -1,5 +1,11 @@
 <?php
 
+hook::add('bind_template_helper', function ($ds, $src, $config) {
+    return ['markdown', markdown_helper($config, $ds)];
+});
+
+
+
 function markdown_sf($md, $config=null, $ds=null)
 {
     $parser = new markdown_sfp();

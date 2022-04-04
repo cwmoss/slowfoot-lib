@@ -6,8 +6,7 @@ require_once 'store_sqlite.php';
 require_once 'JsConverter.php';
 require_once 'template.php';
 require_once 'hook.php';
-require_once 'plugins/markdown.php';
-require_once 'plugins/sanity.php';
+
 
 use slowfoot\store;
 use slowfoot\store_memory;
@@ -39,7 +38,42 @@ function load_config($dir)
     $conf['dist'] = $conf['base'].'/dist';
     $conf['assets'] = normalize_assets_config($conf);
     $conf['store'] = normalize_store_config($conf);
+    $conf['plugins'] = normalize_plugins($conf);
     return $conf;
+}
+
+// TODO:
+//  require in global context?
+//  do wee need a plugin init /w pconf?
+//  plugin via composer?
+//  raise error?
+function normalize_plugins($conf)
+{
+    $plugins = $conf['plugins']??[];
+    $norm = [];
+    foreach ($plugins as $k => $pconf) {
+        $name = is_string($pconf)?$pconf:(!is_numeric($k)?$k:null);
+        if (!$name) {
+            continue;
+        }
+        $pfile = $name.'.php';
+        if (file_exists($conf['src'].'/plugins/'.$pfile)) {
+            $fullname = $conf['src'].'/plugins/'.$pfile;
+        } else {
+            if (file_exists(__DIR__.'/plugins/'.$pfile)) {
+                $fullname = __DIR__.'/plugins/'.$pfile;
+            } else {
+                continue;
+            }
+        }
+        $norm[$name] = [
+            'filename' => $pfile,
+            'fullpath' => $fullname,
+            'conf' => is_array($pconf)?$pconf:[]
+        ];
+        require_once($fullname);
+    }
+    return $norm;
 }
 
 function normalize_template_config($name, $config)
@@ -83,7 +117,7 @@ function normalize_assets_config($conf)
         'src' => '',
         'dest' => 'rendered-images',
         'profiles' => [],
-        'map' => function($img){
+        'map' => function ($img) {
             return hook::invoke_filter('assets_map', $img);
         }
     ];
@@ -487,7 +521,9 @@ function prefix_endpoint($ep)
 
 function write($content, $path, $pagenr, $base)
 {
-    if(!$content) return;
+    if (!$content) {
+        return;
+    }
     if ($pagenr && $pagenr != 1) {
         $path .= '/'.$pagenr;
     }

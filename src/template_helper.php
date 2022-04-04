@@ -1,8 +1,8 @@
 <?php
 use function lolql\query as lquery;
 
-function add_template_helper($name, $fun){
-
+function add_template_helper($name, $fun)
+{
 }
 
 function load_template_helper($ds, $src, $config)
@@ -12,8 +12,8 @@ function load_template_helper($ds, $src, $config)
     } else {
         $custom = [];
     }
-    foreach(hook::invoke('bind_template_helper', [], $ds, $src, $config) as $hlp){
-        $custom[$hlp[0]] = $hlp[1]; 
+    foreach (hook::invoke('bind_template_helper', [], $ds, $src, $config) as $hlp) {
+        $custom[$hlp[0]] = $hlp[1];
     }
     #var_dump($custom);
     $default = [
@@ -47,7 +47,6 @@ function load_template_helper($ds, $src, $config)
             //var_dump($config);
             return \slowfoot\asset_from_file($path, $config['assets']);
         },
-        'markdown' => markdown_helper($config, $ds)
     ];
     return array_merge($default, $custom);
 }

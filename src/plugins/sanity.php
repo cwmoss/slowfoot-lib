@@ -1,5 +1,9 @@
 <?php
+/*
 
+composer install sanity/sanity-php
+
+*/
 use Sanity\BlockContent;
 use Sanity\Client as SanityClient;
 
