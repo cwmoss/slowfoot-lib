@@ -87,7 +87,7 @@ function layout($name = null)
         // reset layout name
         if ($name == '-') {
             $layout = null;
-        }else{
+        } else {
             $layout = $name;
         }
     }
@@ -202,7 +202,10 @@ function load_late_template_helper($helper, $base, $data)
     ];
 
     $helper = array_merge($helper, $additional_helper_for_partials);
-    $markdown = $helper['markdown'];
+
+    foreach (\hook::invoke('bind_late_template_helper', [], $helper, $base, $data) as $hlp) {
+        $helper[$hlp[0]] = $hlp[1];
+    }
 
     return array_merge($additional_helper_for_partials, [
         'partial' => function ($template, $data=[], $non_existent="") use ($helper, $base) {
@@ -213,7 +216,5 @@ function load_late_template_helper($helper, $base, $data)
             
             return partial($base, $template, $data, $helper, $non_existent);
         },
-        'markdown' => markdown_helper_obj($markdown, $data),
-        
      ]);
 }

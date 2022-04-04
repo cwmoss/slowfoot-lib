@@ -4,7 +4,46 @@ hook::add('bind_template_helper', function ($ds, $src, $config) {
     return ['markdown', markdown_helper($config, $ds)];
 });
 
+hook::add('bind_late_template_helper', function ($helper, $base, $data) {
+    $md = $helper['markdown'];
+    return ['markdown', markdown_helper_obj($markdown, $data)];
+});
 
+function load_markdown($opts, $config, $db)
+{
+    $front = new Mni\FrontYAML\Parser;
+    $filep = $config['base'] . '/' . $opts['file'];
+    dbg("++ md glob:", $filep);
+    $prefix = $config['base'] . '/';
+
+    $files = globstar($filep);
+    foreach ($files as $f) {
+        dbg("++ md file:", $f);
+      
+        $fname = str_replace($prefix, '', $f);
+        $path_parts = pathinfo($fname);
+
+        $document = $front->parse(file_get_contents($f), false);
+        $data = $document->getYAML() ?? [];
+        $md = $document->getContent() ?? '';
+        #$id = $data['_id']??($data['id']??$fname);
+        $id = $path_parts['dirname'].'/'.$path_parts['filename'];
+        // TODO: anything goes
+        // $id = str_replace('/', '-', $id);
+        $row = array_merge($data, [
+            'mdbody'=> $md,
+            '_id'=>$id,
+            '_file'=>[
+                'path' => $fname,
+                'dir' => $path_parts['dirname'],
+                'name' => $path_parts['filename'],
+                'ext' => $path_parts['extension']
+            ]
+        ]);
+        yield $row;
+    }
+    return;
+}
 
 function markdown_sf($md, $config=null, $ds=null)
 {
