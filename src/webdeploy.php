@@ -48,7 +48,19 @@ if (!$ok) {
     exit;
 }
 
-
+/*
+    some provider might not have a php cli
+    with the right version but a http php SAPI
+    so web-deploy/http.php could be used
+*/
+if ($NOCLI) {
+    print "http build\n";
+    $FETCH = true;
+    
+    require __DIR__ . '/boot.php';
+    include 'build.php';
+    exit;
+}
 
 #header('X-Accel-Buffering: no');
 #header("Content-Type: text/plain; charset=utf-8");
