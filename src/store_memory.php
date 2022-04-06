@@ -105,6 +105,17 @@ class store_memory
 
     public function info()
     {
-        return [];
+        $info = [];
+        foreach($this->docs as $doc){
+            if(!\key_exists($doc['_type'], $info)){
+                $info[$doc['_type']] = ['_type' => $doc['_type'], 'total'=> 0];
+            }
+            $info[$doc['_type']]['total']++;
+        }
+        $paths = array_reduce($this->paths, function($res, $item){
+            return $res+count($item);
+        }, 0);
+        $info[] = ['_type' => '__paths', 'total'=>$paths];
+        return array_values($info);
     }
 }

@@ -94,6 +94,7 @@ function xsanity_link_url($link, $ds)
 
 function sanity_text($block, $ds, $config)
 {
+    if(!$block) return "";
     $conf = $config['sources']['sanity'];
     #var_dump($conf);
     $serializer = hook::invoke_filter('sanity.block_serializers', [], $ds, $config);

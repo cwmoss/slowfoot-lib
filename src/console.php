@@ -18,7 +18,7 @@ function console() {
         }
         $console_fn = function ($name, $text) use ($console, $presets) {
             if (PHP_SAPI != 'cli') {
-                return;
+            #    return;
             }
 
             $preset = $presets[$name] ?? null;

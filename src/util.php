@@ -143,7 +143,9 @@ function shell_info($start=null, $single=false)
 
     // last resort to non-cli stuff
     if (PHP_SAPI != 'cli') {
-        return;
+        if(!(defined('SLOWFOOT_WEBDEPLOY') && SLOWFOOT_WEBDEPLOY)){
+            return;
+        }
     }
 
     if (!$console) {
