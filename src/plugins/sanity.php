@@ -10,7 +10,7 @@ use Sanity\Client as SanityClient;
 hook::add('bind_template_helper', function ($ds, $src, $config) {
     return ['sanity_text', function ($text, $opts = []) use ($ds, $config) {
         //print_r($sl);
-        return sanity_text($text, $ds, $config);
+        return sanity_text($text, $opts, $ds, $config);
     }];
 });
 hook::add_filter('assets_map', function ($img) {
@@ -92,12 +92,12 @@ function xsanity_link_url($link, $ds)
     return $link['internal'] ? $ds->get_path($link['internal']['_ref']) : ($link['route'] ? path_page($link['route']) : $link['external']);
 }
 
-function sanity_text($block, $ds, $config)
+function sanity_text($block, $opts, $ds, $config)
 {
     if(!$block) return "";
     $conf = $config['sources']['sanity'];
     #var_dump($conf);
-    $serializer = hook::invoke_filter('sanity.block_serializers', [], $ds, $config);
+    $serializer = hook::invoke_filter('sanity.block_serializers', [], $opts, $ds, $config);
     #var_dump($serializer);
 
     $html = BlockContent::toHtml($block, [

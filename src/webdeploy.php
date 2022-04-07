@@ -54,7 +54,7 @@ if (!$ok) {
     so web-deploy/http.php could be used
 */
 if ($NOCLI) {
-    print "http build\n";
+    #print "http build\n";
     $FETCH = true;
     
     require __DIR__ . '/boot.php';
