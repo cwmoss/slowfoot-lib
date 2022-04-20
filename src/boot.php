@@ -40,6 +40,8 @@ if (file_exists("$base/.env")) {
     Dotenv\Dotenv::createImmutable("$base")->load();
 }
 
+$_ENV = array_merge(getenv(), $_ENV);
+
 $src = $base . '/src';
 $dist = $base . '/dist/';
 
