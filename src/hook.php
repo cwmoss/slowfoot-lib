@@ -11,15 +11,15 @@ class hook {
     public static $f = [];
 
     public static function add($name, $fun){
-        if (!self::$h[$name]) {
+        if (!array_key_exists($name, self::$h)) {
             self::$h[$name] = array();
         }
 
         self::$h[$name][] = $fun;
     }
     public static function add_filter($name, $fun){
-        if (!self::$f[$name]) {
-            self::$f[$name] = array();
+        if (!array_key_exists($name, self::$f)) {
+            self::$f[$name] = [];
         }
 
         self::$f[$name][] = $fun;
@@ -30,7 +30,7 @@ class hook {
         array_shift($args);
         array_shift($args);
         # print_r(self::$h);
-        if (!self::$h[$action]) {
+        if (!array_key_exists($action, self::$h)) {
             return $default;
         }
         $res = [];
@@ -49,7 +49,7 @@ class hook {
         array_shift($args);
    
         # print_r(self::$h);
-        if (!self::$f[$action]) {
+        if (!array_key_exists($action, self::$f)) {
             return $start;
         }
         
