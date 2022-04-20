@@ -105,7 +105,7 @@ function normalize_store_config($conf)
     if (is_string($store)) {
         $store=['adapter'=>$store];
     }
-    $store['base'] = $conf['base'];
+    $store['base'] = $conf['base'].'/var';
     return $store;
 }
 function normalize_assets_config($conf)
@@ -115,7 +115,7 @@ function normalize_assets_config($conf)
         'base' => $conf['base'],
         'path' => '/images',
         'src' => '',
-        'dest' => 'rendered-images',
+        'dest' => 'var/rendered-images',
         'profiles' => [],
         'map' => function ($img) {
             return hook::invoke_filter('assets_map', $img);

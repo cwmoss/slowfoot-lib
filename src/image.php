@@ -48,7 +48,7 @@ function image($img, $opts = [], $gopts = [])
 
         if ($gopts['download']) {
             $dl_name = $img['_id'];
-            $download_file = $gopts['base'].'/download/'.$dl_name;
+            $download_file = $gopts['base'].'/var/download/'.$dl_name;
 
             dbg("[image] download to ", $download_file);
 

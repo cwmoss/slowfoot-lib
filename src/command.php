@@ -7,6 +7,7 @@ slowfoot.
 Usage:
   slowfoot dev [-S <server:port>] [-P <port>] [-f | --fetch <content source>] [-d <project directory>]
   slowfoot build [-d <project directory>]
+  slowfoot setup
   slowfoot (-h | --help)
   slowfoot --version
 
@@ -93,4 +94,7 @@ if ($args['build']) {
     
     require __DIR__ . '/boot.php';
     include 'build.php';
+}
+if($args['setup']){
+    include 'setup.php';
 }
