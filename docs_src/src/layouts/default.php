@@ -37,7 +37,7 @@ $nav = ['items'=>[]];
 &copy; 2022
 </div>
 </footer>
-<script src="<?=path_asset('js/prism.js')?>"></script>
+<script src="<?=path_asset('/js/prism.js')?>"></script>
 </body>
 
 </html>
