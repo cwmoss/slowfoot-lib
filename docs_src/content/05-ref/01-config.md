@@ -11,7 +11,7 @@ return [
     'site_url' => '',
     // prefix path of your destination
     // ex: https://acme.com/the-new-snake-oil-is-here
-    //   => path_prefix = 'the-new-snake-oil-is-here
+    //   => path_prefix = '/the-new-snake-oil-is-here
     'path_prefix' => '',
     'title_template' => '',
     //'store' => 'sqlite',
