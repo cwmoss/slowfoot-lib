@@ -127,7 +127,7 @@ foreach ($pages as $pagename) {
             write($content, $pagepath, null, $dist);
         }
     } else {
-        $content = page($pagename, [], $template_helper, $src);
+        $content = page($pagename, [], $template_helper, $context);
         write($content, $pagepath, null, $dist);
     }
     shell_info();

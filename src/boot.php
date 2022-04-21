@@ -43,7 +43,7 @@ if (file_exists("$base/.env")) {
 $_ENV = array_merge(getenv(), $_ENV);
 
 $src = $base . '/src';
-$dist = $base . '/dist/';
+#print "SRC: $src"; exit;
 
 #require_once 'util.php';
 
@@ -51,6 +51,8 @@ $dist = $base . '/dist/';
 #require_once 'slft_fun.php';
 
 $config = load_config($base);
+$dist = $config['build']['dist'];
+
 //print_r($_ENV);
 //print_r($config); exit;
 

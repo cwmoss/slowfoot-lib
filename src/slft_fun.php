@@ -38,7 +38,8 @@ function load_config($dir)
     $conf['dist'] = $conf['base'].'/dist';
     $conf['assets'] = normalize_assets_config($conf);
     $conf['store'] = normalize_store_config($conf);
-    $conf['plugins'] = normalize_plugins($conf);
+    $conf['plugins'] = normalize_plugins_config($conf);
+    $conf['build'] = normalize_build_config($conf);
     return $conf;
 }
 
@@ -47,7 +48,7 @@ function load_config($dir)
 //  do wee need a plugin init /w pconf?
 //  plugin via composer?
 //  raise error?
-function normalize_plugins($conf)
+function normalize_plugins_config($conf)
 {
     $plugins = $conf['plugins']??[];
     $norm = [];
@@ -124,7 +125,16 @@ function normalize_assets_config($conf)
     $assets = array_merge($default, $assets);
     return $assets;
 }
-
+function normalize_build_config($conf){
+    $build = $conf['build']??['dist'=>'dist'];
+    if(is_string($conf['build'])){
+        $build = ['dist'=>$conf['build']];
+    }
+    #if($build['dist'][0]!='/'){
+        $build['dist'] = $conf['base'].'/'.$build['dist'];
+    #}
+    return $build;
+}
 function make_path_fn($pattern)
 {
     $replacements = [];

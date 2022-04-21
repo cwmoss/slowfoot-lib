@@ -60,6 +60,7 @@ function template($_template, $data, $helper, $__context)
 function page($_template, $data, $helper, $__context)
 {
     $_base = $__context['src'];
+
     extract($data);
     extract($helper);
     extract(load_late_template_helper($helper, $_base, $data));

@@ -1,1 +1,1 @@
-<!doctype html><meta http-equiv="refresh" content="0; URL=/01-getting-started"><title>shortest html5</title>
+<!doctype html><meta http-equiv="refresh" content="0; URL=<?=path_page('/01-getting-started')?>"><title>shortest html5</title>

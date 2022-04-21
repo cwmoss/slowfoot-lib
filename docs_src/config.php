@@ -4,7 +4,7 @@ return [
     'site_name' => 'slowfoot Documentation',
     'site_description' => 'Docs for slowfoot',
     'site_url' => '',
-    'path_prefix' => getenv('PATH_PREFIX') ?: $_ENV['PATH_PREFIX'] ?: '',
+    'path_prefix' => '/slowfoot-lib',
     'title_template' => '',
     //'store' => 'sqlite',
     'sources' => [
@@ -20,7 +20,8 @@ return [
     ],
     'plugins' => [
         'markdown'
-    ]
+    ],
+    'build' => '../docs'
 ];
 
 function load_chapter_index($opts, $conf, $db)

@@ -2,6 +2,7 @@ etc/
 vendor/
 logs/
 draft/
+dist/
 composer.lock
 node_modules/
 .quasar/
