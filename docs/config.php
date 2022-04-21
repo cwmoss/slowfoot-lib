@@ -17,6 +17,9 @@ return [
     ],
     'templates' => [
         'chapter' => '/:_file.name',
+    ],
+    'plugins' => [
+        'markdown'
     ]
 ];
 
