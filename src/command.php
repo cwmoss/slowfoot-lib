@@ -77,6 +77,7 @@ if ($args['dev']) {
     print "   🌈 http://$devserver\n\n";
     print "<cmd> click\n";
     print "have fun!\n\n";
+    #print $command."\n";
     $wss = "php {$slft_lib_base}/wss.php ".SLOWFOOT_BASE;
     #shell_exec("$wss &");
     #print "end";

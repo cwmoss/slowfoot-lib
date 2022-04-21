@@ -9,7 +9,10 @@ return [
     'site_name' => 'slowfoot Documentation',
     'site_description' => 'Docs for slowfoot',
     'site_url' => '',
-    'path_prefix' => getenv('PATH_PREFIX') ?: $_ENV['PATH_PREFIX'] ?: '',
+    // prefix path of your destination
+    // ex: https://acme.com/the-new-snake-oil-is-here
+    //   => path_prefix = 'the-new-snake-oil-is-here
+    'path_prefix' => '',
     'title_template' => '',
     //'store' => 'sqlite',
     'sources' => [
