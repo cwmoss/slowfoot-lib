@@ -125,13 +125,14 @@ function normalize_assets_config($conf)
     $assets = array_merge($default, $assets);
     return $assets;
 }
-function normalize_build_config($conf){
+function normalize_build_config($conf)
+{
     $build = $conf['build']??['dist'=>'dist'];
-    if(is_string($conf['build'])){
+    if (is_string($conf['build'])) {
         $build = ['dist'=>$conf['build']];
     }
     #if($build['dist'][0]!='/'){
-        $build['dist'] = $conf['base'].'/'.$build['dist'];
+    $build['dist'] = $conf['base'].'/'.$build['dist'];
     #}
     return $build;
 }
@@ -467,6 +468,12 @@ function slow_query_cmd($q)
 function template_name($tconfig, $type, $name)
 {
     return $tconfig[$type][$name]['template'];
+}
+
+function template_context($type, $context, $data, $ds, $config)
+{
+    $context['template_type'] = $type;
+    return \hook::invoke_filter('modify_template_context', $context, $data, $ds, $config);
 }
 
 function path_asset($asset, $cachebust = false)

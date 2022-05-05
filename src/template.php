@@ -12,11 +12,11 @@ function process_template($id, $path)
     process_template_data($data, $path);
 }
 
-function partial($base, $template, $data=[], $helper=[], $non_existent="")
+function partial($base, $template, $data=[], $helper=[], $_context=[], $non_existent="")
 {
     extract($data);
     extract($helper);
-    extract(load_late_template_helper($helper, $base, $data));
+    extract(load_late_template_helper($helper, $base, $data, $_context));
     $file = $base . '/partials/' . $template . '.php';
     if (is_file($file)) {
         ob_start();
@@ -28,10 +28,11 @@ function partial($base, $template, $data=[], $helper=[], $non_existent="")
     return $content;
 }
 
-function template_get_context($name, $context, $props)
+function template_get_context($name, $context, $props, $data, $helper)
 {
     $name = trim($name, '/');
-    return array_merge($context, $props, ['name'=>$name]);
+    $context = array_merge($context, $props, ['name'=>$name]);
+    return $context;
 }
 
 function template($_template, $data, $helper, $__context)
@@ -40,8 +41,10 @@ function template($_template, $data, $helper, $__context)
     $_base = $__context['src'];
     extract($data);
     extract($helper);
-    extract(load_late_template_helper($helper, $_base, $data));
-    $_context = template_get_context($_template, $__context, ['is_template'=>true, 'is_page'=>false]);
+    
+    $_context = template_get_context($_template, $__context, ['is_template'=>true, 'is_page'=>false], $data, $helper);
+    extract(load_late_template_helper($helper, $_base, $data, $_context));
+
     \collect_data();
     \collect_data('meta', $_context, true);
     layout('-');
@@ -63,8 +66,10 @@ function page($_template, $data, $helper, $__context)
 
     extract($data);
     extract($helper);
-    extract(load_late_template_helper($helper, $_base, $data));
-    $_context = template_get_context($_template, $__context, ['is_template'=>false, 'is_page'=>true]);
+    
+    $_context = template_get_context($_template, $__context, ['is_template'=>false, 'is_page'=>true], $data, $helper);
+    extract(load_late_template_helper($helper, $_base, $data, $_context));
+
     \collect_data();
     \collect_data('meta', $_context, true);
     layout('-');
@@ -189,7 +194,7 @@ function process_template_data($data, $path)
 }
 
 
-function load_late_template_helper($helper, $base, $data)
+function load_late_template_helper($helper, $base, $data, $context)
 {
     $additional_helper_for_partials = [
         // global $p('pagekey.subkey.etc') function
@@ -209,13 +214,13 @@ function load_late_template_helper($helper, $base, $data)
     }
 
     return array_merge($additional_helper_for_partials, [
-        'partial' => function ($template, $data=[], $non_existent="") use ($helper, $base) {
+        'partial' => function ($template, $data=[], $non_existent="") use ($helper, $base, $context) {
             //dbg('+++ partial src', $src);
             $helper['dot'] = function ($dot_path, $default = null) use ($data) {
                 return dot_get($data, $dot_path, $default);
             };
             
-            return partial($base, $template, $data, $helper, $non_existent);
+            return partial($base, $template, $data, $helper, $context, $non_existent);
         },
      ]);
 }

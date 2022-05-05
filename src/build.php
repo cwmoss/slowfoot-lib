@@ -72,7 +72,7 @@ foreach ($templates as $type => $conf) {
                     'path_name' => $templateconf['name']
                 ],
                 $template_helper,
-                $context
+                template_context('template', $context, $row, $ds, $config)
             );
             write($content, $path, null, $dist);
         }
@@ -99,7 +99,7 @@ foreach ($pages as $pagename) {
         foreach (chunked_paginate($ds, $paginate) as $coll) {
             dbg('page', $pagenr);
             $context['path']=$pagepath;
-            $content = page($pagename, ['collection' => $coll], $template_helper, $context);
+            $content = page($pagename, ['collection' => $coll], $template_helper, template_context('page', $context, $coll, $ds, $config));
             $content = remove_tags($content);
             write($content, $pagepath, $dist);
             $pagenr++;
@@ -114,7 +114,7 @@ foreach ($pages as $pagename) {
                 $pagination = pagination($info, $pagenr?:1);
 
                 $context['path']=$pagepath;
-                $content = page($pagename, ['page' => $qres, 'pagination'=>$pagination], $template_helper, $context);
+                $content = page($pagename, ['page' => $qres, 'pagination'=>$pagination], $template_helper, template_context('page', $context, $qres, $ds, $config));
                 $content = remove_tags($content, ['page-query']);
                 $pagepath_pg = $pagepath . '/' . $pagenr;
                 write($content, $pagepath, $pagenr, $dist);
@@ -122,12 +122,12 @@ foreach ($pages as $pagename) {
         } else {
             $qres = $ds->query($page_query['__content']);
             $context['path']=$pagepath;
-            $content = page($pagename, ['page' => $qres, 'pagination'=>[]], $template_helper, $context);
+            $content = page($pagename, ['page' => $qres, 'pagination'=>[]], $template_helper, template_context('page', $context, $qres, $ds, $config));
             $content = remove_tags($content, ['page-query']);
             write($content, $pagepath, null, $dist);
         }
     } else {
-        $content = page($pagename, [], $template_helper, $context);
+        $content = page($pagename, [], $template_helper, template_context('page', $context, [], $ds, $config));
         write($content, $pagepath, null, $dist);
     }
     shell_info();

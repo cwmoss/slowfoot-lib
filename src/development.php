@@ -180,7 +180,7 @@ $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages
                 'path_name' => $name
             ],
             $template_helper,
-            $context
+            template_context('template', $context, $obj, $ds, $config)
         );
         debug_js("page", $obj);
     } else {
@@ -212,12 +212,22 @@ $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages
             
             #var_dump($qres);
             //print_r($coll);
-            $content = page($pagename, ['page' => $qres, 'pagination'=>$pagination], $template_helper, $context);
+            $content = page(
+                $pagename,
+                ['page' => $qres, 'pagination'=>$pagination],
+                $template_helper,
+                template_context('page', $context, $qres, $ds, $config)
+            );
             $content = remove_tags($content, ['page-query']);
 
             debug_js("page", $qres);
         } else {
-            $content = page($requestpath, [], $template_helper, $context);
+            $content = page(
+                $requestpath,
+                [],
+                $template_helper,
+                template_context('page', $context, [], $ds, $config)
+            );
 
             debug_js("page", []);
         }
