@@ -183,6 +183,7 @@ $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages
             template_context('template', $context, $obj, $ds, $config)
         );
         debug_js("page", $obj);
+        debug_js("meta", \collect_data('meta', true));
     } else {
         list($dummy, $pagename, $pagenr) = explode('/', $requestpath);
         $pagename = '/' . $pagename;
@@ -221,6 +222,7 @@ $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages
             $content = remove_tags($content, ['page-query']);
 
             debug_js("page", $qres);
+            debug_js("meta", \collect_data('meta', true));
         } else {
             $content = page(
                 $requestpath,
@@ -230,6 +232,7 @@ $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages
             );
 
             debug_js("page", []);
+            debug_js("meta", \collect_data('meta', true));
         }
     }
     $debug = true;
