@@ -5,6 +5,7 @@
 //   require_once __DIR__.'/../vendor/autoload.php';
 #}
 
+ini_set('display_errors', 0);
 if (!defined('SLOWFOOT_BASE')) {
     // via php cli webserver
 #    print_r($_SERVER);
