@@ -24,7 +24,7 @@ if (!$dist) {
 # print_r($ds->info);
 #print_r($ds->db->paths_rev);
 #exit;
-print console_table(['_type'=>'type', 'total'=>'total'], $ds->info());
+print console_table(['_type' => 'type', 'total' => 'total'], $ds->info());
 
 
 
@@ -35,10 +35,11 @@ shell_info();
 #array_map('unlink', array_filter((array) globstar("$dist/**/*.*")));
 // exit;
 
-$context = ['mode'=>'build', 'src'=>$src, 'path'=>'',
-    'site_name'=>$config['site_name']??'',
-    'site_description'=>$config['site_description']??'',
-    'site_url'=>$config['site_url']??''
+$context = [
+    'mode' => 'build', 'src' => $src, 'path' => '',
+    'site_name' => $config['site_name'] ?? '',
+    'site_description' => $config['site_description'] ?? '',
+    'site_url' => $config['site_url'] ?? ''
 ];
 
 shell_info("writing templates", true);
@@ -58,11 +59,11 @@ foreach ($templates as $type => $conf) {
             if ($path == '/index') {
                 $path = '/';
             }
-            if ($path=="/") {
+            if ($path == "/") {
                 #var_dump($row);
                 #exit;
             }
-            $context['path']=$path;
+            $context['path'] = $path;
             $content = template(
                 $templateconf['template'],
                 [
@@ -88,7 +89,7 @@ foreach ($pages as $pagename) {
     shell_info("  => $pagename");
     // $paginate = check_pagination($pagename, $src);
     $pp = preprocess($pagename, $src);
-    $page_query = $pp['page-query']??null;
+    $page_query = $pp['page-query'] ?? null;
     $pagepath = $pagename;
     if ($pagepath == '/index') {
         $pagepath = '/';
@@ -98,31 +99,31 @@ foreach ($pages as $pagename) {
         $path = $pagepath;
         foreach (chunked_paginate($ds, $paginate) as $coll) {
             dbg('page', $pagenr);
-            $context['path']=$pagepath;
+            $context['path'] = $pagepath;
             $content = page($pagename, ['collection' => $coll], $template_helper, template_context('page', $context, $coll, $ds, $config));
-            $content = remove_tags($content);
-            write($content, $pagepath, $dist);
+            $content = remove_tags($content, ['page-query']);
+            write($content, $pagepath, null, $dist);
             $pagenr++;
             $pagepath = $path . '/' . $pagenr;
         }
     } elseif ($page_query) {
         if ($page_query['paginate']) {
             [$info, $pagequery] = $ds->query_paginated($page_query['__content'], $page_query['paginate'], []);
-            
-            for ($pagenr=1; $pagenr <= $info['minpage']; $pagenr++) {
-                $qres = $pagequery($pagenr);
-                $pagination = pagination($info, $pagenr?:1);
 
-                $context['path']=$pagepath;
-                $content = page($pagename, ['page' => $qres, 'pagination'=>$pagination], $template_helper, template_context('page', $context, $qres, $ds, $config));
+            for ($pagenr = 1; $pagenr <= $info['minpage']; $pagenr++) {
+                $qres = $pagequery($pagenr);
+                $pagination = pagination($info, $pagenr ?: 1);
+
+                $context['path'] = $pagepath;
+                $content = page($pagename, ['page' => $qres, 'pagination' => $pagination], $template_helper, template_context('page', $context, $qres, $ds, $config));
                 $content = remove_tags($content, ['page-query']);
                 $pagepath_pg = $pagepath . '/' . $pagenr;
                 write($content, $pagepath, $pagenr, $dist);
             }
         } else {
             $qres = $ds->query($page_query['__content']);
-            $context['path']=$pagepath;
-            $content = page($pagename, ['page' => $qres, 'pagination'=>[]], $template_helper, template_context('page', $context, $qres, $ds, $config));
+            $context['path'] = $pagepath;
+            $content = page($pagename, ['page' => $qres, 'pagination' => []], $template_helper, template_context('page', $context, $qres, $ds, $config));
             $content = remove_tags($content, ['page-query']);
             write($content, $pagepath, null, $dist);
         }
