@@ -12,8 +12,7 @@ namespace lolql;
 require_once __DIR__ . '/compare.php';
 
 // TODO: slice/ limit
-function query($ds, $query, $params=[])
-{
+function query($ds, $query, $params = []) {
     $query = is_string($query) ? parse($query, $params) : $query;
 
     // TODO: params aus dem parsing herausnehmen und zum evaluierungszeitpunkt einfügen
@@ -26,8 +25,7 @@ function query($ds, $query, $params=[])
     return $rs;
 }
 // TODO: params aus dem parsing herausnehmen und zum evaluierungszeitpunkt einfügen
-function parse($string, $params=[])
-{
+function parse($string, $params = []) {
     $string = normalize($string);
     $string = replace_params($string, $params);
 
@@ -64,8 +62,9 @@ function parse($string, $params=[])
         );
     }
     $order = build_order_fun($parts['order'][0]);
-    $limit = parse_limit($parts['limit'][0]??"");
-    return ['q' => $q,
+    $limit = parse_limit($parts['limit'][0] ?? "");
+    return [
+        'q' => $q,
         'order' => $order[0],
         'order_raw' => $order[1],
         'limit' => $limit,
@@ -73,8 +72,7 @@ function parse($string, $params=[])
     ];
 }
 
-function eval_cond($db, $query)
-{
+function eval_cond($db, $query) {
     $evaluator = get_evaluator($query);
 
     return array_filter($db, function ($item) use ($query, $evaluator) {
@@ -84,8 +82,7 @@ function eval_cond($db, $query)
     });
 }
 
-function eval_cond_as_sql_function($query)
-{
+function eval_cond_as_sql_function($query) {
     $evaluator = get_evaluator($query);
     return function ($json_col) use ($query, $evaluator) {
         $item = json_decode($json_col, true);
@@ -96,11 +93,11 @@ function eval_cond_as_sql_function($query)
     };
 }
 
-function get_evaluator($query)
-{
+function get_evaluator($query) {
     #print_r($query);
     $evaluator = function ($query, $item, $level = 0) use (&$evaluator) {
         // dbg('level... ', $level);
+        $ok = false;
         foreach ($query as $q) {
             if (!is_assoc($q)) {
                 //print "\n\nhuhu\n\n";
@@ -124,8 +121,7 @@ function get_evaluator($query)
     return $evaluator;
 }
 
-function evaluate($cond, $data)
-{
+function evaluate($cond, $data) {
     foreach ($cond as $k => $v) {
         $ok = evaluate_single($k, $v, $data);
         if (!$ok) {
@@ -134,8 +130,7 @@ function evaluate($cond, $data)
     }
     return true;
 }
-function evaluate_single($l, $r, $op, $data)
-{
+function evaluate_single($l, $r, $op, $data) {
     if ($l['t'] == 'k') {
         $l['v'] = get_value($l['c'], $data);
     } else {
@@ -147,13 +142,13 @@ function evaluate_single($l, $r, $op, $data)
         $r['v'] = get_literal($r['c']);
     }
 
-    $ops = ['==' => 'eq', 'in'=>'in', '!=' => 'ne', '>' => 'gt', '<' => 'lt', '<=' => 'lte', '>=' => 'gte', 'matches'=>'matches'];
-    $ops_m = $ops[$op]??null;
+    $ops = ['==' => 'eq', 'in' => 'in', '!=' => 'ne', '>' => 'gt', '<' => 'lt', '<=' => 'lte', '>=' => 'gte', 'matches' => 'matches'];
+    $ops_m = $ops[$op] ?? null;
     if (!$ops_m) {
         return false;
     }
 
-    $cmp = __NAMESPACE__ . '\\' . 'cmp_'. $ops_m;
+    $cmp = __NAMESPACE__ . '\\' . 'cmp_' . $ops_m;
     if (!function_exists($cmp)) {
         return false;
     }
@@ -161,8 +156,7 @@ function evaluate_single($l, $r, $op, $data)
     return $cmp($l, $r);
 }
 
-function get_value($keys, $data)
-{
+function get_value($keys, $data) {
     $current = array_shift($keys);
 
     // nested?
@@ -181,13 +175,11 @@ function get_value($keys, $data)
     }
 }
 
-function get_literal($data)
-{
+function get_literal($data) {
     return $data;
 }
 
-function build_order_fun($order)
-{
+function build_order_fun($order) {
     $orders = parse_order($order);
     if (!$order) {
         return null;
@@ -196,7 +188,7 @@ function build_order_fun($order)
     foreach ($orders as $k => $o) {
         //$key = $dir = $cmp = null;
         // keys must start with 0, 1, 2...
-        list($key, $dir, $cmp) = array_merge($o);
+        list($key, $dir, $cmp) = array_merge($o) + [1 => "", 2 => ""];
         //print "key, $key";
         if ($dir && ($dir != 'asc' && $dir != 'desc')) {
             $cmp = $dir;
@@ -222,46 +214,42 @@ function build_order_fun($order)
                 }
             }
             return 0;
-        //return strnatcmp($a[$key], $b[$key]);
+            //return strnatcmp($a[$key], $b[$key]);
         },
         $os
     ];
 }
 
-function parse_order($order)
-{
+function parse_order($order) {
     if (!$order) {
         return [];
     }
     return array_map('\lolql\words', explode(',', $order));
 }
-function parse_limit($limit)
-{
-    $l = ['limit'=>null, 'offset'=>0];
+function parse_limit($limit) {
+    $l = ['limit' => null, 'offset' => 0];
     if (!$limit) {
         return $l;
     }
     $limit_offset = words($limit);
-    $l['limit'] = $limit_offset[0]??null;
-    $l['offset'] = $limit_offset[1]??0;
+    $l['limit'] = $limit_offset[0] ?? null;
+    $l['offset'] = $limit_offset[1] ?? 0;
     return $l;
 }
-function words($string)
-{
+function words($string) {
     return array_filter(explode(' ', $string), 'trim');
 }
 /**
-     * Parse a string into an array.
-     *
-*/
+ * Parse a string into an array.
+ *
+ */
 // https://stackoverflow.com/questions/196520/php-best-way-to-extract-text-within-parenthesis
 // https://stackoverflow.com/questions/2650414/php-curly-braces-into-array
 
 // @rodneyrehm
 // http://stackoverflow.com/a/7917979/99923
 
-function parse_parentheses($string)
-{
+function parse_parentheses($string) {
     if ($string[0] == '(') {
         // killer outer parens, as they're unnecessary
         $string = substr($string, 1, -1);
@@ -299,7 +287,7 @@ function parse_parentheses($string)
                 // add just saved scope to current scope
                 $current[] = $t;
                 break;
-           /*
+                /*
             case ' ':
                 // make each word its own token
                 $this->push();
@@ -321,23 +309,20 @@ function parse_parentheses($string)
     return $current;
 }
 
-function normalize($string)
-{
+function normalize($string) {
     return join(' ', array_filter(
         explode("\n", $string),
         fn ($line) => trim($line)[0] != '#'
     ));
 }
 
-function replace_params($q, $params=[])
-{
-    foreach ($params as $k=>$v) {
-        $q = \str_replace('$'.$k, '"'.$v.'"', $q);
+function replace_params($q, $params = []) {
+    foreach ($params as $k => $v) {
+        $q = \str_replace('$' . $k, '"' . $v . '"', $q);
     }
     return $q;
 }
-function parse_condition($string)
-{
+function parse_condition($string) {
     $t = token_get_all('<?' . $string . '?>');
     $t = compact_tokens($t);
     //print_r($t);
@@ -353,8 +338,7 @@ c content
 o operator
 x next logical operator (&& ||)
 */
-function combine_tokens($tokens)
-{
+function combine_tokens($tokens) {
     $start = ['l' => ['t' => null, 'c' => []], 'o' => null, 'r' => ['t' => null, 'c' => []], 'x' => null];
     $buffer = $start;
     $lr = 'l';
@@ -388,8 +372,7 @@ function combine_tokens($tokens)
     return $res;
 }
 
-function compact_tokens($t)
-{
+function compact_tokens($t) {
     $t = array_map(function ($tok) {
         if (is_array($tok)) {
             return $tok[1] == '<?' || $tok[1] == '?>' ? '' : $tok[1];
@@ -400,8 +383,7 @@ function compact_tokens($t)
     return $t;
 }
 
-function array_map_recursive($fn, $arr)
-{
+function array_map_recursive($fn, $arr) {
     return array_map(function ($item) use ($fn) {
         return is_array($item) ? array_map($fn, $item) : $fn($item);
     }, $arr);
