@@ -100,7 +100,12 @@ foreach ($pages as $pagename) {
         foreach (chunked_paginate($ds, $paginate) as $coll) {
             dbg('page', $pagenr);
             $context['path'] = $pagepath;
-            $content = page($pagename, ['collection' => $coll], $template_helper, template_context('page', $context, $coll, $ds, $config));
+            $content = page(
+                $pagename,
+                ['collection' => $coll],
+                $template_helper,
+                template_context('page', $context, $coll, $ds, $config)
+            );
             $content = remove_tags($content, ['page-query']);
             write($content, $pagepath, null, $dist);
             $pagenr++;
