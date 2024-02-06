@@ -4,16 +4,14 @@ namespace slowfoot\template;
 
 use function lolql\parse;
 
-function process_template($id, $path)
-{
+function process_template($id, $path) {
     global $templates;
     layout('-');
     $data = query('*[_id=="$id"][0]', ['id' => $id]);
     process_template_data($data, $path);
 }
 
-function partial($base, $template, $data=[], $helper=[], $_context=[], $non_existent="")
-{
+function partial($base, $template, $data = [], $helper = [], $_context = [], $non_existent = "") {
     extract($data);
     extract($helper);
     extract(load_late_template_helper($helper, $base, $data, $_context));
@@ -28,21 +26,25 @@ function partial($base, $template, $data=[], $helper=[], $_context=[], $non_exis
     return $content;
 }
 
-function template_get_context($name, $context, $props, $data, $helper)
-{
+function template_get_context($name, $context, $props, $data, $helper) {
     $name = trim($name, '/');
-    $context = array_merge($context, $props, ['name'=>$name]);
+    $context = array_merge($context, $props, ['name' => $name]);
     return $context;
 }
 
-function template($_template, $data, $helper, $__context)
-{
+function template($_template, $data, $helper, $__context) {
     #var_dump($__context);
     $_base = $__context['src'];
     extract($data);
     extract($helper);
-    
-    $_context = template_get_context($_template, $__context, ['is_template'=>true, 'is_page'=>false], $data, $helper);
+
+    $_context = template_get_context(
+        $_template,
+        $__context,
+        ['is_template' => true, 'is_page' => false],
+        $data,
+        $helper
+    );
     extract(load_late_template_helper($helper, $_base, $data, $_context));
 
     \collect_data();
@@ -60,14 +62,19 @@ function template($_template, $data, $helper, $__context)
     return $content;
 }
 
-function page($_template, $data, $helper, $__context)
-{
+function page($_template, $data, $helper, $__context) {
     $_base = $__context['src'];
 
     extract($data);
     extract($helper);
-    
-    $_context = template_get_context($_template, $__context, ['is_template'=>false, 'is_page'=>true], $data, $helper);
+
+    $_context = template_get_context(
+        $_template,
+        $__context,
+        ['is_template' => false, 'is_page' => true],
+        $data,
+        $helper
+    );
     extract(load_late_template_helper($helper, $_base, $data, $_context));
 
     \collect_data();
@@ -86,8 +93,7 @@ function page($_template, $data, $helper, $__context)
     return $content;
 }
 
-function layout($name = null)
-{
+function layout($name = null) {
     static $layout = null;
     if (!is_null($name)) {
         // reset layout name
@@ -104,8 +110,7 @@ function layout($name = null)
 $x = new SimpleXMLElement('<element lang="sql"></element>');
 iterator_to_array($x->attributes()))
 */
-function check_pagination($_template, $_base)
-{
+function check_pagination($_template, $_base) {
     $content = file_get_contents($_base . '/pages/' . $_template . '.php');
     $prule = preg_match('!<page-query>(.*?)</page-query>!ism', $content, $mat);
     if ($prule) {
@@ -114,14 +119,12 @@ function check_pagination($_template, $_base)
         return false;
     }
 }
-function preprocess($_template, $_base)
-{
+function preprocess($_template, $_base) {
     $content = file_get_contents($_base . '/pages/' . $_template . '.php');
     return parse_tags($content, ['page-query']);
 }
 
-function parse_tags($content, $tags)
-{
+function parse_tags($content, $tags) {
     $res = [];
     foreach ($tags as $tag) {
         #print "hhh $tag\n$content";
@@ -138,8 +141,7 @@ function parse_tags($content, $tags)
     return $res;
 }
 
-function remove_tags($content, $tags)
-{
+function remove_tags($content, $tags) {
     //dbg('remove...');
     foreach ($tags as $tag) {
         $content = preg_replace("!<$tag([^>]*?)>(.*?)</$tag>!ism", '', $content);
@@ -148,8 +150,7 @@ function remove_tags($content, $tags)
     return $content;
 }
 
-function page_paginated($_template, $data, $_base)
-{
+function page_paginated($_template, $data, $_base) {
     extract($data);
     ob_start();
     include $_base . '/pages/' . $_template . '.php';
@@ -163,8 +164,7 @@ function page_paginated($_template, $data, $_base)
     return $content;
 }
 
-function paginate($how = null)
-{
+function paginate($how = null) {
     static $rules;
     if (!is_null($how)) {
         // reset
@@ -176,8 +176,7 @@ function paginate($how = null)
     return $rules;
 }
 
-function process_template_data($data, $path)
-{
+function process_template_data($data, $path) {
     global $templates;
     $file_template = $templates[$data['_type']]['template'];
     extract($data);
@@ -194,8 +193,7 @@ function process_template_data($data, $path)
 }
 
 
-function load_late_template_helper($helper, $base, $data, $context)
-{
+function load_late_template_helper($helper, $base, $data, $context) {
     $additional_helper_for_partials = [
         // global $p('pagekey.subkey.etc') function
         'p' => function ($dot_path, $default = null) use ($data) {
@@ -214,13 +212,13 @@ function load_late_template_helper($helper, $base, $data, $context)
     }
 
     return array_merge($additional_helper_for_partials, [
-        'partial' => function ($template, $data=[], $non_existent="") use ($helper, $base, $context) {
+        'partial' => function ($template, $data = [], $non_existent = "") use ($helper, $base, $context) {
             //dbg('+++ partial src', $src);
             $helper['dot'] = function ($dot_path, $default = null) use ($data) {
                 return dot_get($data, $dot_path, $default);
             };
-            
+
             return partial($base, $template, $data, $helper, $context, $non_existent);
         },
-     ]);
+    ]);
 }

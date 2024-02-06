@@ -7,8 +7,8 @@ title == "hello"
 title == subtitle
 authors._ref == "a19"
 */
-function cmp_eq($l, $r)
-{
+
+function cmp_eq($l, $r) {
     // dbg('cmp +++ ', $l, $r);
 
     if ($l['t'] == 'k' && is_array($l['v'])) {
@@ -26,9 +26,8 @@ function cmp_eq($l, $r)
     return ($l['v'][0] == $r['v'][0]);
 }
 
-function cmp_lt($l, $r)
-{
-    dbg('cmp +++ < ', $l, $r);
+function cmp_lt($l, $r) {
+    // dbg('cmp +++ < ', $l, $r);
 
     if ($l['t'] == 'k' && is_array($l['v'])) {
         return false;
@@ -45,9 +44,8 @@ function cmp_lt($l, $r)
     return ($l['v'][0] < $r['v'][0]);
 }
 
-function cmp_gt($l, $r)
-{
-    dbg('cmp +++ > ', $l, $r);
+function cmp_gt($l, $r) {
+    // dbg('cmp +++ > ', $l, $r);
 
     if ($l['t'] == 'k' && is_array($l['v'])) {
         return false;
@@ -69,8 +67,7 @@ title matches "world"
 title matches "world*"
 title matches "*world"
 */
-function cmp_matches($l, $r)
-{
+function cmp_matches($l, $r) {
     if ($r['t'] != 'v') {
         return false;
     }
@@ -91,8 +88,7 @@ function cmp_matches($l, $r)
 title in ["Aliens", "Interstellar", "Passengers"]
 "yolo" in tags
 */
-function cmp_in($l, $r)
-{
+function cmp_in($l, $r) {
     if ($l['t'] == 'k') {
         $haystack = $l['v'];
         $needle = $r['v'][0];

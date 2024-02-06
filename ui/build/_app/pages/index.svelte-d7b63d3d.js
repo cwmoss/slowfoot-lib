@@ -1,0 +1,1 @@
+import{S as o,i as e,s as n}from"../chunks/vendor-c72829ad.js";import{b as t}from"../chunks/config-2c29d870.js";import"../chunks/paths-28a87002.js";console.log("index page module",t);class c extends o{constructor(s){super();e(this,s,null,null,n,{})}}export{c as default};
