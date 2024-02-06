@@ -16,8 +16,8 @@ namespace slowfoot;
 
     cache: rendered-images
 */
-function image($img, $opts = [], $gopts = [])
-{
+
+function image($img, $opts = [], $gopts = []) {
     static $resizer;
     if (!$resizer) {
         $resizer = get_resizer($gopts['base']);
@@ -34,13 +34,13 @@ function image($img, $opts = [], $gopts = [])
         }
     }
 
-    if ($img['_type']!='slft.asset') {
+    if ($img['_type'] != 'slft.asset') {
         if (!isset($gopts['map'])) {
             return;
         }
         $img = $gopts['map']($img);
     }
-    
+
     dbg("[image] start", $img['url'], $profile);
 
     if (is_remote($img['url'])) {
@@ -48,7 +48,7 @@ function image($img, $opts = [], $gopts = [])
 
         if ($gopts['download']) {
             $dl_name = $img['_id'];
-            $download_file = $gopts['base'].'/var/download/'.$dl_name;
+            $download_file = $gopts['base'] . '/var/download/' . $dl_name;
 
             dbg("[image] download to ", $download_file);
 
@@ -72,7 +72,7 @@ function image($img, $opts = [], $gopts = [])
     $name = get_name($img['url'], $profile);
     $dest = $gopts['base'] . '/' . $gopts['dest'] . '/' . $name;
 
-    $src = $img['download_file']?:$img['_id'];
+    $src = $img['download_file'] ?: $img['_id'];
 
     dbg("[image] resizer", $src, $dest);
     $res = resize($resizer, $src, $dest, $profile, $gopts['base']);
@@ -87,8 +87,7 @@ function image($img, $opts = [], $gopts = [])
 }
 
 // <img> tag
-function image_tag($img, $opts = [], $tagopts=[], $gopts = [])
-{
+function image_tag($img, $opts = [], $tagopts = [], $gopts = []) {
     $resize = image($img, $opts, $gopts);
     if (!$resize) {
         return "";
@@ -101,19 +100,17 @@ function image_tag($img, $opts = [], $tagopts=[], $gopts = [])
     }
 }
 
-function image_url($img, $opts = [], $gopts = [])
-{
+function image_url($img, $opts = [], $gopts = []) {
     $resize = image($img, $opts, $gopts);
     if (!$resize) {
         return "";
     }
-    
+
     return prefixed_url($resize['resize_url'], $gopts);
 }
 
-function prefixed_url($url, $opts=[])
-{
-    $url = PATH_PREFIX. $opts['path'] . '/' .$url;
+function prefixed_url($url, $opts = []) {
+    $url = PATH_PREFIX . $opts['path'] . '/' . $url;
     return $url;
 }
 
@@ -124,30 +121,29 @@ function prefixed_url($url, $opts=[])
     https://iptc.org/standards/photo-metadata/social-media-sites-photo-metadata-test-results-2019/
     https://de.wikipedia.org/wiki/IPTC-IIM-Standard
 */
-function set_tags($dest, $profile)
-{
+function set_tags($dest, $profile) {
     $tags = [
         'caption' => '2#120',
         'creator' => '2#80',
         'copyright' => '2#116',
         'credit' => '2#110',
     ];
-    $caption = $profile['4c']['caption']??$profile['caption']??$profile['alt'];
-    $creator = $profile['4c']['creator']??$profile['author'];
-    $copyright = $profile['4c']['copyright']??"© All Rights Reserved.";
-    $credit = $profile['4c']['credit']??"© ".$creator;
+    $caption = $profile['4c']['caption'] ?? $profile['caption'] ?? $profile['alt'];
+    $creator = $profile['4c']['creator'] ?? $profile['author'];
+    $copyright = $profile['4c']['copyright'] ?? "© All Rights Reserved.";
+    $credit = $profile['4c']['credit'] ?? "© " . $creator;
 
     $utf8seq = chr(0x1b) . chr(0x25) . chr(0x47);
     $length = strlen($utf8seq);
     $data = chr(0x1C) . chr(1) . chr('090') . chr($length >> 8) . chr($length & 0xFF) . $utf8seq;
-    foreach ($tags as $tname=>$tcode) {
+    foreach ($tags as $tname => $tcode) {
         if ($$tname) {
             $tag = substr($tcode, 2);
             $data .= iptc_make_tag(2, $tag, $$tname);
         }
     }
     $content = iptcembed($data, $dest);
-    if ($content!==false) {
+    if ($content !== false) {
         $fp = fopen($dest, "wb");
         fwrite($fp, $content);
         fclose($fp);
@@ -155,8 +151,7 @@ function set_tags($dest, $profile)
 }
 
 
-function iptc_make_tag($rec, $data, $value)
-{
+function iptc_make_tag($rec, $data, $value) {
     $length = strlen($value);
     $retval = chr(0x1C) . chr($rec) . chr($data);
 
@@ -164,18 +159,17 @@ function iptc_make_tag($rec, $data, $value)
         $retval .= chr($length >> 8) .  chr($length & 0xFF);
     } else {
         $retval .= chr(0x80) .
-                   chr(0x04) .
-                   chr(($length >> 24) & 0xFF) .
-                   chr(($length >> 16) & 0xFF) .
-                   chr(($length >> 8) & 0xFF) .
-                   chr($length & 0xFF);
+            chr(0x04) .
+            chr(($length >> 24) & 0xFF) .
+            chr(($length >> 16) & 0xFF) .
+            chr(($length >> 8) & 0xFF) .
+            chr($length & 0xFF);
     }
 
     return $retval . $value;
 }
 
-function get_resizer($base)
-{
+function get_resizer($base) {
     // The internal adapter
     $adapter = new \League\Flysystem\InMemory\InMemoryFilesystemAdapter();
 
@@ -190,8 +184,7 @@ function get_resizer($base)
     return [$server, $cache];
 }
 
-function asset_from_file($path, $gopts)
-{
+function asset_from_file($path, $gopts) {
     //var_dump($gopts);
     $fname = $gopts['base'] . '/' . $gopts['src'] . '/' . $path;
     $info = \getimagesize($fname);
@@ -210,33 +203,30 @@ function asset_from_file($path, $gopts)
     ];
 }
 
-function html($res, $opts, $tagopts)
-{
+function html($res, $opts, $tagopts) {
     //print_r($opts);
     return sprintf(
-        '<img src="%s" width="%s" xheight="%s" alt="%s" loading="lazy" class="%s">',
+        '<img src="%s" width="%s" height="%s" alt="%s" loading="lazy" class="%s">',
         prefixed_url($res['resize_url'], $opts),
         $res['resize'][0],
         $res['resize'][1],
-        \htmlspecialchars($tagopts['alt']??''),
-        \htmlspecialchars($tagopts['class']??'')
+        \htmlspecialchars($tagopts['alt'] ?? ''),
+        \htmlspecialchars($tagopts['class'] ?? '')
     );
 }
 
-function html_cdn($res, $opts, $tagopts)
-{
+function html_cdn($res, $opts, $tagopts) {
     return sprintf(
         '<img src="%s" alt="%s" class="%s">',
         $res['resize_url'],
-        \htmlspecialchars($tagopts['alt']??''),
-        \htmlspecialchars($tagopts['class']??'')
+        \htmlspecialchars($tagopts['alt'] ?? ''),
+        \htmlspecialchars($tagopts['class'] ?? '')
     );
 }
-function resize($resizer, $src, $dest, $profile, $base)
-{
+function resize($resizer, $src, $dest, $profile, $base) {
     #dbg('++ resize', $src, $dest, $profile);
     // copy-only
-    if (isset($profile['size'])&& !$profile['size']) {
+    if (isset($profile['size']) && !$profile['size']) {
         `cp $src $dest`;
         return \getimagesize($dest);
     }
@@ -249,13 +239,13 @@ function resize($resizer, $src, $dest, $profile, $base)
         dbg("+++ not exists", $src);
         return [];
     }
-    
+
     // TODO: this should not be needed
     $src = \str_replace($base, '', $src);
 
     if (!$profile['w'] || !$profile['h']) {
         $new = resize_one_side($resizer[0], $src, $dest, $profile['w'], $profile['h']);
-    //var_dump($new);
+        //var_dump($new);
     } else {
         $mode = $profile['mode'];
         if (!$mode) {
@@ -275,8 +265,7 @@ function resize($resizer, $src, $dest, $profile, $base)
     return [];
 }
 
-function resize_one_side($resizer, $src, $dest, $w, $h)
-{
+function resize_one_side($resizer, $src, $dest, $w, $h) {
     $p = $w ? ['w' => $w] : ['h' => $h];
     #dbg('+++ server', $src, $p);
     $p['q'] = 72;
@@ -284,8 +273,7 @@ function resize_one_side($resizer, $src, $dest, $w, $h)
     return $resizer->makeImage($src, $p);
 }
 
-function resize_two_sides($resizer, $src, $dest, $w, $h, $mode)
-{
+function resize_two_sides($resizer, $src, $dest, $w, $h, $mode) {
     $mode = $mode == 'fit' ? 'contain' : 'crop';
     $p = ['w' => $w, 'h' => $h, 'fit' => $mode];
     $p['q'] = 72;
@@ -296,8 +284,7 @@ function resize_two_sides($resizer, $src, $dest, $w, $h, $mode)
 /*
     crop with focal point
 */
-function resize_fp($resizer, $src, $dest, $w, $h, $fp)
-{
+function resize_fp($resizer, $src, $dest, $w, $h, $fp) {
     $p = ['w' => $w, 'h' => $h, 'fit' => 'crop-' . round($fp[0] * 100) . '-' . round($fp[1] * 100)];
     $p['q'] = 72;
     $p['sharp'] = 5;
@@ -305,8 +292,7 @@ function resize_fp($resizer, $src, $dest, $w, $h, $fp)
     return $resizer->makeImage($src, $p);
 }
 
-function get_profile($opts = [], $profiles = [])
-{
+function get_profile($opts = [], $profiles = []) {
     if (is_string($opts)) {
         $profilename = $opts;
         $opts = [];
@@ -319,21 +305,19 @@ function get_profile($opts = [], $profiles = [])
     return $profile;
 }
 
-function get_name($url, $profile)
-{
+function get_name($url, $profile) {
     $significant = 'size mode fp 4c';
     $profile = array_intersect_key($profile, array_flip(explode(' ', $significant)));
     ksort($profile);
     $info = \pathinfo($url);
-    $hash = \md5($info['filename'] . '?'. http_build_query($profile));
+    $hash = \md5($info['filename'] . '?' . http_build_query($profile));
     if (!$profile['size']) {
         $profile['size'] = 'ypoc';
     }
     return $info['filename'] . '--' . $hash . '-' . $profile['size'] . '.' . $info['extension'];
 }
 
-function download_remote_image($url, $file_name)
-{
+function download_remote_image($url, $file_name) {
     if (file_exists($file_name) || file_put_contents($file_name, file_get_contents($url))) {
         $info = \getimagesize($file_name);
         if (!\in_array($info['mime'], ['image/jpeg', 'image/png'])) {
@@ -347,8 +331,7 @@ function download_remote_image($url, $file_name)
 }
 
 // TODO: make it more bulletproof
-function is_remote($url)
-{
+function is_remote($url) {
     return (preg_match("!^https?://!", $url));
 }
 /*
