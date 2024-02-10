@@ -2,7 +2,7 @@
 require __DIR__ . '/boot.php';
 #require_once __DIR__.'/../vendor/autoload.php';
 #dbg("++start");
-require_once __DIR__.'/utils_server.php';
+require_once __DIR__ . '/utils_server.php';
 #dbg("++start");
 use function slowfoot\template\page;
 use function slowfoot\template\template;
@@ -41,18 +41,18 @@ $router->mount('/__api', function () use ($router, $ds, $config, $src, $template
         resp($ds->info());
     });
 
-    $router->get('/type/([-\w.]+)(/\d+)?', function ($type, $page=1) use ($router, $ds) {
+    $router->get('/type/([-\w.]+)(/\d+)?', function ($type, $page = 1) use ($router, $ds) {
         dbg("[api] type", $type);
         #print "hallo";
-        if ($type=='__paths') {
+        if ($type == '__paths') {
             $rows = $ds->db->db->safeQuery('SELECT * FROM paths LIMIT ? OFFSET ?', [20, 0]);
         } else {
             $rows = $ds->query_type($type);
         }
         //$rows = $db->run('SELECT * FROM docs LIMIT 20');
         //$rows = $db->q('SELECT _id, body FROM docs WHERE _type = ? LIMIT 20', $type);
-        
-        resp(['rows'=>$rows]);
+
+        resp(['rows' => $rows]);
     });
 
     $router->get('/id', function () use ($router, $ds) {
@@ -72,14 +72,23 @@ $router->mount('/__api', function () use ($router, $ds, $config, $src, $template
     $router->get('/preview/(.*)', function ($id_type) use ($router, $ds, $config, $src, $template_helper) {
         list($id, $type) = explode('/', $id_type);
         dbg("[api/preview]", $id_type);
-        
+
         $preview_obj = load_preview_object($id, $type, $config);
 
         #$template = $templates[$obj['_type']]['_']['template'];
         #$template = template_name($config['templates'], $obj['_type'], $name);
         #dbg('[api/preview] template', $preview_obj);
-        
-        $content = template($preview_obj['template'], ['page' => $preview_obj['data']], $template_helper, $src);
+        $context = [
+            'mode' => 'dev',
+            'src' => $src,
+            'path' => $id_type,
+            'site_name' => $config['site_name'] ?? '',
+            'site_description' => $config['site_description'] ?? '',
+            'site_url' => $config['site_url'] ?? '',
+
+        ];
+
+        $content = template($preview_obj['template'], ['page' => $preview_obj['data']], $template_helper, template_context('template', $context, $preview_obj, $ds, $config));
 
         header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
         header('Cache-Control: post-check=0, pre-check=0', false);
@@ -92,15 +101,15 @@ $router->mount('/__api', function () use ($router, $ds, $config, $src, $template
 
 $router->mount('/__ui', function () use ($router, $ds) {
     $router->get('/', function () use ($router, $ds) {
-        $uibase = __DIR__.'/../ui/build';
+        $uibase = __DIR__ . '/../ui/build';
         #dbg("+++ ui index ++++", $uibase);
         send_file($uibase, 'index.html');
         exit;
     });
 
     $router->get('(.*)?', function ($file) use ($router, $ds) {
-        $uibase = __DIR__.'/../ui/build';
-        $uifile = $uibase.'/'.$file;
+        $uibase = __DIR__ . '/../ui/build';
+        $uifile = $uibase . '/' . $file;
         dbg("__ui file00", $file, $uifile);
 
         if (file_exists($uifile)) {
@@ -111,27 +120,27 @@ $router->mount('/__ui', function () use ($router, $ds) {
             exit;
         }
         dbg("__ui file", $file, $uifile);
-        resp(['ok'=>$file]);
+        resp(['ok' => $file]);
     });
 });
 
 $router->get('/__sf/(.*)', function ($requestpath) use ($router, $ds) {
-    $docbase = __DIR__.'/assets';
+    $docbase = __DIR__ . '/assets';
     send_file($docbase, $requestpath);
     exit;
 });
 
 $router->post('/__fun/(.*)', function ($requestpath) use ($router, $ds) {
-    $docbase = $_SERVER['DOCUMENT_ROOT'].'/../endpoints';
-    include($docbase."/".$requestpath);
+    $docbase = $_SERVER['DOCUMENT_ROOT'] . '/../endpoints';
+    include($docbase . "/" . $requestpath);
     exit;
 });
 
 #dbg("++ image path", $config['assets']['path']);
 
-$router->get($config['assets']['path'].'/'.'(.*\.\w{1,5})', function ($requestpath) use ($router, $ds, $config) {
+$router->get($config['assets']['path'] . '/' . '(.*\.\w{1,5})', function ($requestpath) use ($router, $ds, $config) {
     dbg('[dev] asssets', $requestpath);
-    $docbase = $_SERVER['DOCUMENT_ROOT'].'/../var/rendered-images';
+    $docbase = $_SERVER['DOCUMENT_ROOT'] . '/../var/rendered-images';
     #dbg("++ image path base", $docbase, $requestpath);
     send_file($docbase, $requestpath);
     exit;
@@ -147,7 +156,7 @@ $router->get('(.*\.\w{1,5})', function ($requestpath) use ($router, $ds) {
 $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages, $src, $template_helper) {
     dbg('[dev] page/template', $requestpath);
     send_nocache();
-    $requestpath = '/'.$requestpath;
+    $requestpath = '/' . $requestpath;
     // startseite?
     if ($requestpath == '/' || $requestpath == '') {
         $requestpath = '/index';
@@ -156,13 +165,13 @@ $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages
     [$obj_id, $name] = $ds->get_by_path($requestpath);
 
     $context = [
-        'mode'=>'dev',
-        'src'=>$src,
-        'path'=>$requestpath,
-        'site_name'=>$config['site_name']??'',
-        'site_description'=>$config['site_description']??'',
-        'site_url'=>$config['site_url']??'',
-        
+        'mode' => 'dev',
+        'src' => $src,
+        'path' => $requestpath,
+        'site_name' => $config['site_name'] ?? '',
+        'site_description' => $config['site_description'] ?? '',
+        'site_url' => $config['site_url'] ?? '',
+
     ];
 
     if ($obj_id) {
@@ -183,44 +192,46 @@ $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages
             template_context('template', $context, $obj, $ds, $config)
         );
         debug_js("page", $obj);
+        debug_js("meta", \collect_data('meta', true));
     } else {
         list($dummy, $pagename, $pagenr) = explode('/', $requestpath);
         $pagename = '/' . $pagename;
-        if ($pagename=='') {
+        if ($pagename == '') {
             //    $pagename='/index';
         }
-        
+
         dbg('page...', $pagename, $pagenr, $requestpath);
         $obj_id = array_search($pagename, $pages);
         #$pagination_query = check_pagination($pagename, $src);
         $pp = preprocess($pagename, $src);
         #dbg('page query', $pp);
-        if ($page_query = ($pp['page-query']??null)) {
+        if ($page_query = ($pp['page-query'] ?? null)) {
             //var_dump($paginate);
             dbg('[page] query', $page_query);
             if ($page_query['paginate']) {
                 [$info, $pagequery] = $ds->query_paginated($page_query['__content'], $page_query['paginate'], []);
-                
+
                 //foreach (range(1, $pages) as $page) {
                 $qres = $pagequery($pagenr);
-                $pagination = pagination($info, $pagenr?:1);
-            //}
+                $pagination = pagination($info, $pagenr ?: 1);
+                //}
             } else {
                 $pagination = [];
                 $qres = $ds->query($page_query['__content']);  // query_page($ds, $pagination_query, $pagenr);
             }
-            
+
             #var_dump($qres);
             //print_r($coll);
             $content = page(
                 $pagename,
-                ['page' => $qres, 'pagination'=>$pagination],
+                ['page' => $qres, 'pagination' => $pagination],
                 $template_helper,
                 template_context('page', $context, $qres, $ds, $config)
             );
             $content = remove_tags($content, ['page-query']);
 
             debug_js("page", $qres);
+            debug_js("meta", \collect_data('meta', true));
         } else {
             $content = page(
                 $requestpath,
@@ -230,14 +241,15 @@ $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages
             );
 
             debug_js("page", []);
+            debug_js("meta", \collect_data('meta', true));
         }
     }
     $debug = true;
     if ($debug) {
-        $inspector = include_to_buffer(__DIR__.'/assets/debug.php');
+        $inspector = include_to_buffer(__DIR__ . '/assets/debug.php');
         $inspector_css = '<link rel="stylesheet" href="/__sf/inspector-json.css">';
-        $content = str_replace('</head>', $inspector_css.'</head>', $content);
-        $content = str_replace('</body>', $inspector.'</body>', $content);
+        $content = str_replace('</head>', $inspector_css . '</head>', $content);
+        $content = str_replace('</body>', $inspector . '</body>', $content);
     }
     print $content;
     exit;
