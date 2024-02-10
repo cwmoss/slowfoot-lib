@@ -24,7 +24,7 @@ DOC;
 
 //require_once(__DIR__.'/../vendor/autoload.php');
 
-$parsed = Docopt::handle($doc, array('version'=>'slowfoot 0.1'));
+$parsed = Docopt::handle($doc, array('version' => 'slowfoot 0.1'));
 #var_dump($parsed);
 $args = $parsed->args;
 #var_dump($args);
@@ -42,35 +42,35 @@ $logo = '
  ';
 
 if ($args['dev']) {
-    print $logo."\n";
+    print $logo . "\n";
 
     $FETCH = $args['-f'];
     $PDIR = $args['-d'];
-    if ($PDIR && $PDIR[0]!='/') {
-        $PDIR = SLOWFOOT_BASE.'/'.$PDIR;
+    if ($PDIR && $PDIR[0] != '/') {
+        $PDIR = SLOWFOOT_BASE . '/' . $PDIR;
     }
     $dev_src = 'src/';
     if ($PDIR) {
-        $dev_src = $PDIR.'/src/';
+        $dev_src = $PDIR . '/src/';
     }
 
-    $devserver = explode(':', $args['--server']??'localhost:1199');
+    $devserver = explode(':', $args['--server'] ?? 'localhost:1199');
     if ($args['--port']) {
-        $devserver[1]=$args['--port'];
+        $devserver[1] = $args['--port'];
     }
     $devserver = join(":", $devserver);
 
     // evtl. fetching data
     require __DIR__ . '/boot.php';
 
-    print console_table(['_type'=>'type', 'total'=>'total'], $ds->info());
-    
+    print console_table(['_type' => 'type', 'total' => 'total'], $ds->info());
+
     // this wont work :)
     // `(sleep 1 ; open http://localhost:1199/ )&`;
     // this works!
     # automatisches öffnen gefällt mir nicht mehr
     # shell_exec('(sleep 1 ; open http://localhost:1199/ ) 2>/dev/null >/dev/null &');
-    $command = "XXXPHP_CLI_SERVER_WORKERS=4 php -S {$devserver} -t {$dev_src} {$slft_lib_base}/development.php";
+    $command = "XXXPHP_CLI_SERVER_WORKERS=4 php -d short_open_tag=On -S {$devserver} -t {$dev_src} {$slft_lib_base}/development.php";
     print "\n\n";
 
     print "starting development server\n\n";
@@ -78,24 +78,24 @@ if ($args['dev']) {
     print "<cmd> click\n";
     print "have fun!\n\n";
     #print $command."\n";
-    $wss = "php {$slft_lib_base}/wss.php ".SLOWFOOT_BASE;
+    $wss = "php {$slft_lib_base}/wss.php " . SLOWFOOT_BASE;
     #shell_exec("$wss &");
     #print "end";
     `$command`;
     #`($command &) && ($wss &)`;
 }
 if ($args['build']) {
-    print $logo."\n";
-    
+    print $logo . "\n";
+
     $FETCH = true;
     $PDIR = $args['-d'];
-    if ($PDIR && $PDIR[0]!='/') {
-        $PDIR = SLOWFOOT_BASE.'/'.$PDIR;
+    if ($PDIR && $PDIR[0] != '/') {
+        $PDIR = SLOWFOOT_BASE . '/' . $PDIR;
     }
-    
+
     require __DIR__ . '/boot.php';
     include 'build.php';
 }
-if($args['setup']){
+if ($args['setup']) {
     include 'setup.php';
 }

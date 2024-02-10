@@ -33,6 +33,7 @@ class store_sqlite {
             }
             $this->was_filled = \file_exists($name);
         }
+
         $this->db = \ParagonIE\EasyDB\Factory::fromArray([
             "sqlite:$name"
         ]);
