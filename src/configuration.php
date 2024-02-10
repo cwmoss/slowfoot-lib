@@ -14,6 +14,8 @@ require_once 'hook.php';
 use slowfoot\store;
 use slowfoot\store_memory;
 use slowfoot\store_sqlite;
+use slowfoot\loader;
+
 use Ovidigital\JsObjectToJson\JsConverter;
 use function lolql\parse;
 use function lolql\query as lquery;
@@ -74,6 +76,9 @@ class configuration {
         $this->build = $this->normalize_build_config($this->build);
     }
 
+    public function get_loader() {
+        return new loader($this);
+    }
     public function get_store(): store {
         if (strpos($this->store['adapter'], 'sqlite') === 0) {
             $db = new store_sqlite($this->store);

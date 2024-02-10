@@ -7,6 +7,7 @@
 
 use slowfoot\configuration;
 
+
 ini_set('display_errors', 0);
 if (!defined('SLOWFOOT_BASE')) {
     // via php cli webserver
@@ -54,6 +55,8 @@ $src = $base . '/src';
 #require_once 'slft_fun.php';
 
 $config = configuration::load($base);
+$dataloader = $config->get_loader();
+
 $dist = $config->build['dist'];
 
 //print_r($_ENV);
@@ -81,7 +84,7 @@ if (isset($FETCH) && $FETCH) {
     `rm -rf $dbfile`;
 }
 //var_dump($hooks);
-$ds = load_data($config->sources, $config->hooks, $config);
+$ds = $dataloader->load();
 
 $templates = $config->templates;
 /*

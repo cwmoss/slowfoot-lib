@@ -74,28 +74,6 @@ function query_type($ds, $type) {
     return $ds->query_type($type);
 }
 
-function queryxxx($ds, $filter) {
-    if (is_string($filter)) {
-        $filter = ['_type' => $filter];
-    }
-    $rs = array_filter($ds->data, function ($row) use ($filter) {
-        return evaluate($filter, $row);
-    });
-
-    if ($filter['_type'] == 'artist') {
-        $skey = 'firstname';
-    }
-
-    $sfn = \lolql\build_order_fun('firstname, familyname');
-
-    if ($sfn) {
-        dbg('... sorting..');
-        usort($rs, $sfn);
-        // usort($rs, build_sorter($skey));
-    }
-    return $rs;
-}
-
 function build_sorter($key) {
     return function ($a, $b) use ($key) {
         return strnatcasecmp($a[$key], $b[$key]);
