@@ -1,15 +1,17 @@
 <?php
 // require_once __DIR__ . '/../vendor/autoload.php';
 #if (!class_exists("\Composer\Autoload\ClassLoader")) {
-    //require_once __DIR__.'/../vendor/autoload.php';
+//require_once __DIR__.'/../vendor/autoload.php';
 //   require_once __DIR__.'/../vendor/autoload.php';
 #}
+
+use slowfoot\configuration;
 
 ini_set('display_errors', 0);
 if (!defined('SLOWFOOT_BASE')) {
     // via php cli webserver
-#    print_r($_SERVER);
-#    print_r($_SERVER);
+    #    print_r($_SERVER);
+    #    print_r($_SERVER);
     // different project path without vendor/ dir?
     // TODO: better ideas
     $internal = str_replace('vendor/cwmoss/slowfoot-lib/docs_src/src', '', $_SERVER['DOCUMENT_ROOT']);
@@ -20,9 +22,9 @@ if (!defined('SLOWFOOT_BASE')) {
 } else {
 }
 
-$autoload = $internal??SLOWFOOT_BASE;
+$autoload = $internal ?? SLOWFOOT_BASE;
 #print $internal." --- ".SLOWFOOT_BASE.' --- '.$_SERVER['DOCUMENT_ROOT']; exit;
-require_once $autoload.'/vendor/autoload.php';
+require_once $autoload . '/vendor/autoload.php';
 
 if (!defined('SLOWFOOT_PREVIEW')) {
     define('SLOWFOOT_PREVIEW', false);
@@ -51,8 +53,8 @@ $src = $base . '/src';
 #require_once 'image.php';
 #require_once 'slft_fun.php';
 
-$config = load_config($base);
-$dist = $config['build']['dist'];
+$config = configuration::load($base);
+$dist = $config->build['dist'];
 
 //print_r($_ENV);
 //print_r($config); exit;
@@ -66,7 +68,7 @@ if (!defined('PATH_PREFIX')) {
 }
 
 if (!(SLOWFOOT_PREVIEW || SLOWFOOT_WEBDEPLOY)) {
-#    require_once 'routing.php';
+    #    require_once 'routing.php';
 }
 
 require_once 'template_helper.php';
@@ -75,13 +77,13 @@ require_once 'template_helper.php';
 
 # TODO: im store inbauen
 if (isset($FETCH) && $FETCH) {
-    $dbfile = SLOWFOOT_BASE.'/var/slowfoot.db';
+    $dbfile = SLOWFOOT_BASE . '/var/slowfoot.db';
     `rm -rf $dbfile`;
 }
 //var_dump($hooks);
-$ds = load_data($config['sources'], $config['hooks'], $config);
+$ds = load_data($config->sources, $config->hooks, $config);
 
-$templates = $config['templates'];
+$templates = $config->templates;
 /*
 $paths = array_reduce($templates, function ($res, $item) use ($ds) {
     return array_merge($res, array_map(function ($obj) use ($item) {

@@ -61,7 +61,7 @@ if ($args['dev']) {
     $devserver = join(":", $devserver);
 
     // evtl. fetching data
-    require __DIR__ . '/boot.php';
+    require __DIR__ . '/_boot.php';
 
     print console_table(['_type' => 'type', 'total' => 'total'], $ds->info());
 
@@ -93,7 +93,7 @@ if ($args['build']) {
         $PDIR = SLOWFOOT_BASE . '/' . $PDIR;
     }
 
-    require __DIR__ . '/boot.php';
+    require __DIR__ . '/_boot.php';
     include 'build.php';
 }
 if ($args['setup']) {

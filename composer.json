@@ -1,32 +1,35 @@
 {
-    "name": "cwmoss/slowfoot-lib",
-    "version": "1.0",
-    "autoload": {
-        "files": [
-            "src/compat.php",
-            "src/util.php",
-            "src/utils_html.php",
-            "src/image.php",
-            "src/slft_fun.php"
-        ]
-    },
-    "require": {
-        "spatie/async": "^1.5",
-        "erusev/parsedown": "^1.7",
-        "ausi/slug-generator": "^1.1",
-        "jbroadway/urlify": "^1.2",
-        "vlucas/phpdotenv": "^5.3",
-        "ovidigital/js-object-to-json": "^1.0",
-        "league/glide": "^2.0",
-        "league/flysystem-memory": "^2.0",
-        "sensiolabs/ansi-to-html": "^1.2",
-        "paragonie/easydb": "^2.11",
-        "bramus/router": "^1.6",
-        "php-parallel-lint/php-console-color": "^1.0",
-        "docopt/docopt": "^1.0",
-        "phplucidframe/console-table": "^1.2",
-        "bloatless/php-websocket": "^3.0",
-        "mnapoli/front-yaml": "^2.0",
-        "benjaminhoegh/parsedown-toc": "*"
+  "name": "cwmoss/slowfoot-lib",
+  "version": "1.0",
+  "autoload": {
+    "files": [
+      "src/compat.php",
+      "src/util.php",
+      "src/utils_html.php",
+      "src/image.php",
+      "src/slft_fun.php"
+    ],
+    "psr-4": {
+      "slowfoot\\": "src"
     }
+  },
+  "require": {
+    "spatie/async": "^1.5",
+    "erusev/parsedown": "^1.7",
+    "ausi/slug-generator": "^1.1",
+    "jbroadway/urlify": "^1.2",
+    "vlucas/phpdotenv": "^5.3",
+    "ovidigital/js-object-to-json": "^1.0",
+    "league/glide": "^2.0",
+    "league/flysystem-memory": "^2.0",
+    "sensiolabs/ansi-to-html": "^1.2",
+    "paragonie/easydb": "^2.11",
+    "bramus/router": "^1.6",
+    "php-parallel-lint/php-console-color": "^1.0",
+    "docopt/docopt": "^1.0",
+    "phplucidframe/console-table": "^1.2",
+    "bloatless/php-websocket": "^3.0",
+    "mnapoli/front-yaml": "^2.0",
+    "benjaminhoegh/parsedown-toc": "*"
+  }
 }

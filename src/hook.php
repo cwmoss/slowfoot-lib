@@ -1,4 +1,6 @@
 <?php
+
+namespace slowfoot;
 /*
 
 hook::load($custdir."/hooks.php");
@@ -10,14 +12,14 @@ class hook {
     public static $h = [];
     public static $f = [];
 
-    public static function add($name, $fun){
+    public static function add($name, $fun) {
         if (!array_key_exists($name, self::$h)) {
             self::$h[$name] = array();
         }
 
         self::$h[$name][] = $fun;
     }
-    public static function add_filter($name, $fun){
+    public static function add_filter($name, $fun) {
         if (!array_key_exists($name, self::$f)) {
             self::$f[$name] = [];
         }
@@ -47,12 +49,12 @@ class hook {
         #print_r(self::$f);
         $args = func_get_args();
         array_shift($args);
-   
+
         # print_r(self::$h);
         if (!array_key_exists($action, self::$f)) {
             return $start;
         }
-        
+
         foreach (self::$f[$action] as $meth) {
             // return $meth();
             $start = call_user_func_array($meth, $args);
