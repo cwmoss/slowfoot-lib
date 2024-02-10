@@ -11,6 +11,7 @@ require_once 'hook.php';
 use slowfoot\store;
 use slowfoot\store_memory;
 use slowfoot\store_sqlite;
+use slowfoot\hook;
 use Ovidigital\JsObjectToJson\JsConverter;
 use function lolql\parse;
 use function lolql\query as lquery;
@@ -24,112 +25,6 @@ if (! function_exists(__NAMESPACE__ . '\greetings'))
 
 */
 
-function load_config($dir) {
-    $conf = include $dir . '/config.php';
-    $tpls = [];
-    foreach ($conf['templates'] as $name => $t) {
-        $tpls[$name] = normalize_template_config($name, $t);
-    }
-    $conf['templates'] = $tpls;
-    #$conf['base'] = $dir;
-    $conf['base'] = '/' . get_absolute_path($dir);
-    $conf['src'] = $conf['base'] . '/src';
-    $conf['dist'] = $conf['base'] . '/dist';
-    $conf['assets'] = normalize_assets_config($conf);
-    $conf['store'] = normalize_store_config($conf);
-    $conf['plugins'] = normalize_plugins_config($conf);
-    $conf['build'] = normalize_build_config($conf);
-    return $conf;
-}
-
-// TODO:
-//  require in global context?
-//  do wee need a plugin init /w pconf?
-//  plugin via composer?
-//  raise error?
-function normalize_plugins_config($conf) {
-    $plugins = $conf['plugins'] ?? [];
-    $norm = [];
-    foreach ($plugins as $k => $pconf) {
-        $name = is_string($pconf) ? $pconf : (!is_numeric($k) ? $k : null);
-        if (!$name) {
-            continue;
-        }
-        $pfile = $name . '.php';
-        if (file_exists($conf['src'] . '/plugins/' . $pfile)) {
-            $fullname = $conf['src'] . '/plugins/' . $pfile;
-        } else {
-            if (file_exists(__DIR__ . '/plugins/' . $pfile)) {
-                $fullname = __DIR__ . '/plugins/' . $pfile;
-            } else {
-                continue;
-            }
-        }
-        $norm[$name] = [
-            'filename' => $pfile,
-            'fullpath' => $fullname,
-            'conf' => is_array($pconf) ? $pconf : []
-        ];
-        require_once($fullname);
-    }
-    return $norm;
-}
-
-function normalize_template_config($name, $config) {
-    if (!is_array($config) || is_assoc($config)) {
-        $config = [$config];
-    }
-    $tpl = [];
-    foreach ($config as $t) {
-        if (!is_array($t)) {
-            $t = ['path' => $t];
-        }
-        if (is_string($t['path'])) {
-            $t['path'] = make_path_fn($t['path']);
-        }
-        $subname = $t['name'] ?? '_';
-        $tpl[$subname] = array_merge(['type' => $name, 'template' => $name, 'name' => $subname], $t);
-    }
-    return $tpl;
-}
-
-function normalize_store_config($conf) {
-    $def = ['adapter' => 'memory'];
-    $store = $conf['store'] ?? null;
-    if (!$store) {
-        return $def;
-    }
-    if (is_string($store)) {
-        $store = ['adapter' => $store];
-    }
-    $store['base'] = $conf['base'] . '/var';
-    return $store;
-}
-function normalize_assets_config($conf) {
-    $assets = $conf['assets'] ?: [];
-    $default = [
-        'base' => $conf['base'],
-        'path' => '/images',
-        'src' => '',
-        'dest' => 'var/rendered-images',
-        'profiles' => [],
-        'map' => function ($img) {
-            return hook::invoke_filter('assets_map', $img);
-        }
-    ];
-    $assets = array_merge($default, $assets);
-    return $assets;
-}
-function normalize_build_config($conf) {
-    $build = $conf['build'] ?? ['dist' => 'dist'];
-    if (is_string($build)) {
-        $build = ['dist' => $conf['build']];
-    }
-    #if($build['dist'][0]!='/'){
-    $build['dist'] = $conf['base'] . '/' . $build['dist'];
-    #}
-    return $build;
-}
 function make_path_fn($pattern) {
     $replacements = [];
     if (preg_match_all('!:([^/:]+)!', $pattern, $mat, PREG_SET_ORDER)) {
@@ -174,136 +69,6 @@ function url_safe($path) {
     $path = strtolower($path);
     return $path;
 }
-
-function xload_data($sources, $hooks) {
-    $db = [];
-    $loaded = $rejected = [];
-    foreach (file($dataset) as $line) {
-        $row = json_decode($line, true);
-        $otype = $row['_type'];
-        if ($hooks['on_load']) {
-            $row = $hooks['on_load']($row, $db);
-        }
-        if (!$row) {
-            $rejected[$otype]++;
-        } else {
-            $db[$row['_id']] = $row;
-            $loaded[$row['_type']]++;
-        }
-    }
-    $db['_info'] = ['loaded' => $loaded, 'rejected' => $rejected];
-    return $db;
-}
-
-function get_store($config) {
-    if (strpos($config['store']['adapter'], 'sqlite') === 0) {
-        $db = new store_sqlite($config['store']);
-    } else {
-        $db = new store_memory();
-    }
-    return new store($db, $config['templates']);
-}
-function load_data($sources, $hooks, $config) {
-    $db = get_store($config);
-    $db_store = get_class($db->db);
-
-    # TODO fetch or not
-    if ($db->has_data_on_create()) {
-        shell_info("store {$db_store} using old data", true);
-        return $db;
-    }
-
-    shell_info("fetching data {$db_store}", true);
-
-    foreach ($sources as $name => $opts) {
-        if (!is_array($opts)) {
-            $opts = ['file' => $opts];
-        }
-        $def = ['loader' => $name, 'type' => $name, 'name' => $name];
-        $opts = array_merge($def, $opts);
-
-        $fun = 'load_' . $opts['loader'];
-
-        shell_info("fetching $name");
-
-        foreach ($fun($opts, $config, $db) as $row) {
-            if (!isset($row['_type']) || !$row['_type']) {
-                #print_r($row);
-                $row['_type'] = $opts['type'];
-            }
-            $otype = $row['_type'];
-            $row['_src'] = $name;
-            if ($hooks['on_load']) {
-                $row = $hooks['on_load']($row, $db);
-            }
-            if (!$row) {
-                $db->rejected($otype);
-            } else {
-                if (!$row['_id']) {
-                    $row['_id'] = $row['id'];
-                }
-                // $row['_id'] = str_replace('/', '-', $row['_id']);
-                $db->add($row['_id'], $row);
-            }
-        }
-        shell_info();
-    }
-    return $db;
-}
-
-function load_dataset($opts, $config, $db) {
-    $file = $config['base'] . '/' . $opts['file'];
-    foreach (file($file) as $row) {
-        yield json_decode($row, true);
-    }
-    return;
-}
-
-function load_json($opts, $config, $db) {
-    $file = $config['base'] . '/' . $opts['file'];
-    $rows = json_decode(file_get_contents($file), true);
-    if (is_assoc($rows)) {
-        $rows = [$rows];
-    }
-    foreach ($rows as $row) {
-        yield $row;
-    }
-    return;
-}
-
-
-
-function load_csv($opts, $config, $db) {
-    $file = $config['base'] . '/' . $opts['file'];
-    $opts = array_merge(['sep' => ',', 'enc' => '"'], $opts);
-    $header = null;
-    foreach (file($file) as $row) {
-        if (is_null($header)) {
-            $header = str_getcsv($row, $opts['sep'], $opts['enc']);
-            print_r($header);
-            continue;
-        }
-        $data = str_getcsv($row, $opts['sep'], $opts['enc']);
-
-        if ($opts['json']) {
-            $data = array_map(fn ($val) => json_decode($val, true), $data);
-        }
-        if ($opts['jsol']) {
-            $data = array_map(function ($val) {
-                if ($val[0] == '[' || $val[0] == '{') {
-                    return json_decode(JsConverter::convertToJson($val), true);
-                } else {
-                    return $val;
-                }
-            }, $data);
-        }
-        //print_r($data);
-        //return [];
-        yield array_combine($header, $data);
-    }
-}
-
-
 
 function query_type($ds, $type) {
     return $ds->query_type($type);
@@ -447,7 +212,7 @@ function template_name($tconfig, $type, $name) {
 
 function template_context($type, $context, $data, $ds, $config) {
     $context['template_type'] = $type;
-    return \hook::invoke_filter('modify_template_context', $context, $data, $ds, $config);
+    return hook::invoke_filter('modify_template_context', $context, $data, $ds, $config);
 }
 
 function path_asset($asset, $cachebust = false) {

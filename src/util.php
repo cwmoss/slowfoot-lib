@@ -1,8 +1,7 @@
 <?php
-require_once(__DIR__."/console.php");
+require_once(__DIR__ . "/console.php");
 
-function send_file($base, $file)
-{
+function send_file($base, $file) {
     $name = basename($file);
     $full = $base . '/' . $file;
 
@@ -29,22 +28,22 @@ function send_file($base, $file)
 
     $type = $types[$ext];
 
-    if ($ext=='css') {
+    if ($ext == 'css') {
         $scss = $full . '.scss';
         if (file_exists($scss)) {
             // die(" sassc $scss $full");
             //print "sassc $scss $full";
-            $resp = shell_command('sassc {in} {out} 2>&1', ['in'=>$scss, 'out'=>$full]);
+            $resp = shell_command('sassc {in} {out} 2>&1', ['in' => $scss, 'out' => $full]);
             // $ok = `sassc $scss $full`;
-            if ($resp[1]!==0) {
+            if ($resp[1] !== 0) {
                 dbg("[sassc] error", $resp);
             }
             //var_dump($ok);
         }
-    } 
-    header('Content-Type: '.$type);
+    }
+    header('Content-Type: ' . $type);
 
-    if ($ext=='html'){
+    if ($ext == 'html') {
         header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
         header('Cache-Control: post-check=0, pre-check=0', false);
         header('Pragma: no-cache');
@@ -54,8 +53,7 @@ function send_file($base, $file)
     readfile($full);
 }
 
-function send_asset_file($base, $file, $orig, $cache)
-{
+function send_asset_file($base, $file, $orig, $cache) {
     $full = $base . '/' . $file;
     $full = str_replace($orig, $cache, $full);
     dbg('+++ asset route', $full);
@@ -69,8 +67,7 @@ function send_asset_file($base, $file, $orig, $cache)
     }
 }
 
-function dbg($txt, ...$vars)
-{
+function dbg($txt, ...$vars) {
     // im servermodus wird der zeitstempel automatisch gesetzt
     //	$log = [date('Y-m-d H:i:s')];
     $log = [];
@@ -79,19 +76,17 @@ function dbg($txt, ...$vars)
     } else {
         $log[] = $txt;
     }
-    $log[] = join(' ~ ', array_map(fn ($v) =>json_encode($v, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), $vars));
+    $log[] = join(' ~ ', array_map(fn ($v) => json_encode($v, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), $vars));
     error_log(join(' ', $log));
 }
 
-function markdown($text)
-{
+function markdown($text) {
     $parser = new Parsedown();
     //$parser->setUrlsLinked(false);
     return $parser->text($text);
 }
 
-function fetch($url, $data)
-{
+function fetch($url, $data) {
     if (is_array($data)) {
         $data = json_encode($data);
     }
@@ -100,7 +95,7 @@ function fetch($url, $data)
             'method' => 'POST',
             'content' => $data,
             'header' => "Content-Type: application/json\r\n" .
-                        "Accept: application/json\r\n"
+                "Accept: application/json\r\n"
         ]
     ];
 
@@ -110,15 +105,14 @@ function fetch($url, $data)
     return $response;
 }
 
-function globstar($pattern, $flags = 0)
-{
+function globstar($pattern, $flags = 0) {
     if (stripos($pattern, '**') === false) {
         $files = glob($pattern, $flags);
     } else {
         $position = stripos($pattern, '**');
         $rootPattern = substr($pattern, 0, $position - 1);
         $restPattern = substr($pattern, $position + 2);
-        $patterns = array($rootPattern.$restPattern);
+        $patterns = array($rootPattern . $restPattern);
         $rootPattern .= '/*';
         while ($dirs = glob($rootPattern, GLOB_ONLYDIR)) {
             $rootPattern .= '/*';
@@ -136,14 +130,13 @@ function globstar($pattern, $flags = 0)
     return $files;
 }
 
-function shell_info($start=null, $single=false)
-{
+function shell_info($start = null, $single = false) {
     static $stime;
     static $console;
 
     // last resort to non-cli stuff
     if (PHP_SAPI != 'cli') {
-        if(!(defined('SLOWFOOT_WEBDEPLOY') && SLOWFOOT_WEBDEPLOY)){
+        if (!(defined('SLOWFOOT_WEBDEPLOY') && SLOWFOOT_WEBDEPLOY)) {
             return;
         }
     }
@@ -169,49 +162,44 @@ function shell_info($start=null, $single=false)
     }
 }
 
-function nice_elapsed_time($elapsed)
-{
+function nice_elapsed_time($elapsed) {
     $nice = [
         'time' => $elapsed,
         's' => (int) $elapsed,
         'ms' => (int)($elapsed * 1000),
         'micro' => (int)($elapsed * 1000 * 1000),
     ];
-    $nice['print'] = $nice['s']?
-        $nice['s']. ' s'
-        : ($nice['ms']?$nice['ms'].' ms':$nice['micro'].' μs');
+    $nice['print'] = $nice['s'] ?
+        $nice['s'] . ' s'
+        : ($nice['ms'] ? $nice['ms'] . ' ms' : $nice['micro'] . ' μs');
     return $nice;
 }
 
 // output zur browser console
-function console_log(...$data)
-{
+function console_log(...$data) {
     //func_get_args()
     $out = ["<script>", "console.info('%cPHP console', 'font-weight:bold;color:green;');"];
     foreach ($data as $d) {
-        $out[] = 'console.log('.json_encode($d).');';
+        $out[] = 'console.log(' . json_encode($d) . ');';
     }
     $out[] = "</script>";
     print(join("", $out));
 }
-function debug_js($k=null, $v=null)
-{
-    static $vars=[];
+function debug_js($k = null, $v = null) {
+    static $vars = [];
     if (is_null($k) && is_null($v)) {
         return json_encode($vars, JSON_PRETTY_PRINT);
     }
     $vars[$k] = $v;
 }
 
-function include_to_buffer($incl)
-{
+function include_to_buffer($incl) {
     ob_start();
     include $incl;
     return ob_get_clean();
 }
 
-function dot_get($data, $path, $default=null)
-{
+function dot_get($data, $path, $default = null) {
     $val = $data;
     $path = explode(".", $path);
     #print_r($path);
@@ -230,14 +218,13 @@ function dot_get($data, $path, $default=null)
     i imports
     c css
 */
-function assets_from_manifest($manifest_base, $prefix="", $entry="", $parts='m')
-{
+function assets_from_manifest($manifest_base, $prefix = "", $entry = "", $parts = 'm') {
     #print $manifest_base;
     #return "hoho";
 
     $content = file_get_contents($manifest_base . '/manifest.json');
     $man = json_decode($content, true);
-    $entry = $entry?$man[$entry]:$man[key($man)];
+    $entry = $entry ? $man[$entry] : $man[key($man)];
 
     $main = '<script type="module" crossorigin src="%s"></script>';
     $import = '<link rel="modulepreload" href="%s">';
@@ -246,45 +233,51 @@ function assets_from_manifest($manifest_base, $prefix="", $entry="", $parts='m')
         sprintf($main, man_asset_url($entry, $prefix))
     ];
 
-    if (strpos($parts, 'i')!==false) {
+    if (strpos($parts, 'i') !== false) {
         $tags = array_merge($tags, array_map(function ($url) use ($import) {
             return sprintf($import, $url);
         }, man_imports_urls($entry, $man, $prefix)));
     }
-    if (strpos($parts, 'c')!==false) {
+    if (strpos($parts, 'c') !== false) {
         $tags = array_merge($tags, array_map(function ($url) use ($css) {
             return sprintf($css, $url);
         }, man_css_urls($entry, $prefix)));
     }
-  
+
     return join("\n", $tags);
 }
 
-function man_asset_url($entry, $prefix="")
-{
+function man_asset_url($entry, $prefix = "") {
     return isset($entry['file'])
-        ? $prefix.'/'.$entry['file']
+        ? $prefix . '/' . $entry['file']
         : '';
 }
 
-function man_imports_urls($entry, $manifest, $prefix="")
-{
+function man_imports_urls($entry, $manifest, $prefix = "") {
     $urls = [];
     if (!empty($entry['imports'])) {
         foreach ($entry['imports'] as $imports) {
-            $urls[] = $prefix.'/'.$manifest[$imports]['file'];
+            $urls[] = $prefix . '/' . $manifest[$imports]['file'];
         }
     }
     return $urls;
 }
 
-function man_css_urls($entry, $prefix="")
-{
+function man_css_urls($entry, $prefix = "") {
     $urls = [];
     if (!empty($entry['css'])) {
         foreach ($entry['css'] as $file) {
-            $urls[] = $prefix.'/'.$file;
+            $urls[] = $prefix . '/' . $file;
         }
     }
     return $urls;
+}
+
+if (!function_exists('is_assoc')) {
+    function is_assoc(array $arr) {
+        if ([] === $arr) {
+            return false;
+        }
+        return array_keys($arr) !== range(0, count($arr) - 1);
+    }
 }

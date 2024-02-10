@@ -42,6 +42,7 @@ class configuration {
     public function __construct(
         public string $site_name = "",
         public string $site_url = "",
+        public string $site_description = "",
         public string $path_prefix = "",
         public string $title_template = "",
         public array $sources = [],
@@ -50,6 +51,7 @@ class configuration {
         public array $hooks = [],
         public array $assets = [],
         public array $plugins = [],
+        public array $preview = [],
         public string|array $build = ['dist' => 'dist'],
     ) {
     }
@@ -69,10 +71,17 @@ class configuration {
         $this->assets = $this->normalize_assets_config($this->assets);
         $this->store = $this->normalize_store_config();
         // $this->plugins = $this->normalize_plugins_config();
-        $this->build = $this->normalize_build_config();
+        $this->build = $this->normalize_build_config($this->build);
     }
 
-
+    public function get_store(): store {
+        if (strpos($this->store['adapter'], 'sqlite') === 0) {
+            $db = new store_sqlite($this->store);
+        } else {
+            $db = new store_memory();
+        }
+        return new store($db, $this->templates);
+    }
 
     // TODO:
     //  require in global context?
@@ -201,34 +210,9 @@ function url_safe($path) {
     return $path;
 }
 
-function xload_data($sources, $hooks) {
-    $db = [];
-    $loaded = $rejected = [];
-    foreach (file($dataset) as $line) {
-        $row = json_decode($line, true);
-        $otype = $row['_type'];
-        if ($hooks['on_load']) {
-            $row = $hooks['on_load']($row, $db);
-        }
-        if (!$row) {
-            $rejected[$otype]++;
-        } else {
-            $db[$row['_id']] = $row;
-            $loaded[$row['_type']]++;
-        }
-    }
-    $db['_info'] = ['loaded' => $loaded, 'rejected' => $rejected];
-    return $db;
-}
 
-function get_store($config) {
-    if (strpos($config['store']['adapter'], 'sqlite') === 0) {
-        $db = new store_sqlite($config['store']);
-    } else {
-        $db = new store_memory();
-    }
-    return new store($db, $config['templates']);
-}
+
+
 function load_data($sources, $hooks, $config) {
     $db = get_store($config);
     $db_store = get_class($db->db);

@@ -3,6 +3,7 @@
 namespace slowfoot\template;
 
 use function lolql\parse;
+use slowfoot\hook;
 
 function process_template($id, $path) {
     global $templates;
@@ -207,7 +208,7 @@ function load_late_template_helper($helper, $base, $data, $context) {
 
     $helper = array_merge($helper, $additional_helper_for_partials);
 
-    foreach (\hook::invoke('bind_late_template_helper', [], $helper, $base, $data) as $hlp) {
+    foreach (hook::invoke('bind_late_template_helper', [], $helper, $base, $data) as $hlp) {
         $helper[$hlp[0]] = $hlp[1];
     }
 

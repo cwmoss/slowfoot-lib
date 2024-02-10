@@ -2,7 +2,7 @@
 //print_r($_SERVER);
 define('PATH_PREFIX', dirname($_SERVER['SCRIPT_NAME']));
 
-require __DIR__ . '/boot.php';
+require __DIR__ . '/_boot.php';
 
 $hr = true;
 $hr_host = $_SERVER['HTTP_HOST'];

@@ -1,5 +1,5 @@
 <?php
-require __DIR__ . '/boot.php';
+require __DIR__ . '/_boot.php';
 #require_once __DIR__.'/../vendor/autoload.php';
 #dbg("++start");
 require_once __DIR__ . '/utils_server.php';
@@ -138,7 +138,7 @@ $router->post('/__fun/(.*)', function ($requestpath) use ($router, $ds) {
 
 #dbg("++ image path", $config['assets']['path']);
 
-$router->get($config['assets']['path'] . '/' . '(.*\.\w{1,5})', function ($requestpath) use ($router, $ds, $config) {
+$router->get($config->assets['path'] . '/' . '(.*\.\w{1,5})', function ($requestpath) use ($router, $ds, $config) {
     dbg('[dev] asssets', $requestpath);
     $docbase = $_SERVER['DOCUMENT_ROOT'] . '/../var/rendered-images';
     #dbg("++ image path base", $docbase, $requestpath);
@@ -168,9 +168,9 @@ $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages
         'mode' => 'dev',
         'src' => $src,
         'path' => $requestpath,
-        'site_name' => $config['site_name'] ?? '',
-        'site_description' => $config['site_description'] ?? '',
-        'site_url' => $config['site_url'] ?? '',
+        'site_name' => $config->site_name,
+        'site_description' => $config->site_description,
+        'site_url' => $config->site_url,
 
     ];
 
@@ -178,14 +178,14 @@ $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages
         $obj = $ds->get($obj_id);
 
         // $template = $templates[$obj['_type']][$name]['template'];
-        $template = template_name($config['templates'], $obj['_type'], $name);
+        $template = template_name($config->templates, $obj['_type'], $name);
         #dbg('template', $template, $obj);
         $content = template(
             $template,
             [
                 'page' => $obj,
                 'path' => $ds->get_path($obj_id, $name),
-                'template_config' => $config['templates'][$obj['_type']][$name], //TODO
+                'template_config' => $config->templates[$obj['_type']][$name], //TODO
                 'path_name' => $name
             ],
             $template_helper,
