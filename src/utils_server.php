@@ -330,11 +330,10 @@ function find_free_port(int $start = 10101, string $host = 'localhost'): int {
     $end = $start + 20;
     for ($port = $start; $port < $end; $port++) {
         $connection = @fsockopen($host, $port);
-
         if (is_resource($connection)) {
             fclose($connection);
+            return $port;
         }
-        return $port;
     }
     throw new OutOfBoundsException("could not find a free port");
 }
