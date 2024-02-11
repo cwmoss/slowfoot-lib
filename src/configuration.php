@@ -3,13 +3,7 @@
 namespace slowfoot;
 
 require_once 'lolql.php';
-require_once 'store.php';
-require_once 'store_memory.php';
-require_once 'store_sqlite.php';
 require_once 'JsConverter.php';
-require_once 'template.php';
-require_once 'hook.php';
-
 
 use slowfoot\store;
 use slowfoot\store\memory;

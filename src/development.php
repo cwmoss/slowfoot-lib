@@ -10,6 +10,7 @@ use function slowfoot\template\remove_tags;
 use function slowfoot\template\preprocess;
 
 use Bramus\Router\Router;
+use slowfoot\context;
 use slowfoot\pagebuilder;
 
 #dbg("++start");
@@ -168,20 +169,17 @@ $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages
     #dbg("dev: req", $requestpath);
     [$obj_id, $name] = $ds->get_by_path($requestpath);
 
-    $context = [
-        'mode' => 'dev',
-        'src' => $src,
-        'path' => $requestpath,
-        'site_name' => $config->site_name,
-        'site_description' => $config->site_description,
-        'site_url' => $config->site_url,
-
-    ];
+    $context = new context(
+        mode: 'dev',
+        src: $src,
+        path: $requestpath,
+        config: $config
+    );
 
     if ($obj_id) {
         $content = $builder->make_template($obj_id, $name, $context);
     } else {
-        list($dummy, $pagename, $pagenr) = explode('/', $requestpath);
+        list($dummy, $pagename, $pagenr) = explode('/', $requestpath) + [2 => 0];
         $pagename = '/' . $pagename;
         if ($pagename == '') {
             //    $pagename='/index';

@@ -13,9 +13,9 @@ class template {
     public function __construct(public configuration $config) {
     }
 
-    public function run(string $_template, array $data, array $helper, array $__context): string {
+    public function run(string $_template, array $data, array $helper, context $__context): string {
         #var_dump($__context);
-        $_base = $__context['src'];
+        $_base = $__context->src;
         extract($data);
         extract($helper);
 
@@ -29,7 +29,7 @@ class template {
         extract($this->load_late_template_helper($helper, $_base, $data, $_context));
 
         collect_data();
-        collect_data('meta', $_context, true);
+        collect_data('meta', (array) $_context, true);
         self::layout('-');
         ob_start();
         include $_base . '/templates/' . $_template . '.php';
@@ -43,8 +43,8 @@ class template {
         return $content;
     }
 
-    public function run_page(string $_template, array $data, array $helper, array $__context): string {
-        $_base = $__context['src'];
+    public function run_page(string $_template, array $data, array $helper, context $__context): string {
+        $_base = $__context->src;
 
         extract($data);
         extract($helper);
@@ -59,7 +59,7 @@ class template {
         extract($this->load_late_template_helper($helper, $_base, $data, $_context));
 
         collect_data();
-        collect_data('meta', $_context, true);
+        collect_data('meta', (array) $_context, true);
         self::layout('-');
         ob_start();
         include $_base . '/pages/' . $_template . '.php';
@@ -87,7 +87,7 @@ class template {
         return $layout;
     }
 
-    public function partial($base, $template, $data = [], $helper = [], $_context = [], $non_existent = "") {
+    public function partial($base, $template, context $context, array $data = [], array $helper = [], $non_existent = "") {
         extract($data);
         extract($helper);
         extract($this->load_late_template_helper($helper, $base, $data, $_context));
@@ -104,17 +104,16 @@ class template {
 
     public function get_context(
         string $name,
-        array $context,
+        context $context,
         array $props,
         array $data,
         array $helper
-    ): array {
-        $name = trim($name, '/');
-        $context = array_merge($context, $props, ['name' => $name]);
+    ): context {
+        $context = $context->with(['name' => trim($name, '/')] + $props);
         return $context;
     }
 
-    public function load_late_template_helper($helper, $base, $data, $context) {
+    public function load_late_template_helper($helper, $base, $data, context $context) {
         $additional_helper_for_partials = [
             // global $p('pagekey.subkey.etc') function
             'p' => function ($dot_path, $default = null) use ($data) {
@@ -139,7 +138,7 @@ class template {
                     return dot_get($data, $dot_path, $default);
                 };
 
-                return $this->partial($base, $template, $data, $helper, $context, $non_existent);
+                return $this->partial($base, $template, $context, $data, $helper,  $non_existent);
             },
         ]);
     }
