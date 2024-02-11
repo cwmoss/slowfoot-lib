@@ -9,6 +9,9 @@ use function slowfoot\template\template;
 use function slowfoot\template\remove_tags;
 use function slowfoot\template\preprocess;
 
+use Bramus\Router\Router;
+use slowfoot\pagebuilder;
+
 #dbg("++start");
 #dbg("SERVER", $_SERVER);
 ini_set("precision", 16);
@@ -23,7 +26,7 @@ if (PHP_SAPI == 'cli-server') {
     }
 }
 
-$router = new \Bramus\Router\Router();
+$router = new Router();
 
 $hr = false;
 $debug = true;
@@ -161,6 +164,7 @@ $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages
     if ($requestpath == '/' || $requestpath == '') {
         $requestpath = '/index';
     }
+    $builder = new pagebuilder($config, $ds, $template_helper);
     #dbg("dev: req", $requestpath);
     [$obj_id, $name] = $ds->get_by_path($requestpath);
 
@@ -175,24 +179,7 @@ $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages
     ];
 
     if ($obj_id) {
-        $obj = $ds->get($obj_id);
-
-        // $template = $templates[$obj['_type']][$name]['template'];
-        $template = template_name($config->templates, $obj['_type'], $name);
-        #dbg('template', $template, $obj);
-        $content = template(
-            $template,
-            [
-                'page' => $obj,
-                'path' => $ds->get_path($obj_id, $name),
-                'template_config' => $config->templates[$obj['_type']][$name], //TODO
-                'path_name' => $name
-            ],
-            $template_helper,
-            template_context('template', $context, $obj, $ds, $config)
-        );
-        debug_js("page", $obj);
-        debug_js("meta", \collect_data('meta', true));
+        $content = $builder->make_template($obj_id, $name, $context);
     } else {
         list($dummy, $pagename, $pagenr) = explode('/', $requestpath);
         $pagename = '/' . $pagename;
@@ -202,47 +189,7 @@ $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages
 
         dbg('page...', $pagename, $pagenr, $requestpath);
         $obj_id = array_search($pagename, $pages);
-        #$pagination_query = check_pagination($pagename, $src);
-        $pp = preprocess($pagename, $src);
-        #dbg('page query', $pp);
-        if ($page_query = ($pp['page-query'] ?? null)) {
-            //var_dump($paginate);
-            dbg('[page] query', $page_query);
-            if ($page_query['paginate']) {
-                [$info, $pagequery] = $ds->query_paginated($page_query['__content'], $page_query['paginate'], []);
-
-                //foreach (range(1, $pages) as $page) {
-                $qres = $pagequery($pagenr);
-                $pagination = pagination($info, $pagenr ?: 1);
-                //}
-            } else {
-                $pagination = [];
-                $qres = $ds->query($page_query['__content']);  // query_page($ds, $pagination_query, $pagenr);
-            }
-
-            #var_dump($qres);
-            //print_r($coll);
-            $content = page(
-                $pagename,
-                ['page' => $qres, 'pagination' => $pagination],
-                $template_helper,
-                template_context('page', $context, $qres, $ds, $config)
-            );
-            $content = remove_tags($content, ['page-query']);
-
-            debug_js("page", $qres);
-            debug_js("meta", \collect_data('meta', true));
-        } else {
-            $content = page(
-                $requestpath,
-                [],
-                $template_helper,
-                template_context('page', $context, [], $ds, $config)
-            );
-
-            debug_js("page", []);
-            debug_js("meta", \collect_data('meta', true));
-        }
+        $content = $builder->make_page($pagename, $pagenr, $requestpath, $context);
     }
     $debug = true;
     if ($debug) {

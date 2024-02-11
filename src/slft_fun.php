@@ -79,13 +79,7 @@ function build_sorter($key) {
         return strnatcasecmp($a[$key], $b[$key]);
     };
 }
-function pagination($info, $page) {
-    return array_merge($info, [
-        'page' => $page,
-        'prev' => ($page - 1) ?: null,
-        'next' => (($page + 1) <= $info['totalpages']) ? ($page + 1) : null
-    ]);
-}
+
 
 function chunked_paginate($ds, $rule) {
     $limit = $rule['limit'] ?? 20;
@@ -184,14 +178,6 @@ function slow_query_cmd($q) {
     return json_decode($res, true);
 }
 
-function template_name($tconfig, $type, $name) {
-    return $tconfig[$type][$name]['template'];
-}
-
-function template_context($type, $context, $data, $ds, $config) {
-    $context['template_type'] = $type;
-    return hook::invoke_filter('modify_template_context', $context, $data, $ds, $config);
-}
 
 function path_asset($asset, $cachebust = false) {
     return PATH_PREFIX . $asset . cachebuster($cachebust);
@@ -250,7 +236,7 @@ function remove_stop_words($text) {
 }
 
 function layout($name = null) {
-    return \slowfoot\template\layout($name);
+    return \slowfoot\template::layout($name);
 }
 
 function get_absolute_path_from_base($path, $current, $base) {

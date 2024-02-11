@@ -8,9 +8,9 @@ INSERT INTO docs_fts(_id, btext)
 
 */
 
-namespace slowfoot;
+namespace slowfoot\store;
 
-class store_sqlite {
+class sqlite {
     public $data = [];
 
     // key: _id, value: [path_name => path]
