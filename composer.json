@@ -12,6 +12,9 @@
       "slowfoot\\": "src"
     }
   },
+  "bin": [
+    "bin/slowfoot"
+  ],
   "require": {
     "spatie/async": "^1.5",
     "erusev/parsedown": "^1.7",

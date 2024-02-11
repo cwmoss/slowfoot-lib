@@ -1,0 +1,2 @@
+<?php
+print "huhu " . __DIR__;

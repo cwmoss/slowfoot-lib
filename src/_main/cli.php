@@ -1,5 +1,5 @@
 <?php
-$slft_lib_base = __DIR__;
+$slft_lib_base = dirname(__DIR__);
 
 $doc = <<<DOC
 slowfoot.
@@ -61,7 +61,7 @@ if ($args['dev']) {
     $devserver = join(":", $devserver);
 
     // evtl. fetching data
-    require __DIR__ . '/_boot.php';
+    require $slft_lib_base . '/_boot.php';
 
     print console_table(['_type' => 'type', 'total' => 'total'], $ds->info());
 
@@ -70,7 +70,7 @@ if ($args['dev']) {
     // this works!
     # automatisches öffnen gefällt mir nicht mehr
     # shell_exec('(sleep 1 ; open http://localhost:1199/ ) 2>/dev/null >/dev/null &');
-    $command = "XXXPHP_CLI_SERVER_WORKERS=4 php -d short_open_tag=On -S {$devserver} -t {$dev_src} {$slft_lib_base}/development.php";
+    $command = "XXXPHP_CLI_SERVER_WORKERS=4 php -d short_open_tag=On -S {$devserver} -t {$dev_src} {$slft_lib_base}/_main/development.php";
     print "\n\n";
 
     print "starting development server\n\n";
@@ -93,9 +93,9 @@ if ($args['build']) {
         $PDIR = SLOWFOOT_BASE . '/' . $PDIR;
     }
 
-    require __DIR__ . '/_boot.php';
-    include 'build.php';
+    require $slft_lib_base . '/_boot.php';
+    include $slft_lib_base . '/build.php';
 }
 if ($args['setup']) {
-    include 'setup.php';
+    include $slft_lib_base . '/setup.php';
 }
