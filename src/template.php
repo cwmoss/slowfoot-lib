@@ -87,7 +87,7 @@ class template {
         return $layout;
     }
 
-    public function partial($base, $template, context $context, array $data = [], array $helper = [], $non_existent = "") {
+    public function partial($base, $template, context $_context, array $data = [], array $helper = [], $non_existent = "") {
         extract($data);
         extract($helper);
         extract($this->load_late_template_helper($helper, $base, $data, $_context));

@@ -34,7 +34,7 @@ class pagebuilder {
                 'path_name' => $name
             ],
             $this->helper,
-            $this->template_context('template', $context, $obj, $this->ds, $this->config)
+            $context->with('template_type', 'template')
         );
         debug_js("page", $obj);
         debug_js("meta", \collect_data('meta', true));
@@ -48,7 +48,7 @@ class pagebuilder {
         context $context
     ): string {
         #$pagination_query = check_pagination($pagename, $src);
-        $pp = $this->engine->preprocess($pagename, $context['src']);
+        $pp = $this->engine->preprocess($pagename, $context->src);
         #dbg('page query', $pp);
         if ($page_query = ($pp['page-query'] ?? null)) {
             //var_dump($paginate);

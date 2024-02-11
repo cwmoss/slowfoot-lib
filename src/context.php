@@ -5,6 +5,7 @@ namespace slowfoot;
 class context {
 
     public function __construct(
+        public configuration $config,
         public string $name = '',
         public string $mode = 'build',
         public string $template_type = 'page',
@@ -12,7 +13,6 @@ class context {
         public string $path = '',
         public bool $is_template = false,
         public bool $is_page = true,
-        public configuration $config
     ) {
     }
 

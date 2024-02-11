@@ -2,9 +2,8 @@
 
 namespace slowfoot;
 
-class store
-{
-   
+class store {
+
     // key: _id, value: [path_name => path]
     public $paths = [];
     // key: path, value: [_id, path_name]
@@ -16,26 +15,22 @@ class store
 
     public $db;
 
-    public function __construct($db, $config)
-    {
+    public function __construct($db, $config) {
         $this->db = $db;
         $this->config = $config;
     }
 
-    public function has_data_on_create()
-    {
+    public function has_data_on_create() {
         return $this->db->has_data_on_create();
     }
 
-    public function query_sql($q, $params)
-    {
+    public function query_sql($q, $params) {
         return $this->db->query_sql($q, $params);
     }
 
-    public function query_paginated($q, $limit, $params=[])
-    {
+    public function query_paginated($q, $limit, $params = []) {
         [$total, $page_query] = $this->db->query_paginated($q, $limit, $params);
-        $totalpages = ceil($total/$limit);
+        $totalpages = ceil($total / $limit);
         $info = [
             'total' => $total,
             'totalpages' => $totalpages,
@@ -45,39 +40,37 @@ class store
         return [$info, $page_query];
     }
 
-    public function query($q, $params=[])
-    {
+    public function query($q, $params = []) {
         return $this->db->query($q, $params);
     }
 
-    public function query_type($type)
-    {
+    public function query_type($type) {
         return $this->db->query_type($type);
     }
 
-    public function data()
-    {
+    public function data() {
         return $this->db->data();
     }
 
-    public function get($id)
-    {
-        if (is_array($id)) {
+    public function get($id) {
+        if (is_object($id)) {
+            $id = $id->_id;
+        } elseif (is_array($id)) {
             $id = $id['_id'];
         }
         return $this->db->get('docs', $id);
     }
 
-    public function ref($id)
-    {
-        if (is_array($id)) {
+    public function ref($id) {
+        if (is_object($id)) {
+            $id = $id->_ref;
+        } elseif (is_array($id)) {
             $id = $id['_ref'];
         }
         return $this->db->get('docs', $id);
     }
 
-    public function add($id, $row)
-    {
+    public function add($id, $row) {
         if ($this->db->exists("docs", $id)) {
             return false;
         }
@@ -89,13 +82,11 @@ class store
         return true;
     }
 
-    public function add_row($row)
-    {
+    public function add_row($row) {
         return $this->add($row['_id'], $row);
     }
 
-    public function update($id, $row)
-    {
+    public function update($id, $row) {
         if (!$this->db->exists("docs", $id)) {
             return false;
         }
@@ -103,24 +94,21 @@ class store
         return $this->db->update("docs", $id, $row);
     }
 
-    public function update_row($row)
-    {
+    public function update_row($row) {
         return $this->update($row['_id'], $row);
     }
 
-    public function add_ref($src_id, $src_prop, $dest)
-    {
-        if (is_array($src_id)) {
-            $src_id = $src_id['_id'];
+    public function add_ref($src_id, $src_prop, $dest) {
+        if (is_object($src_id)) {
+            $src_id = $src_id->_id;
         }
-        if (is_array($dest)) {
-            $dest = $dest['_id'];
+        if (is_object($dest)) {
+            $dest = $dest->_id;
         }
         $this->db->add_ref($src_id, $src_prop, $dest);
     }
 
-    public function add_path($row)
-    {
+    public function add_path($row) {
         //print ' type: ' . $row['_type'];
         // only, if we have a template for the type
         if (!$this->config[$row['_type']]) {
@@ -137,14 +125,14 @@ class store
         }
     }
 
-    public function get_path($id, $name = null)
-    {
+    public function get_path($id, $name = null) {
         return PATH_PREFIX . $this->get_fpath($id, $name);
     }
 
-    public function get_fpath($id, $name = null)
-    {
-        if (is_array($id)) {
+    public function get_fpath(string|array|object $id, $name = null) {
+        if (is_object($id)) {
+            $id = $id->_id;
+        } elseif (is_array($id)) {
             $id = $id['_id'];
         }
         if (!$name) {
@@ -153,23 +141,19 @@ class store
         return $this->db->path_get($id, $name);
     }
 
-    public function get_by_path($path)
-    {
+    public function get_by_path($path) {
         return $this->db->path_get_props($path);
     }
 
-    public function rejected($type)
-    {
+    public function rejected($type) {
         $this->info['rejected'][$type]++;
     }
 
-    public function info()
-    {
+    public function info() {
         return $this->db->info();
     }
-    
-    private function conflict($path, $name, $row)
-    {
+
+    private function conflict($path, $name, $row) {
         [$firstid, $firstname] = $this->get_by_path($path);
         $first = $this->get($firstid);
 
