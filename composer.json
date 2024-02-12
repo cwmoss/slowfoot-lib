@@ -3,10 +3,9 @@
   "version": "1.0",
   "autoload": {
     "files": [
-      "src/util.php",
-      "src/utils_html.php",
-      "src/image.php",
-      "src/slft_fun.php"
+      "src/_functions.php",
+      "src/lolql/lolql.php",
+      "src/image.php"
     ],
     "psr-4": {
       "slowfoot\\": "src"

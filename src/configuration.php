@@ -2,16 +2,11 @@
 
 namespace slowfoot;
 
-require_once 'lolql.php';
-require_once 'JsConverter.php';
-
 use OutOfRangeException;
 use slowfoot\store;
 use slowfoot\store\memory;
 use slowfoot\store\sqlite;
 use slowfoot\loader;
-
-use Ovidigital\JsObjectToJson\JsConverter;
 use slowfoot\template;
 
 use function lolql\parse;

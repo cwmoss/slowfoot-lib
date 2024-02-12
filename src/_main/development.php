@@ -1,7 +1,7 @@
 <?php
 require __DIR__ . '/../_boot.php';
-require_once __DIR__ . '/../utils_server.php';
 
+use slowfoot\util\console;
 use function slowfoot\template\page;
 use function slowfoot\template\template;
 use function slowfoot\template\remove_tags;

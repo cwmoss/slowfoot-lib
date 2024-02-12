@@ -2,6 +2,7 @@
 
 namespace slowfoot\loader;
 
+use Exception;
 use slowfoot\configuration;
 use OviDigital\JsObjectToJson\JsConverter;
 
@@ -14,6 +15,9 @@ class csv extends file {
         public bool $json = false,
         public bool $jsol = false
     ) {
+        if ($jsol && !class_exists(JsConverter::class)) {
+            throw new Exception("JsConverter class is missing. please install with: composer require ovidigital/js-object-to-json");
+        }
     }
     public function __invoke(configuration $config) {
         $file = $config->base . '/' . $this->file;

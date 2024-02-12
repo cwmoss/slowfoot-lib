@@ -7,6 +7,7 @@
 
 use slowfoot\configuration;
 
+new slowfoot\error_handler;
 
 ini_set('display_errors', 0);
 if (!defined('SLOWFOOT_BASE')) {

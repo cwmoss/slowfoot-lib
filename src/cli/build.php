@@ -1,11 +1,13 @@
 <?php
 
+use slowfoot\util\console;
+
 use function slowfoot\template\page;
 use function slowfoot\template\template;
 use function slowfoot\template\remove_tags;
 use function slowfoot\template\preprocess;
 
-$console = console();
+$console = console::console();
 
 print memory_get_usage() . " paths ok\n";
 
@@ -24,7 +26,7 @@ if (!$dist) {
 # print_r($ds->info);
 #print_r($ds->db->paths_rev);
 #exit;
-print console_table(['_type' => 'type', 'total' => 'total'], $ds->info());
+print console::console_table(['_type' => 'type', 'total' => 'total'], $ds->info());
 
 
 

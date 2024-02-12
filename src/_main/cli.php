@@ -1,4 +1,7 @@
 <?php
+
+use slowfoot\util\console;
+
 $slft_lib_base = dirname(__DIR__);
 
 $doc = <<<DOC
@@ -63,7 +66,7 @@ if ($args['dev']) {
     // evtl. fetching data
     require $slft_lib_base . '/_boot.php';
 
-    print console_table(['_type' => 'type', 'total' => 'total'], $ds->info());
+    print console::console_table(['_type' => 'type', 'total' => 'total'], $ds->info());
 
     // this wont work :)
     // `(sleep 1 ; open http://localhost:1199/ )&`;
@@ -94,8 +97,8 @@ if ($args['build']) {
     }
 
     require $slft_lib_base . '/_boot.php';
-    include $slft_lib_base . '/build.php';
+    require $slft_lib_base . '/cli/build.php';
 }
 if ($args['setup']) {
-    include $slft_lib_base . '/setup.php';
+    require $slft_lib_base . '/cli/setup.php';
 }

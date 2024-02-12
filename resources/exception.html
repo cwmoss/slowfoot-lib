@@ -1,0 +1,62 @@
+<?php
+// data_url(__DIR__ . '/images/exception-1.jpg', 'image/jpg')
+
+?>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boot Error</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+                Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            box-sizing: border-box;
+            /* background-image: "";
+            background-size: cover;
+            */
+        }
+
+        main {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: row;
+            column-gap: 20px;
+        }
+
+        section {
+            max-width: 45ch;
+            background-color: white;
+            padding: 1em;
+            margin-top: -10em;
+        }
+
+        .container img {
+            width: 420px;
+        }
+
+        .text {
+            display: block;
+            padding: 40px 40px;
+            width: 450px;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <section>
+            <h1>500</h1>
+            <p><?= $message ?></p>
+            <code>
+                <pre><?= $trace ?></pre>
+            </code>
+        </section>
+    </main>
+</body>
+
+</html>
