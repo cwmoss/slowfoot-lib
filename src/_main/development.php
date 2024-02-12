@@ -1,9 +1,7 @@
 <?php
-require __DIR__ . '/_boot.php';
-#require_once __DIR__.'/../vendor/autoload.php';
-#dbg("++start");
-require_once __DIR__ . '/utils_server.php';
-#dbg("++start");
+require __DIR__ . '/../_boot.php';
+require_once __DIR__ . '/../utils_server.php';
+
 use function slowfoot\template\page;
 use function slowfoot\template\template;
 use function slowfoot\template\remove_tags;
@@ -105,14 +103,14 @@ $router->mount('/__api', function () use ($router, $ds, $config, $src, $template
 
 $router->mount('/__ui', function () use ($router, $ds) {
     $router->get('/', function () use ($router, $ds) {
-        $uibase = __DIR__ . '/../ui/build';
+        $uibase = __DIR__ . '/../../ui/build';
         #dbg("+++ ui index ++++", $uibase);
         send_file($uibase, 'index.html');
         exit;
     });
 
     $router->get('(.*)?', function ($file) use ($router, $ds) {
-        $uibase = __DIR__ . '/../ui/build';
+        $uibase = __DIR__ . '/../../ui/build';
         $uifile = $uibase . '/' . $file;
         dbg("__ui file00", $file, $uifile);
 
@@ -129,7 +127,7 @@ $router->mount('/__ui', function () use ($router, $ds) {
 });
 
 $router->get('/__sf/(.*)', function ($requestpath) use ($router, $ds) {
-    $docbase = __DIR__ . '/assets';
+    $docbase = __DIR__ . '/../../resources';
     send_file($docbase, $requestpath);
     exit;
 });
@@ -191,7 +189,7 @@ $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages
     }
     $debug = true;
     if ($debug) {
-        $inspector = include_to_buffer(__DIR__ . '/assets/debug.php');
+        $inspector = include_to_buffer(__DIR__ . '/../../resources/debug.php');
         $inspector_css = '<link rel="stylesheet" href="/__sf/inspector-json.css">';
         $content = str_replace('</head>', $inspector_css . '</head>', $content);
         $content = str_replace('</body>', $inspector . '</body>', $content);

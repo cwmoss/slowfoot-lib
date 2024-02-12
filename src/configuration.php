@@ -5,6 +5,7 @@ namespace slowfoot;
 require_once 'lolql.php';
 require_once 'JsConverter.php';
 
+use OutOfRangeException;
 use slowfoot\store;
 use slowfoot\store\memory;
 use slowfoot\store\sqlite;
@@ -68,7 +69,7 @@ class configuration {
         }
         $this->assets = $this->normalize_assets_config($this->assets);
         $this->store = $this->normalize_store_config();
-        // $this->plugins = $this->normalize_plugins_config();
+        $this->plugins = $this->init_plugins();
         $this->build = $this->normalize_build_config($this->build);
     }
 
@@ -92,32 +93,17 @@ class configuration {
     //  do wee need a plugin init /w pconf?
     //  plugin via composer?
     //  raise error?
-    function normalize_plugins_config($conf) {
-        $plugins = $conf['plugins'] ?? [];
-        $norm = [];
-        foreach ($plugins as $k => $pconf) {
-            $name = is_string($pconf) ? $pconf : (!is_numeric($k) ? $k : null);
-            if (!$name) {
-                continue;
-            }
-            $pfile = $name . '.php';
-            if (file_exists($conf['src'] . '/plugins/' . $pfile)) {
-                $fullname = $conf['src'] . '/plugins/' . $pfile;
-            } else {
-                if (file_exists(__DIR__ . '/plugins/' . $pfile)) {
-                    $fullname = __DIR__ . '/plugins/' . $pfile;
-                } else {
-                    continue;
-                }
-            }
-            $norm[$name] = [
-                'filename' => $pfile,
-                'fullpath' => $fullname,
-                'conf' => is_array($pconf) ? $pconf : []
-            ];
-            require_once($fullname);
+    public function init_plugins() {
+        foreach ($this->plugins as $plugin) {
+            $plugin->init();
         }
-        return $norm;
+    }
+
+    public function get_plugin($class) {
+        foreach ($this->plugins as $plugin) {
+            if ($class == get_class($plugin)) return $plugin;
+        }
+        throw new OutOfRangeException("plugin $class not found");
     }
 
     function normalize_template_config($name, $config) {

@@ -10,7 +10,7 @@ class loader {
     public function load() {
         $db = $this->config->get_store();
         $db_store = get_class($db->db);
-        $hooks = $this->config->hooks;
+        $onload = $this->config->hooks['on_load'] ?? null;
         # TODO fetch or not
         if ($db->has_data_on_create()) {
             shell_info("store {$db_store} using old data", true);
@@ -19,26 +19,22 @@ class loader {
 
         shell_info("fetching data {$db_store}", true);
 
-        foreach ($this->config->sources as $name => $opts) {
-            if (!is_array($opts)) {
-                $opts = ['file' => $opts];
-            }
-            $def = ['loader' => $name, 'type' => $name, 'name' => $name];
-            $opts = array_merge($def, $opts);
+        foreach ($this->config->sources as $name => $loader) {
+            $opts = ['loader' => $name, 'type' => $name, 'name' => $name];
 
-            $fun = 'load_' . $opts['loader'];
+            $fun = $loader(...);
 
             shell_info("fetching $name");
 
-            foreach ($fun($opts, $this->config, $db) as $row) {
+            foreach ($fun($this->config) as $row) {
                 if (!isset($row['_type']) || !$row['_type']) {
                     #print_r($row);
                     $row['_type'] = $opts['type'];
                 }
                 $otype = $row['_type'];
                 $row['_src'] = $name;
-                if ($hooks['on_load']) {
-                    $row = $hooks['on_load']($row, $db);
+                if ($onload) {
+                    $row = $onload($row, $db);
                 }
                 if (!$row) {
                     $db->rejected($otype);

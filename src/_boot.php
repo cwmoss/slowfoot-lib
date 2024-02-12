@@ -66,7 +66,7 @@ if (!defined('PATH_PREFIX')) {
     if (PHP_SAPI == 'cli-server') {
         define('PATH_PREFIX', "");
     } else {
-        define('PATH_PREFIX', $config['path_prefix']);
+        define('PATH_PREFIX', $config->path_prefix);
     }
 }
 

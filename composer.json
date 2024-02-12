@@ -16,6 +16,7 @@
     "bin/slowfoot"
   ],
   "require": {
+    "composer-runtime-api": "^2.2.2",
     "spatie/async": "^1.5",
     "erusev/parsedown": "^1.7",
     "ausi/slug-generator": "^1.1",
