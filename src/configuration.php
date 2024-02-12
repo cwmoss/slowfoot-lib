@@ -69,7 +69,7 @@ class configuration {
         }
         $this->assets = $this->normalize_assets_config($this->assets);
         $this->store = $this->normalize_store_config();
-        $this->plugins = $this->init_plugins();
+        $this->init_plugins();
         $this->build = $this->normalize_build_config($this->build);
     }
 
