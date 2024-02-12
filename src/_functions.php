@@ -259,71 +259,7 @@ function get_absolute_path($path) {
     return implode(DIRECTORY_SEPARATOR, $absolutes);
 }
 
-function send_file($base, $file) {
-    $name = basename($file);
-    $full = $base . '/' . $file;
 
-    if (!file_exists($full)) {
-        header('HTTP/1.1 404 Not Found');
-        return;
-    }
-
-    $ext = pathinfo($name, PATHINFO_EXTENSION);
-
-    $types = [
-        'css' => 'text/css',
-        'js'   => 'text/javascript',
-        'jpg' => 'image/jpeg',
-        'jpeg' => 'image/jpeg',
-        'png' => 'image/png',
-        'svg' => 'image/svg+xml',
-        'html' => 'text/html',
-        'woff' => 'font/woff',
-        'woff2' => 'font/woff2',
-        'ttf' => 'font/ttf',
-        'otf' => 'font/otf'
-    ];
-
-    $type = $types[$ext];
-
-    if ($ext == 'css') {
-        $scss = $full . '.scss';
-        if (file_exists($scss)) {
-            // die(" sassc $scss $full");
-            //print "sassc $scss $full";
-            $resp = shell_command('sassc {in} {out} 2>&1', ['in' => $scss, 'out' => $full]);
-            // $ok = `sassc $scss $full`;
-            if ($resp[1] !== 0) {
-                dbg("[sassc] error", $resp);
-            }
-            //var_dump($ok);
-        }
-    }
-    header('Content-Type: ' . $type);
-
-    if ($ext == 'html') {
-        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
-        header('Cache-Control: post-check=0, pre-check=0', false);
-        header('Pragma: no-cache');
-        header('Content-Type: text/html');
-    }
-
-    readfile($full);
-}
-
-function send_asset_file($base, $file, $orig, $cache) {
-    $full = $base . '/' . $file;
-    $full = str_replace($orig, $cache, $full);
-    dbg('+++ asset route', $full);
-    //print "$full";
-    //exit;
-    header('Content-Type: image/jpg');
-    if (file_exists($full)) {
-        readfile($full);
-    } else {
-        header('HTTP/1.1 404 Not Found');
-    }
-}
 
 function dbg($txt, ...$vars) {
     // im servermodus wird der zeitstempel automatisch gesetzt

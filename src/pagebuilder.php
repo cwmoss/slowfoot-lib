@@ -2,6 +2,8 @@
 
 namespace slowfoot;
 
+use slowfoot\util\html;
+
 class pagebuilder {
 
     public template $engine;
@@ -37,7 +39,7 @@ class pagebuilder {
             $context->with('template_type', 'template')
         );
         debug_js("page", $obj);
-        debug_js("meta", \collect_data('meta', true));
+        debug_js("meta", html::collect_data('meta', true));
         return $content;
     }
 
@@ -80,7 +82,7 @@ class pagebuilder {
             $content = $this->engine->remove_tags($content, ['page-query']);
 
             debug_js("page", $qres);
-            debug_js("meta", \collect_data('meta', true));
+            debug_js("meta", html::collect_data('meta', true));
         } else {
             $content = $this->engine->run_page(
                 $requestpath,
@@ -90,7 +92,7 @@ class pagebuilder {
             );
 
             debug_js("page", []);
-            debug_js("meta", \collect_data('meta', true));
+            debug_js("meta", html::collect_data('meta', true));
         }
         return $content;
     }

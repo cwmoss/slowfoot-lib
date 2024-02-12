@@ -10,7 +10,7 @@ use Xorc_Controller;
 
 class error_handler {
 
-    public function __construct(public string $error_logfile = "") {
+    public function __construct(public string $error_logfile = "php://stderr") {
         $this->install();
     }
 

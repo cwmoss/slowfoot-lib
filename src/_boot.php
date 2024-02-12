@@ -7,8 +7,6 @@
 
 use slowfoot\configuration;
 
-new slowfoot\error_handler;
-
 ini_set('display_errors', 0);
 if (!defined('SLOWFOOT_BASE')) {
     // via php cli webserver
@@ -27,6 +25,8 @@ if (!defined('SLOWFOOT_BASE')) {
 $autoload = $internal ?? SLOWFOOT_BASE;
 #print $internal." --- ".SLOWFOOT_BASE.' --- '.$_SERVER['DOCUMENT_ROOT']; exit;
 require_once $autoload . '/vendor/autoload.php';
+
+new slowfoot\error_handler;
 
 if (!defined('SLOWFOOT_PREVIEW')) {
     define('SLOWFOOT_PREVIEW', false);

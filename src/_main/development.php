@@ -1,7 +1,19 @@
 <?php
+define('SLOWFOOT_START', microtime(true));
+
+/*
+TODO: vendor-dir vs project-dir
+*/
+$project_dir = $_SERVER['DOCUMENT_ROOT'] . '/../';
+define('SLOWFOOT_BASE', $project_dir);
+
+//require $project_dir . '/vendor/autoload.php';
+
 require __DIR__ . '/../_boot.php';
 
 use slowfoot\util\console;
+use slowfoot\util\server;
+
 use function slowfoot\template\page;
 use function slowfoot\template\template;
 use function slowfoot\template\remove_tags;
@@ -32,7 +44,7 @@ $debug = true;
 
 $router->mount('/__api', function () use ($router, $ds, $config, $src, $template_helper) {
     #dbg('server', $_SERVER);
-    send_cors();
+    server::send_cors();
     $router->get('/index', function () use ($router, $ds) {
 
         #print "hallo";
@@ -40,7 +52,7 @@ $router->mount('/__api', function () use ($router, $ds, $config, $src, $template
         //$rows = $db->run('SELECT * FROM docs LIMIT 20');
         // $rows = $db->run('SELECT _type, count(*) AS total FROM docs GROUP BY _type');
 
-        resp($ds->info());
+        server::resp($ds->info());
     });
 
     $router->get('/type/([-\w.]+)(/\d+)?', function ($type, $page = 1) use ($router, $ds) {
@@ -54,20 +66,20 @@ $router->mount('/__api', function () use ($router, $ds, $config, $src, $template
         //$rows = $db->run('SELECT * FROM docs LIMIT 20');
         //$rows = $db->q('SELECT _id, body FROM docs WHERE _type = ? LIMIT 20', $type);
 
-        resp(['rows' => $rows]);
+        server::resp(['rows' => $rows]);
     });
 
     $router->get('/id', function () use ($router, $ds) {
         $id = $_GET['id'];
         //$row = $db->row('SELECT _id, _type, body FROM docs WHERE _id = ? ', $id);
         $row = $ds->get($id);
-        resp($row);
+        server::resp($row);
     });
 
     $router->get('/fts', function () use ($router, $ds) {
         $q = $_GET['q'];
         $rows = $ds->q("SELECT _id, snippet(docs_fts,1, '<b>', '</b>', '[...]', 30) body FROM docs_fts WHERE docs_fts = ? ", $q);
-        resp($rows);
+        server::resp($rows);
     });
 
 
@@ -105,7 +117,7 @@ $router->mount('/__ui', function () use ($router, $ds) {
     $router->get('/', function () use ($router, $ds) {
         $uibase = __DIR__ . '/../../ui/build';
         #dbg("+++ ui index ++++", $uibase);
-        send_file($uibase, 'index.html');
+        server::send_file($uibase, 'index.html');
         exit;
     });
 
@@ -122,13 +134,13 @@ $router->mount('/__ui', function () use ($router, $ds) {
             exit;
         }
         dbg("__ui file", $file, $uifile);
-        resp(['ok' => $file]);
+        server::resp(['ok' => $file]);
     });
 });
 
 $router->get('/__sf/(.*)', function ($requestpath) use ($router, $ds) {
     $docbase = __DIR__ . '/../../resources';
-    send_file($docbase, $requestpath);
+    server::send_file($docbase, $requestpath);
     exit;
 });
 
@@ -144,20 +156,20 @@ $router->get($config->assets['path'] . '/' . '(.*\.\w{1,5})', function ($request
     dbg('[dev] asssets', $requestpath);
     $docbase = $_SERVER['DOCUMENT_ROOT'] . '/../var/rendered-images';
     #dbg("++ image path base", $docbase, $requestpath);
-    send_file($docbase, $requestpath);
+    server::send_file($docbase, $requestpath);
     exit;
 });
 
 $router->get('(.*\.\w{1,5})', function ($requestpath) use ($router, $ds) {
     $docbase = $_SERVER['DOCUMENT_ROOT'];
     dbg('[dev] some.doc', $requestpath);
-    send_file($docbase, $requestpath);
+    server::send_file($docbase, $requestpath);
     exit;
 });
 
 $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages, $src, $template_helper) {
     dbg('[dev] page/template', $requestpath);
-    send_nocache();
+    server::send_nocache();
     $requestpath = '/' . $requestpath;
     // startseite?
     if ($requestpath == '/' || $requestpath == '') {
@@ -200,7 +212,7 @@ $router->get('(.*)?', function ($requestpath) use ($router, $ds, $config, $pages
 
 $router->set404(function () {
     // dbg('-- 404');
-    e404();
+    server::e404();
 });
 
 $router->run();

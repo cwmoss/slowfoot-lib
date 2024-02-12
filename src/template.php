@@ -7,6 +7,8 @@ use function collect_data;
 use function dot_get;
 use slowfoot\configuration;
 use slowfoot\hook;
+use slowfoot\util\html;
+
 
 class template {
 
@@ -28,8 +30,8 @@ class template {
         );
         extract($this->load_late_template_helper($helper, $_base, $data, $_context));
 
-        collect_data();
-        collect_data('meta', (array) $_context, true);
+        html::collect_data();
+        html::collect_data('meta', (array) $_context, true);
         self::layout('-');
         ob_start();
         include $_base . '/templates/' . $_template . '.php';
@@ -58,8 +60,8 @@ class template {
         );
         extract($this->load_late_template_helper($helper, $_base, $data, $_context));
 
-        collect_data();
-        collect_data('meta', (array) $_context, true);
+        html::collect_data();
+        html::collect_data('meta', (array) $_context, true);
         self::layout('-');
         ob_start();
         include $_base . '/pages/' . $_template . '.php';

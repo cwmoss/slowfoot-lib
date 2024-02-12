@@ -48,9 +48,6 @@ class server {
         return $normalized_array;
     }
 
-
-
-
     static public function text_for($muster, $vars = array()) {
         $repl = array();
         foreach ($vars as $k => $v) {
@@ -101,31 +98,31 @@ class server {
 
     static public function e404($msg = 'not found') {
         header('HTTP/1.1 404 Not Found');
-        resp(['fail' => $msg]);
+        self::resp(['fail' => $msg]);
     }
 
     static public function e401($msg = 'unauthorized api request') {
         dbg('+++ 401 +++ ');
         header('HTTP/1.1 401 Unauthorized');
-        resp(['fail' => $msg]);
+        self::resp(['fail' => $msg]);
         exit;
     }
 
     static public function e500($msg = 'fatal error') {
         dbg('+++ 500 +++ ');
         header('HTTP/1.1 500 Bad Request');
-        resp(['fail' => $msg]);
+        self::resp(['fail' => $msg]);
         exit;
     }
 
     static public function get_json_and_raw_req() {
-        $raw = get_raw_req();
+        $raw = self::get_raw_req();
         $post = json_decode($raw, true);
         return [$post, $raw];
     }
 
     static public function get_json_req() {
-        return json_decode(get_raw_req(), true);
+        return json_decode(self::get_raw_req(), true);
     }
 
     static public function get_raw_req() {
@@ -187,5 +184,71 @@ class server {
             }
         }
         throw new OutOfBoundsException("could not find a free port");
+    }
+
+    static public function send_file($base, $file) {
+        $name = basename($file);
+        $full = $base . '/' . $file;
+
+        if (!file_exists($full)) {
+            header('HTTP/1.1 404 Not Found');
+            return;
+        }
+
+        $ext = pathinfo($name, PATHINFO_EXTENSION);
+
+        $types = [
+            'css' => 'text/css',
+            'js'   => 'text/javascript',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'svg' => 'image/svg+xml',
+            'html' => 'text/html',
+            'woff' => 'font/woff',
+            'woff2' => 'font/woff2',
+            'ttf' => 'font/ttf',
+            'otf' => 'font/otf'
+        ];
+
+        $type = $types[$ext];
+
+        if ($ext == 'css') {
+            $scss = $full . '.scss';
+            if (file_exists($scss)) {
+                // die(" sassc $scss $full");
+                //print "sassc $scss $full";
+                $resp = self::shell_command('sassc {in} {out} 2>&1', ['in' => $scss, 'out' => $full]);
+                // $ok = `sassc $scss $full`;
+                if ($resp[1] !== 0) {
+                    dbg("[sassc] error", $resp);
+                }
+                //var_dump($ok);
+            }
+        }
+        header('Content-Type: ' . $type);
+
+        if ($ext == 'html') {
+            header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+            header('Cache-Control: post-check=0, pre-check=0', false);
+            header('Pragma: no-cache');
+            header('Content-Type: text/html');
+        }
+
+        readfile($full);
+    }
+
+    static public function send_asset_file($base, $file, $orig, $cache) {
+        $full = $base . '/' . $file;
+        $full = str_replace($orig, $cache, $full);
+        dbg('+++ asset route', $full);
+        //print "$full";
+        //exit;
+        header('Content-Type: image/jpg');
+        if (file_exists($full)) {
+            readfile($full);
+        } else {
+            header('HTTP/1.1 404 Not Found');
+        }
     }
 }
