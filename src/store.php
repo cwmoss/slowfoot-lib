@@ -52,21 +52,23 @@ class store {
         return $this->db->data();
     }
 
-    public function get($id) {
+    public function id_maybe_object_or_array(int|string|array|object $id, $propname = '_id') {
         if (is_object($id)) {
-            $id = $id->_id;
+            $id = $id->$propname;
         } elseif (is_array($id)) {
-            $id = $id['_id'];
+            $id = $id[$propname];
         }
+        return (string) $id;
+    }
+
+    public function get($id) {
+        $id = $this->id_maybe_object_or_array($id);
         return $this->db->get('docs', $id);
     }
 
     public function ref($id) {
-        if (is_object($id)) {
-            $id = $id->_ref;
-        } elseif (is_array($id)) {
-            $id = $id['_ref'];
-        }
+        if (!$id) return;
+        $id = $this->id_maybe_object_or_array($id, '_ref');
         return $this->db->get('docs', $id);
     }
 
@@ -99,12 +101,8 @@ class store {
     }
 
     public function add_ref($src_id, $src_prop, $dest) {
-        if (is_object($src_id)) {
-            $src_id = $src_id->_id;
-        }
-        if (is_object($dest)) {
-            $dest = $dest->_id;
-        }
+        $src_id = $this->id_maybe_object_or_array($src_id);
+        $dest = $this->id_maybe_object_or_array($dest);
         $this->db->add_ref($src_id, $src_prop, $dest);
     }
 
@@ -129,12 +127,8 @@ class store {
         return PATH_PREFIX . $this->get_fpath($id, $name);
     }
 
-    public function get_fpath(string|array|object $id, $name = null) {
-        if (is_object($id)) {
-            $id = $id->_id;
-        } elseif (is_array($id)) {
-            $id = $id['_id'];
-        }
+    public function get_fpath(int|string|array|object $id, $name = null) {
+        $id = $this->id_maybe_object_or_array($id);
         if (!$name) {
             $name = '_';
         }
@@ -146,7 +140,11 @@ class store {
     }
 
     public function rejected($type) {
-        $this->info['rejected'][$type]++;
+        if (!isset($this->info['rejected'][$type])) {
+            $this->info['rejected'][$type] = 1;
+        } else {
+            $this->info['rejected'][$type]++;
+        }
     }
 
     public function info() {
