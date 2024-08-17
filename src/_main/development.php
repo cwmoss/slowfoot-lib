@@ -1,6 +1,7 @@
 <?php
 define('SLOWFOOT_START', microtime(true));
-
+error_reporting(E_ALL);
+ini_set("display_errors", 0);
 /*
 TODO: vendor-dir vs project-dir
 */

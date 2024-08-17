@@ -1,7 +1,10 @@
 <?php
+require $project_dir . '/vendor/autoload.php';
 
 use slowfoot\util\console;
 
+error_reporting(E_ALL);
+ini_set("display_errors", 0);
 $slft_lib_base = dirname(__DIR__);
 
 $doc = <<<DOC

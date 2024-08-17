@@ -6,6 +6,4 @@ $project_dir = isset($_composer_bin_dir) ? dirname(dirname($bin_dir)) : dirname(
 
 define('SLOWFOOT_BASE', $project_dir);
 
-require $project_dir . '/vendor/autoload.php';
-
 require $project_dir . '/vendor/cwmoss/slowfoot-lib/src/_main/cli.php';
