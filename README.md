@@ -1,3 +1,6 @@
+[![pages-build-deployment](https://github.com/cwmoss/slowfoot-lib/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/cwmoss/slowfoot-lib/actions/workflows/pages/pages-build-deployment)
+
+
 # slowfoot lib
 
 ## config
